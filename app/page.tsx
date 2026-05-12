@@ -3,6 +3,7 @@
 import Image from "next/image";
 import {
   ArrowRight,
+  ArrowUpRight,
   Car,
   CheckCircle2,
   ChevronLeft,
@@ -22,8 +23,8 @@ type NavItem =
 // Main homepage navigation. Route links open full pages, target links scroll inside the homepage.
 const navItems: NavItem[] = [
   { label: "Car Stocks", href: "/car-stocks" },
-  { label: "Pre-Owned", target: "deals" },
-  { label: "Reconditioned", target: "purpose" },
+  { label: "Pre-Owned", href: "/pre-owned" },
+  { label: "Reconditioned", href: "/reconditioned" },
   { label: "Verify Auction Sheet", href: "/verify-auction-sheet" },
 ];
 
@@ -51,6 +52,7 @@ const heroSlides = [
 const stock = [
   {
     id: "noah-white-2021",
+    slug: "toyota-alphard",
     brand: "Toyota",
     name: "Toyota Noah",
     year: "2021 MPV",
@@ -59,6 +61,7 @@ const stock = [
   },
   {
     id: "noah-black-2021",
+    slug: "mercedes-s560e",
     brand: "Toyota",
     name: "Toyota Noah",
     year: "2021 MPV",
@@ -67,6 +70,7 @@ const stock = [
   },
   {
     id: "noah-pearl-2021",
+    slug: "bmw-745le",
     brand: "Toyota",
     name: "Toyota Noah",
     year: "2021 MPV",
@@ -75,6 +79,7 @@ const stock = [
   },
   {
     id: "noah-2023",
+    slug: "land-cruiser-lc300",
     brand: "Toyota",
     name: "Toyota Noah",
     year: "2023 MPV",
@@ -83,6 +88,7 @@ const stock = [
   },
   {
     id: "axio-2021",
+    slug: "lexus-rx500h",
     brand: "Toyota",
     name: "Toyota Axio",
     year: "2021 Sedan",
@@ -91,6 +97,7 @@ const stock = [
   },
   {
     id: "voxy-2021",
+    slug: "bmw-x7-black",
     brand: "Toyota",
     name: "Toyota Voxy",
     year: "2021 MPV",
@@ -99,6 +106,7 @@ const stock = [
   },
   {
     id: "esquire-2020",
+    slug: "range-rover-2020",
     brand: "Toyota",
     name: "Toyota Esquire",
     year: "2020 MPV",
@@ -107,6 +115,7 @@ const stock = [
   },
   {
     id: "harrier-2021",
+    slug: "land-cruiser-vx-2016",
     brand: "Toyota",
     name: "Toyota Harrier",
     year: "2021 SUV",
@@ -115,6 +124,7 @@ const stock = [
   },
   {
     id: "allion-2020",
+    slug: "range-rover-2019",
     brand: "Toyota",
     name: "Toyota Allion",
     year: "2020 Sedan",
@@ -123,6 +133,7 @@ const stock = [
   },
   {
     id: "premio-2021",
+    slug: "land-cruiser-zx-v8",
     brand: "Toyota",
     name: "Toyota Premio",
     year: "2021 Sedan",
@@ -154,6 +165,26 @@ const categories = [
   },
 ];
 
+const preferenceOptions = [
+  {
+    title: "Reconditioned Unit",
+    href: "/reconditioned",
+    image: "/hero-slide-2.webp",
+  },
+  {
+    title: "Pre-owned Unit",
+    href: "/pre-owned",
+    image: "/hero-slide-3.webp",
+  },
+  {
+    title: "BYD",
+    href: "/car-stocks",
+    image: "/cat-crossover.webp",
+  },
+];
+
+const brandLogos = ["AUDI", "BMW", "BYD", "HONDA", "JAGUAR", "LAND ROVER", "LEXUS"];
+
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 }
@@ -171,6 +202,7 @@ export default function Home() {
   const stockRowRef = useRef<HTMLDivElement>(null);
   const stockDragRef = useRef({
     active: false,
+    moved: false,
     hovered: false,
     startX: 0,
     startScrollLeft: 0,
@@ -268,8 +300,8 @@ export default function Home() {
       return;
     }
 
-    event.preventDefault();
     stockDragRef.current.active = true;
+    stockDragRef.current.moved = false;
     stockDragRef.current.startX = event.clientX;
     stockDragRef.current.startScrollLeft = row.scrollLeft;
     setStockDragging(true);
@@ -284,8 +316,11 @@ export default function Home() {
     }
 
     const resetPoint = row.scrollWidth / 2;
-    event.preventDefault();
     const dragDistance = event.clientX - stockDragRef.current.startX;
+    if (Math.abs(dragDistance) > 5) {
+      stockDragRef.current.moved = true;
+      event.preventDefault();
+    }
     let nextScrollLeft = stockDragRef.current.startScrollLeft - dragDistance * 1.35;
 
     if (nextScrollLeft < 0) {
@@ -313,6 +348,13 @@ export default function Home() {
   function stopStockDrag() {
     stockDragRef.current.active = false;
     setStockDragging(false);
+  }
+
+  function preventStockClickAfterDrag(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (stockDragRef.current.moved) {
+      event.preventDefault();
+      stockDragRef.current.moved = false;
+    }
   }
 
   return (
@@ -402,76 +444,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="deals-section" id="deals">
-        <div className="section-heading">
-          <h1>Unbeatable Deals</h1>
-          <p>Bringing you the best prices with a commitment to customer care.</p>
-        </div>
-
-        <div
-          ref={stockRowRef}
-          className={stockDragging ? "stock-row dragging" : "stock-row"}
-          aria-label="Auto sliding vehicle stock list"
-          onPointerDown={handleStockPointerDown}
-          onPointerMove={handleStockPointerMove}
-          onPointerUp={handleStockPointerUp}
-          onPointerCancel={handleStockPointerUp}
-          onMouseEnter={() => {
-            stockDragRef.current.hovered = true;
-          }}
-          onMouseLeave={() => {
-            stockDragRef.current.hovered = false;
-            stopStockDrag();
-          }}
-        >
-          <div className="stock-track">
-            {carouselStock.map((item, index) => (
-              <article className="vehicle-card" key={`${item.id}-${index}`}>
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  width={340}
-                  height={340}
-                  draggable={false}
-                  suppressHydrationWarning
-                />
-                <div className="vehicle-meta">
-                  <span className="maker">
-                    <Car size={18} /> {item.brand}
-                  </span>
-                  <h2>{item.name}</h2>
-                  <span className="accent-line" />
-                  <p>{item.year}</p>
-                  <strong>BDT {item.price} Lacs</strong>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="budget-panel">
-          <div>
-            <h2>Looking in a budget?</h2>
-            <p>Set your price range to discover available options.</p>
-          </div>
-          <label className="range-control">
-            <span>~ BDT 10L</span>
-            <input
-              type="range"
-              min="10"
-              max="54"
-              value={budget}
-              onChange={(event) => setBudget(Number(event.target.value))}
-            />
-            <span>{budget}L</span>
-          </label>
-          <button type="button" onClick={() => setSearchOpen(true)}>
-            <Search size={17} />
-            Search
-          </button>
-        </div>
-      </section>
-
       <section className="purpose-section" id="purpose">
         <h2>Explore vehicles that suit your purpose</h2>
         <div className="category-row">
@@ -499,31 +471,112 @@ export default function Home() {
           <div className="verify-copy">
             <h2>Verify any auction sheet</h2>
             <p>
-              At Reliant Motors, we provide authentic auction sheet verification to ensure you are confident with your
-              purchase.
+              At Recon Imports, our expert Auction Sheet Verification service helps you verify your vehicle's true
+              history, condition, and mileage before you buy.
             </p>
-            <ul>
-              <li>Enter Chassis Number or VIN</li>
-              <li>Confirm Order</li>
-              <li>Receive Verified Report</li>
-            </ul>
-            <div className="vin-form">
-              <input
-                value={auctionVin}
-                onChange={(event) => setAuctionVin(event.target.value)}
-                placeholder="Chassis number or VIN"
-                aria-label="Chassis number or VIN"
-              />
-              <button type="button" onClick={() => (window.location.href = "/verify-auction-sheet")}>
-                Get Verified <ArrowRight size={18} />
-              </button>
-            </div>
           </div>
-          <div className="auction-sheet" aria-hidden="true">
-            <div className="sheet-grid" />
-            <CheckCircle2 size={70} />
+          <a className="verify-link" href="/verify-auction-sheet">
+            Get Verified <ArrowRight size={18} />
+          </a>
+        </div>
+      </section>
+
+      <section className="deals-section" id="deals">
+        <div className="section-heading">
+          <h1>Unbeatable Deals</h1>
+          <p>Bringing you the best prices with a commitment to customer care.</p>
+        </div>
+        <a className="see-all-link" href="/car-stocks">
+          See All
+        </a>
+
+        <div
+          ref={stockRowRef}
+          className={stockDragging ? "stock-row dragging" : "stock-row"}
+          aria-label="Auto sliding vehicle stock list"
+          onPointerDown={handleStockPointerDown}
+          onPointerMove={handleStockPointerMove}
+          onPointerUp={handleStockPointerUp}
+          onPointerCancel={handleStockPointerUp}
+          onMouseEnter={() => {
+            stockDragRef.current.hovered = true;
+          }}
+          onMouseLeave={() => {
+            stockDragRef.current.hovered = false;
+            stopStockDrag();
+          }}
+        >
+          <div className="stock-track">
+            {carouselStock.map((item, index) => (
+              <a
+                className="vehicle-card"
+                draggable={false}
+                href={`/car-stocks/${item.slug}`}
+                key={`${item.id}-${index}`}
+                onClick={preventStockClickAfterDrag}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={340}
+                  height={340}
+                  draggable={false}
+                  suppressHydrationWarning
+                />
+                <div className="vehicle-meta">
+                  <span className="maker">
+                    <Car size={18} /> {item.brand}
+                  </span>
+                  <h2>{item.name}</h2>
+                  <span className="accent-line" />
+                  <p>{item.year}</p>
+                  <strong>BDT {item.price} Lacs</strong>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
+      </section>
+
+      <section className="preference-section" aria-labelledby="preference-heading">
+        <h2 id="preference-heading">Choose per your preference</h2>
+        <div className="preference-grid">
+          {preferenceOptions.map((option) => (
+            <a className="preference-card" href={option.href} key={option.title}>
+              <Image src={option.image} alt={option.title} fill sizes="(max-width: 860px) 100vw, 33vw" />
+              <span>{option.title}</span>
+              <i aria-hidden="true">
+                <ArrowUpRight size={24} />
+              </i>
+            </a>
+          ))}
+        </div>
+
+        <div className="brand-logo-row" aria-label="Available brands">
+          {brandLogos.map((brand) => (
+            <a className="brand-logo-card" href="/car-stocks" key={brand}>
+              <span>{brand}</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="brand-logo-dots" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+
+        <section className="consult-banner" aria-label="Connect to consult">
+          <Image src="/hero-slide-1.webp" alt="" fill sizes="100vw" />
+          <div className="consult-copy">
+            <h2>Connect to Consult</h2>
+            <p>
+              Our expert sales team is here to assist you to choose your vehicle according to your necessity, choice and
+              preference.
+            </p>
+            <a href="tel:+8801886589009">Book An Appointment</a>
+          </div>
+        </section>
       </section>
 
       {/* Footer: dark wave footer with current site links, newsletter signup, and social channels. */}
@@ -557,6 +610,7 @@ export default function Home() {
                 onChange={(event) => setNewsletter(event.target.value)}
                 placeholder="Your Email Address"
                 type="email"
+                suppressHydrationWarning
               />
               <button type="button">Subscribe</button>
             </label>
@@ -600,6 +654,7 @@ export default function Home() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search by model, type, or year"
+                suppressHydrationWarning
               />
             </label>
             <p>{filteredStock.length} vehicles match your current search.</p>

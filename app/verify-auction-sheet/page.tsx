@@ -29,13 +29,14 @@ export default function VerifyAuctionSheetPage() {
           <img src="/recon-logo.webp" alt="Recon Imports" />
         </a>
         <nav aria-label="Verify auction sheet navigation">
+          <a href="/">Home</a>
           <a href="/car-stocks">
             Car Stocks
           </a>
-          <a href="/">Home</a>
-          <a href="/#deals">
+          <a href="/pre-owned">
             Pre-Owned
           </a>
+          <a href="/reconditioned">Reconditioned</a>
           <a className="active" href="/verify-auction-sheet">
             Verify Auction Sheet
           </a>
