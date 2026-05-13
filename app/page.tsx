@@ -15,6 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { brandOptions } from "./car-stocks/brands";
+import { formatPrice, inventory } from "./car-stocks/inventory";
 
 type NavItem =
   | { label: string; href: string; target?: never }
@@ -23,9 +25,11 @@ type NavItem =
 // Main homepage navigation. Route links open full pages, target links scroll inside the homepage.
 const navItems: NavItem[] = [
   { label: "Car Stocks", href: "/car-stocks" },
-  { label: "Pre-Owned", href: "/pre-owned" },
   { label: "Reconditioned", href: "/reconditioned" },
-  { label: "Verify Auction Sheet", href: "/verify-auction-sheet" },
+  { label: "EVS", href: "/ev" },
+  { label: "Pre-Owner", href: "/pre-owned" },
+  { label: "Pre-Order", href: "/pre-order" },
+  { label: "Send Requirements", href: "/send-requirements" },
 ];
 
 const heroSlides = [
@@ -49,118 +53,41 @@ const heroSlides = [
   },
 ];
 
-const stock = [
-  {
-    id: "noah-white-2021",
-    slug: "toyota-alphard",
-    brand: "Toyota",
-    name: "Toyota Noah",
-    year: "2021 MPV",
-    price: 37,
-    image: "/stock-noah-white.webp",
-  },
-  {
-    id: "noah-black-2021",
-    slug: "mercedes-s560e",
-    brand: "Toyota",
-    name: "Toyota Noah",
-    year: "2021 MPV",
-    price: 36.5,
-    image: "/stock-noah-black.webp",
-  },
-  {
-    id: "noah-pearl-2021",
-    slug: "bmw-745le",
-    brand: "Toyota",
-    name: "Toyota Noah",
-    year: "2021 MPV",
-    price: 37,
-    image: "/stock-noah-pearl.webp",
-  },
-  {
-    id: "noah-2023",
-    slug: "land-cruiser-lc300",
-    brand: "Toyota",
-    name: "Toyota Noah",
-    year: "2023 MPV",
-    price: 54,
-    image: "/stock-noah-2023.webp",
-  },
-  {
-    id: "axio-2021",
-    slug: "lexus-rx500h",
-    brand: "Toyota",
-    name: "Toyota Axio",
-    year: "2021 Sedan",
-    price: 29,
-    image: "/stock-axio.webp",
-  },
-  {
-    id: "voxy-2021",
-    slug: "bmw-x7-black",
-    brand: "Toyota",
-    name: "Toyota Voxy",
-    year: "2021 MPV",
-    price: 39,
-    image: "/stock-noah-black.webp",
-  },
-  {
-    id: "esquire-2020",
-    slug: "range-rover-2020",
-    brand: "Toyota",
-    name: "Toyota Esquire",
-    year: "2020 MPV",
-    price: 35,
-    image: "/stock-noah-pearl.webp",
-  },
-  {
-    id: "harrier-2021",
-    slug: "land-cruiser-vx-2016",
-    brand: "Toyota",
-    name: "Toyota Harrier",
-    year: "2021 SUV",
-    price: 51,
-    image: "/stock-noah-2023.webp",
-  },
-  {
-    id: "allion-2020",
-    slug: "range-rover-2019",
-    brand: "Toyota",
-    name: "Toyota Allion",
-    year: "2020 Sedan",
-    price: 31,
-    image: "/stock-axio.webp",
-  },
-  {
-    id: "premio-2021",
-    slug: "land-cruiser-zx-v8",
-    brand: "Toyota",
-    name: "Toyota Premio",
-    year: "2021 Sedan",
-    price: 34,
-    image: "/stock-noah-white.webp",
-  },
-];
-
 const categories = [
   {
+    title: "Sedan",
+    href: "/sedan",
+    copy: "Comfortable city driving with a refined passenger-first profile.",
+    image: "/stock-axio.webp",
+  },
+  {
+    title: "Hatchback",
+    href: "/hatchback",
+    copy: "Compact, practical, and easy to handle for daily movement.",
+    image: "/stock-noah-white.webp",
+  },
+  {
     title: "SUV",
+    href: "/suv",
     copy: "Spacious and versatile for power and adventure.",
     image: "/cat-suv.webp",
   },
   {
-    title: "MPV",
-    copy: "Multi-purpose vehicles designed for maximum seating and flexibility.",
-    image: "/cat-mpv.webp",
-  },
-  {
     title: "Crossover",
+    href: "/crossover",
     copy: "Blending sedan agility with the versatile, elevated stance of an SUV.",
     image: "/cat-crossover.webp",
   },
   {
-    title: "Wagon",
-    copy: "Practical cars with extra room for family and cargo.",
+    title: "MPV",
+    href: "/mpv",
+    copy: "Multi-purpose vehicles designed for maximum seating and flexibility.",
+    image: "/cat-mpv.webp",
+  },
+  {
+    title: "Passenger Van",
+    href: "/passenger-van",
+    copy: "Roomy passenger transport for groups, families, and business needs.",
     image: "/cat-wagon.webp",
   },
 ];
@@ -177,13 +104,15 @@ const preferenceOptions = [
     image: "/hero-slide-3.webp",
   },
   {
-    title: "BYD",
-    href: "/car-stocks",
+    title: "Pre-Order Unit",
+    href: "/pre-order",
     image: "/cat-crossover.webp",
   },
 ];
 
-const brandLogos = ["AUDI", "BMW", "BYD", "HONDA", "JAGUAR", "LAND ROVER", "LEXUS"];
+const brandLogoPages = Array.from({ length: Math.ceil(brandOptions.length / 9) }, (_, index) =>
+  brandOptions.slice(index * 9, index * 9 + 9),
+);
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -198,36 +127,58 @@ export default function Home() {
   const [auctionVin, setAuctionVin] = useState("");
   const [newsletter, setNewsletter] = useState("");
   const [stockDragging, setStockDragging] = useState(false);
+  const [purposeDragging, setPurposeDragging] = useState(false);
+  const [brandSlide, setBrandSlide] = useState(0);
   const [headerGlass, setHeaderGlass] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const stockRowRef = useRef<HTMLDivElement>(null);
+  const purposeRowRef = useRef<HTMLDivElement>(null);
   const stockDragRef = useRef({
     active: false,
     moved: false,
     hovered: false,
+    pendingHref: "",
+    suppressClick: false,
+    startX: 0,
+    startScrollLeft: 0,
+  });
+  const purposeDragRef = useRef({
+    active: false,
+    moved: false,
+    hovered: false,
+    pendingHref: "",
+    suppressClick: false,
     startX: 0,
     startScrollLeft: 0,
   });
 
+  const latestStock = useMemo(() => inventory.slice(-10).reverse(), []);
   const filteredStock = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    return stock.filter((item) => {
-      const matchesBudget = item.price <= budget;
+    return inventory.filter((item) => {
+      const matchesBudget = item.price <= budget * 100000;
       const matchesQuery =
         !normalizedQuery ||
-        `${item.brand} ${item.name} ${item.year}`.toLowerCase().includes(normalizedQuery);
+        `${item.brand} ${item.name} ${item.year} ${item.body} ${item.type}`.toLowerCase().includes(normalizedQuery);
 
       return matchesBudget && matchesQuery;
     });
   }, [budget, query]);
-  const carouselStock = [...filteredStock, ...filteredStock];
+  const carouselStock = [...latestStock, ...latestStock];
+  const carouselCategories = [...categories, ...categories];
 
   useEffect(() => {
     let animationFrame = 0;
+    let isRunning = false;
 
     function animateStockRow() {
       const row = stockRowRef.current;
 
-      if (row && filteredStock.length > 0 && !stockDragRef.current.active && !stockDragRef.current.hovered) {
+      if (!isRunning) {
+        return;
+      }
+
+      if (row && latestStock.length > 0 && !stockDragRef.current.active && !stockDragRef.current.hovered) {
         const resetPoint = row.scrollWidth / 2;
         row.scrollLeft += 0.65;
 
@@ -239,10 +190,120 @@ export default function Home() {
       animationFrame = requestAnimationFrame(animateStockRow);
     }
 
-    animationFrame = requestAnimationFrame(animateStockRow);
+    function startStockRow() {
+      cancelAnimationFrame(animationFrame);
+      stockDragRef.current.active = false;
+      stockDragRef.current.moved = false;
+      stockDragRef.current.pendingHref = "";
+      stockDragRef.current.suppressClick = false;
+      isRunning = true;
+      animationFrame = requestAnimationFrame(animateStockRow);
+    }
 
-    return () => cancelAnimationFrame(animationFrame);
-  }, [filteredStock.length]);
+    function handleVisibleStockRow() {
+      if (document.visibilityState === "visible") {
+        startStockRow();
+      }
+    }
+
+    startStockRow();
+    window.addEventListener("pageshow", startStockRow);
+    window.addEventListener("focus", startStockRow);
+    document.addEventListener("visibilitychange", handleVisibleStockRow);
+
+    return () => {
+      isRunning = false;
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("pageshow", startStockRow);
+      window.removeEventListener("focus", startStockRow);
+      document.removeEventListener("visibilitychange", handleVisibleStockRow);
+    };
+  }, [latestStock.length]);
+
+  useEffect(() => {
+    let animationFrame = 0;
+    let initialized = false;
+    let isRunning = false;
+
+    function animatePurposeRow() {
+      const row = purposeRowRef.current;
+
+      if (!isRunning) {
+        return;
+      }
+
+      if (row) {
+        const resetPoint = row.scrollWidth / 2;
+
+        if (!initialized && resetPoint > 0) {
+          row.scrollLeft = resetPoint;
+          initialized = true;
+        }
+
+        if (resetPoint > 0 && !purposeDragRef.current.active) {
+          if (row.scrollLeft <= 1) {
+            row.scrollLeft += resetPoint;
+          }
+
+          row.scrollLeft -= 1.35;
+        }
+      }
+
+      animationFrame = requestAnimationFrame(animatePurposeRow);
+    }
+
+    function startPurposeRow() {
+      cancelAnimationFrame(animationFrame);
+      purposeDragRef.current.active = false;
+      purposeDragRef.current.moved = false;
+      purposeDragRef.current.pendingHref = "";
+      purposeDragRef.current.suppressClick = false;
+      setPurposeDragging(false);
+      initialized = false;
+      isRunning = true;
+      animationFrame = requestAnimationFrame(animatePurposeRow);
+    }
+
+    function handleVisiblePurposeRow() {
+      if (document.visibilityState === "visible") {
+        startPurposeRow();
+      }
+    }
+
+    startPurposeRow();
+    window.addEventListener("pageshow", startPurposeRow);
+    window.addEventListener("focus", startPurposeRow);
+    document.addEventListener("visibilitychange", handleVisiblePurposeRow);
+
+    return () => {
+      isRunning = false;
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("pageshow", startPurposeRow);
+      window.removeEventListener("focus", startPurposeRow);
+      document.removeEventListener("visibilitychange", handleVisiblePurposeRow);
+    };
+  }, []);
+
+  useEffect(() => {
+    function resetPurposeLoop() {
+      const row = purposeRowRef.current;
+
+      if (!row) {
+        return;
+      }
+
+      const resetPoint = row.scrollWidth / 2;
+
+      if (resetPoint > 0) {
+        row.scrollLeft = resetPoint;
+      }
+    }
+
+    resetPurposeLoop();
+    window.addEventListener("resize", resetPurposeLoop);
+
+    return () => window.removeEventListener("resize", resetPurposeLoop);
+  }, []);
 
   useEffect(() => {
     if (stockRowRef.current) {
@@ -259,14 +320,73 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const interval = window.setInterval(() => {
+      setBrandSlide((current) => (current + 1) % brandLogoPages.length);
+    }, 3600);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     function updateHeaderGlass() {
-      setHeaderGlass(window.scrollY > 24);
+      const shouldUseGlass = window.scrollY > 24;
+      setHeaderGlass(shouldUseGlass);
+      headerRef.current?.classList.toggle("glass", shouldUseGlass);
     }
 
     updateHeaderGlass();
     window.addEventListener("scroll", updateHeaderGlass, { passive: true });
+    window.addEventListener("pageshow", updateHeaderGlass);
+    window.addEventListener("focus", updateHeaderGlass);
+    window.addEventListener("hashchange", updateHeaderGlass);
 
-    return () => window.removeEventListener("scroll", updateHeaderGlass);
+    return () => {
+      window.removeEventListener("scroll", updateHeaderGlass);
+      window.removeEventListener("pageshow", updateHeaderGlass);
+      window.removeEventListener("focus", updateHeaderGlass);
+      window.removeEventListener("hashchange", updateHeaderGlass);
+    };
+  }, []);
+
+  useEffect(() => {
+    function restoreHomeInteractions() {
+      stockDragRef.current.active = false;
+      stockDragRef.current.moved = false;
+      stockDragRef.current.pendingHref = "";
+      stockDragRef.current.suppressClick = false;
+      purposeDragRef.current.active = false;
+      purposeDragRef.current.moved = false;
+      purposeDragRef.current.pendingHref = "";
+      purposeDragRef.current.suppressClick = false;
+      setStockDragging(false);
+      setPurposeDragging(false);
+      const syncHeaderGlass = () => {
+        const shouldUseGlass = window.scrollY > 24;
+        setHeaderGlass(shouldUseGlass);
+        headerRef.current?.classList.toggle("glass", shouldUseGlass);
+      };
+      syncHeaderGlass();
+      requestAnimationFrame(syncHeaderGlass);
+      window.setTimeout(syncHeaderGlass, 80);
+      window.setTimeout(syncHeaderGlass, 260);
+      window.setTimeout(syncHeaderGlass, 700);
+    }
+
+    function handleVisibleRestore() {
+      if (document.visibilityState === "visible") {
+        restoreHomeInteractions();
+      }
+    }
+
+    window.addEventListener("pageshow", restoreHomeInteractions);
+    window.addEventListener("focus", restoreHomeInteractions);
+    document.addEventListener("visibilitychange", handleVisibleRestore);
+
+    return () => {
+      window.removeEventListener("pageshow", restoreHomeInteractions);
+      window.removeEventListener("focus", restoreHomeInteractions);
+      document.removeEventListener("visibilitychange", handleVisibleRestore);
+    };
   }, []);
 
   function nextSlide() {
@@ -279,8 +399,16 @@ export default function Home() {
 
   function downloadStockList() {
     const rows = [
-      ["Brand", "Model", "Year Type", "Price"],
-      ...stock.map((item) => [item.brand, item.name, item.year, `BDT ${item.price} Lacs`]),
+      ["Brand", "Model", "Year", "Body", "Type", "Mileage", "Price"],
+      ...inventory.map((item) => [
+        item.brand,
+        item.name,
+        item.year,
+        item.body,
+        item.type,
+        item.mileage,
+        formatPrice(item.price),
+      ]),
     ];
     const csv = rows.map((row) => row.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -302,6 +430,9 @@ export default function Home() {
 
     stockDragRef.current.active = true;
     stockDragRef.current.moved = false;
+    stockDragRef.current.pendingHref =
+      (event.target as HTMLElement).closest<HTMLAnchorElement>(".deals-stock-card")?.getAttribute("href") ?? "";
+    stockDragRef.current.suppressClick = false;
     stockDragRef.current.startX = event.clientX;
     stockDragRef.current.startScrollLeft = row.scrollLeft;
     setStockDragging(true);
@@ -336,8 +467,28 @@ export default function Home() {
 
   function handleStockPointerUp(event: React.PointerEvent<HTMLDivElement>) {
     const row = stockRowRef.current;
+    const shouldNavigate = !stockDragRef.current.moved && stockDragRef.current.pendingHref;
+    const nextHref = stockDragRef.current.pendingHref;
 
     stockDragRef.current.active = false;
+    stockDragRef.current.pendingHref = "";
+    setStockDragging(false);
+
+    if (row?.hasPointerCapture(event.pointerId)) {
+      row.releasePointerCapture(event.pointerId);
+    }
+
+    if (shouldNavigate) {
+      stockDragRef.current.suppressClick = true;
+      window.location.assign(nextHref);
+    }
+  }
+
+  function cancelStockDrag(event: React.PointerEvent<HTMLDivElement>) {
+    const row = stockRowRef.current;
+
+    stockDragRef.current.active = false;
+    stockDragRef.current.pendingHref = "";
     setStockDragging(false);
 
     if (row?.hasPointerCapture(event.pointerId)) {
@@ -347,14 +498,106 @@ export default function Home() {
 
   function stopStockDrag() {
     stockDragRef.current.active = false;
+    stockDragRef.current.pendingHref = "";
     setStockDragging(false);
   }
 
-  function preventStockClickAfterDrag(event: React.MouseEvent<HTMLAnchorElement>) {
-    if (stockDragRef.current.moved) {
+  function handleDealCardClick(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (stockDragRef.current.moved || stockDragRef.current.suppressClick) {
       event.preventDefault();
       stockDragRef.current.moved = false;
+      stockDragRef.current.suppressClick = false;
+      return;
     }
+
+    event.preventDefault();
+    window.location.assign(href);
+  }
+
+  function handlePurposePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    const row = purposeRowRef.current;
+
+    if (!row) {
+      return;
+    }
+
+    purposeDragRef.current.active = true;
+    purposeDragRef.current.moved = false;
+    purposeDragRef.current.pendingHref =
+      (event.target as HTMLElement).closest<HTMLAnchorElement>(".category-card")?.getAttribute("href") ?? "";
+    purposeDragRef.current.startX = event.clientX;
+    purposeDragRef.current.startScrollLeft = row.scrollLeft;
+    setPurposeDragging(true);
+    row.setPointerCapture(event.pointerId);
+  }
+
+  function handlePurposePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const row = purposeRowRef.current;
+
+    if (!row || !purposeDragRef.current.active) {
+      return;
+    }
+
+    const resetPoint = row.scrollWidth / 2;
+    const dragDistance = event.clientX - purposeDragRef.current.startX;
+    if (Math.abs(dragDistance) > 5) {
+      purposeDragRef.current.moved = true;
+      event.preventDefault();
+    }
+
+    let nextScrollLeft = purposeDragRef.current.startScrollLeft - dragDistance * 1.25;
+
+    if (nextScrollLeft < 0) {
+      nextScrollLeft += resetPoint;
+    }
+
+    if (nextScrollLeft >= resetPoint) {
+      nextScrollLeft -= resetPoint;
+    }
+
+    row.scrollLeft = nextScrollLeft;
+  }
+
+  function handlePurposePointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    const row = purposeRowRef.current;
+    const shouldNavigate = !purposeDragRef.current.moved && purposeDragRef.current.pendingHref;
+    const nextHref = purposeDragRef.current.pendingHref;
+
+    purposeDragRef.current.active = false;
+    purposeDragRef.current.pendingHref = "";
+    setPurposeDragging(false);
+
+    if (row?.hasPointerCapture(event.pointerId)) {
+      row.releasePointerCapture(event.pointerId);
+    }
+
+    if (shouldNavigate) {
+      purposeDragRef.current.suppressClick = true;
+      window.location.assign(nextHref);
+    }
+  }
+
+  function stopPurposeDrag() {
+    purposeDragRef.current.active = false;
+    purposeDragRef.current.pendingHref = "";
+    setPurposeDragging(false);
+  }
+
+  function handlePurposeCardClick(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (purposeDragRef.current.moved || purposeDragRef.current.suppressClick) {
+      event.preventDefault();
+      purposeDragRef.current.moved = false;
+      purposeDragRef.current.suppressClick = false;
+      return;
+    }
+
+    event.preventDefault();
+    window.location.assign(href);
+  }
+
+  function goToPage(href: string) {
+    setMobileMenuOpen(false);
+    window.location.assign(href);
   }
 
   return (
@@ -364,11 +607,10 @@ export default function Home() {
           <span className="phone-dot" />
           +880 1886-589009
         </a>
-        <a href="/verify-auction-sheet">Get any auction sheet verified</a>
         <a href="tel:+8801886589009">Showroom <ChevronRight size={14} /></a>
       </div>
 
-      <header className={headerGlass ? "site-header glass" : "site-header"}>
+      <header ref={headerRef} className={headerGlass ? "site-header glass" : "site-header"}>
         <button
           className="icon-button menu-button"
           type="button"
@@ -389,7 +631,7 @@ export default function Home() {
               type="button"
               onClick={() => {
                 if (item.href) {
-                  window.location.href = item.href;
+                  goToPage(item.href);
                   return;
                 }
 
@@ -444,28 +686,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="purpose-section" id="purpose">
-        <h2>Explore vehicles that suit your purpose</h2>
-        <div className="category-row">
-          {categories.map((category) => (
-            <article className="category-card" key={category.title}>
-              <div>
-                <Car size={34} />
-                <h3>{category.title}</h3>
-                <p>{category.copy}</p>
-              </div>
-              <Image
-                src={category.image}
-                alt={`${category.title} vehicle detail`}
-                width={430}
-                height={245}
-                suppressHydrationWarning
-              />
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="verify-section" id="verify">
         <div className="verify-card">
           <div className="verify-copy">
@@ -478,6 +698,52 @@ export default function Home() {
           <a className="verify-link" href="/verify-auction-sheet">
             Get Verified <ArrowRight size={18} />
           </a>
+        </div>
+      </section>
+
+      <section className="purpose-section" id="purpose">
+        <h2>Explore vehicles that suit your purpose</h2>
+        <div
+          ref={purposeRowRef}
+          className={purposeDragging ? "category-row dragging" : "category-row"}
+          aria-label="Auto sliding vehicle body type list"
+          onPointerDown={handlePurposePointerDown}
+          onPointerMove={handlePurposePointerMove}
+          onPointerUp={handlePurposePointerUp}
+          onPointerCancel={handlePurposePointerUp}
+          onMouseEnter={() => {
+            purposeDragRef.current.hovered = true;
+          }}
+          onMouseLeave={() => {
+            purposeDragRef.current.hovered = false;
+            stopPurposeDrag();
+          }}
+        >
+          <div className="category-track">
+            {carouselCategories.map((category, index) => (
+              <a
+                className="category-card"
+                draggable={false}
+                href={category.href}
+                key={`${category.title}-${index}`}
+                onClick={(event) => handlePurposeCardClick(event, category.href)}
+              >
+                <div>
+                  <Car size={34} />
+                  <h3>{category.title}</h3>
+                  <p>{category.copy}</p>
+                </div>
+                <Image
+                  src={category.image}
+                  alt={`${category.title} vehicle detail`}
+                  width={430}
+                  height={245}
+                  draggable={false}
+                  suppressHydrationWarning
+                />
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -497,7 +763,7 @@ export default function Home() {
           onPointerDown={handleStockPointerDown}
           onPointerMove={handleStockPointerMove}
           onPointerUp={handleStockPointerUp}
-          onPointerCancel={handleStockPointerUp}
+          onPointerCancel={cancelStockDrag}
           onMouseEnter={() => {
             stockDragRef.current.hovered = true;
           }}
@@ -509,11 +775,11 @@ export default function Home() {
           <div className="stock-track">
             {carouselStock.map((item, index) => (
               <a
-                className="vehicle-card"
+                className="stock-card deals-stock-card"
                 draggable={false}
-                href={`/car-stocks/${item.slug}`}
+                href={`/car-stocks/${item.id}`}
                 key={`${item.id}-${index}`}
-                onClick={preventStockClickAfterDrag}
+                onClick={(event) => handleDealCardClick(event, `/car-stocks/${item.id}`)}
               >
                 <Image
                   src={item.image}
@@ -523,14 +789,16 @@ export default function Home() {
                   draggable={false}
                   suppressHydrationWarning
                 />
-                <div className="vehicle-meta">
-                  <span className="maker">
-                    <Car size={18} /> {item.brand}
-                  </span>
+                <div className="stock-card-body">
                   <h2>{item.name}</h2>
-                  <span className="accent-line" />
                   <p>{item.year}</p>
-                  <strong>BDT {item.price} Lacs</strong>
+                  <div className="stock-meta">
+                    <span>{item.fuel}</span>
+                    <span>{item.type}</span>
+                    <span>{item.mileage}</span>
+                  </div>
+                  <strong>{formatPrice(item.price)}</strong>
+                  <span className="stock-details-link">Show Details</span>
                 </div>
               </a>
             ))}
@@ -552,18 +820,24 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="brand-logo-row" aria-label="Available brands">
-          {brandLogos.map((brand) => (
-            <a className="brand-logo-card" href="/car-stocks" key={brand}>
-              <span>{brand}</span>
-            </a>
-          ))}
+        <div className="brand-logo-slider" aria-label="Available brands">
+          <div className="brand-logo-track" style={{ transform: `translateX(-${brandSlide * 100}%)` }}>
+            {brandLogoPages.map((brandPage, pageIndex) => (
+              <div className="brand-logo-page" key={`brand-page-${pageIndex}`}>
+                {brandPage.map((brand) => (
+                  <a className="brand-logo-card" href={`/${brand.slug}`} key={brand.slug}>
+                    <span>{brand.name}</span>
+                  </a>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="brand-logo-dots" aria-hidden="true">
-          <span />
-          <span />
-          <span />
+          {brandLogoPages.map((_, index) => (
+            <span className={index === brandSlide ? "active" : ""} key={`brand-dot-${index}`} />
+          ))}
         </div>
 
         <section className="consult-banner" aria-label="Connect to consult">
@@ -584,26 +858,30 @@ export default function Home() {
         <div className="footer-main">
           <div className="footer-column">
             <h3>Vehicles</h3>
-            <button type="button">Sedan</button>
             <button type="button">SUV</button>
-            <button type="button">Crossover</button>
+            <button type="button">Sedan</button>
             <button type="button">Wagon</button>
+            <button type="button">Crossover</button>
+            <button type="button">Passenger Van</button>
           </div>
           <div className="footer-column">
             <h3>Support</h3>
-            <button type="button">Contact us</button>
-            <button type="button">FAQs & support</button>
+            <button type="button">About Us</button>
+            <button type="button">Privacy Policy</button>
+            <button type="button">FAQ's & support</button>
+            <button type="button">Import Regulations</button>
             <button type="button">Terms & conditions</button>
-            <button type="button">After-sales</button>
           </div>
           <div className="footer-column">
-            <h3>Reliant Motors</h3>
-            <button type="button">About us</button>
+            <h3>Recon Imports</h3>
             <a href="/car-stocks">Car Stocks</a>
-            <a href="/verify-auction-sheet">Verify Auction Sheet</a>
+            <a href="/sell-your-car">Sell Your Car</a>
+            <a href="/car-stocks">Download Stock List</a>
+            <a href="/send-requirements">Send Your Requirements</a>
+            <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
           </div>
           <div className="footer-newsletter">
-            <h3>Stay updated with Reliant Motors</h3>
+            <h3>Stay updated with Recon Imports</h3>
             <label>
               <input
                 value={newsletter}
@@ -623,16 +901,11 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <strong>
-            &copy; 2026 Reliant Motors. All Rights Reserved by{" "}
+            &copy; 2026 Recon Imports. All Rights Reserved by{" "}
             <a className="footer-credit" href="https://backdropinteractive.com/" target="_blank" rel="noreferrer">
               @Backdrop Interactive
             </a>
           </strong>
-          <nav aria-label="Footer legal links">
-            <button type="button">Terms of Service</button>
-            <button type="button">Privacy Policy</button>
-            <button type="button">Terms & conditions</button>
-          </nav>
         </div>
       </footer>
 

@@ -5,6 +5,42 @@ import SuggestedCarousel from "./SuggestedCarousel";
 
 const products = [
   {
+    slug: "byd-atto-3",
+    name: "BYD Atto 3",
+    brand: "BYD",
+    model: "2024",
+    regYear: "2024",
+    mileage: "0 KM",
+    engine: "Electric Motor",
+    transmission: "AUTOMATIC",
+    fuel: "ELECTRIC",
+    drive: "FWD",
+    wheel: "18 inch",
+    exterior: "White",
+    body: "Crossover",
+    price: "BDT 68,00,000",
+    hero: "/cat-crossover.webp",
+    gallery: ["/cat-crossover.webp", "/hero-slide-3.webp", "/cat-suv.webp", "/stock-noah-2023.webp", "/cat-mpv.webp"],
+  },
+  {
+    slug: "toyota-prado-pre-order",
+    name: "Toyota Land Cruiser Prado",
+    brand: "Toyota",
+    model: "2025",
+    regYear: "Pre Order",
+    mileage: "Factory Order",
+    engine: "2700",
+    transmission: "AUTOMATIC",
+    fuel: "OCTANE",
+    drive: "4WD",
+    wheel: "18 inch",
+    exterior: "Pearl White",
+    body: "SUV",
+    price: "BDT 1,45,00,000",
+    hero: "/cat-suv.webp",
+    gallery: ["/cat-suv.webp", "/hero-slide-1.webp", "/stock-noah-2023.webp", "/cat-crossover.webp", "/cat-wagon.webp"],
+  },
+  {
     slug: "toyota-alphard",
     name: "Toyota Alphard",
     brand: "Toyota",
@@ -79,7 +115,7 @@ const products = [
   {
     slug: "range-rover-2020",
     name: "Range Rover Vogue Autobiography",
-    brand: "Range Rover",
+    brand: "Land Rover",
     model: "2020",
     regYear: "2020",
     mileage: "5k Miles",
@@ -97,7 +133,7 @@ const products = [
   {
     slug: "range-rover-2019",
     name: "Range Rover Vogue Autobiography",
-    brand: "Range Rover",
+    brand: "Land Rover",
     model: "2019",
     regYear: "2019",
     mileage: "14k KM",
@@ -223,6 +259,8 @@ const products = [
 ];
 
 const suggested = [
+  { name: "BYD Atto 3", image: "/cat-crossover.webp", slug: "byd-atto-3" },
+  { name: "Toyota Land Cruiser Prado", image: "/cat-suv.webp", slug: "toyota-prado-pre-order" },
   { name: "Toyota Alphard", image: "/stock-noah-2023.webp", slug: "toyota-alphard" },
   { name: "Land Cruiser LC300 ZX", image: "/cat-suv.webp", slug: "land-cruiser-lc300" },
   { name: "BMW X7 Xdrive40i M-Sport", image: "/cat-crossover.webp", slug: "bmw-x7-black" },
@@ -269,9 +307,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <a className="active" href="/car-stocks">
             Car Stocks
           </a>
-          <a href="/pre-owned">Pre-Owned</a>
           <a href="/reconditioned">Reconditioned</a>
-          <a href="/verify-auction-sheet">Verify Auction Sheet</a>
+          <a href="/ev">EVS</a>
+          <a href="/pre-owned">Pre-Owner</a>
+          <a href="/pre-order">Pre-Order</a>
+          <a href="/send-requirements">Send Requirements</a>
         </nav>
         <a className="download-button cars-download" href="/car-stocks">
           <Download size={17} />
@@ -381,23 +421,27 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="footer-main">
           <div className="footer-column">
             <h3>Vehicles</h3>
-            <button type="button">Sedan</button>
             <button type="button">SUV</button>
-            <button type="button">Crossover</button>
+            <button type="button">Sedan</button>
             <button type="button">Wagon</button>
+            <button type="button">Crossover</button>
+            <button type="button">Passenger Van</button>
           </div>
           <div className="footer-column">
             <h3>Support</h3>
-            <button type="button">Contact us</button>
-            <button type="button">FAQs & support</button>
+            <button type="button">About Us</button>
+            <button type="button">Privacy Policy</button>
+            <button type="button">FAQ's & support</button>
+            <button type="button">Import Regulations</button>
             <button type="button">Terms & conditions</button>
-            <button type="button">After-sales</button>
           </div>
           <div className="footer-column">
             <h3>Recon Imports</h3>
-            <button type="button">About us</button>
             <a href="/car-stocks">Car Stocks</a>
-            <a href="/verify-auction-sheet">Verify Auction Sheet</a>
+            <a href="/sell-your-car">Sell Your Car</a>
+            <a href="/car-stocks">Download Stock List</a>
+            <a href="/send-requirements">Send Your Requirements</a>
+            <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
           </div>
           <div className="footer-newsletter">
             <h3>Stay updated with Recon Imports</h3>
@@ -425,11 +469,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               @Backdrop Interactive
             </a>
           </strong>
-          <nav aria-label="Footer legal links">
-            <button type="button">Terms of Service</button>
-            <button type="button">Privacy Policy</button>
-            <button type="button">Terms & conditions</button>
-          </nav>
         </div>
       </footer>
     </main>

@@ -2,170 +2,8 @@
 
 import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { useMemo, useState } from "react";
-
-// Inventory data used by the car stocks grid and filter controls.
-const inventory = [
-  {
-    id: "land-cruiser-lc300",
-    name: "Land Cruiser LC300 ZX",
-    year: "2022",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "23K km",
-    price: 37900000,
-    brand: "Toyota",
-    body: "SUV",
-    availability: "Available",
-    image: "/stock-noah-2023.webp",
-  },
-  {
-    id: "bmw-x7-blue",
-    name: "BMW X7",
-    year: "2021",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "15K km",
-    price: 27900000,
-    brand: "BMW",
-    body: "SUV",
-    availability: "Available",
-    image: "/cat-mpv.webp",
-  },
-  {
-    id: "bmw-x7-black",
-    name: "BMW X7 Xdrive40i M-Sport",
-    year: "2022",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "15K km",
-    price: 26900000,
-    brand: "BMW",
-    body: "SUV",
-    availability: "Available",
-    image: "/cat-crossover.webp",
-  },
-  {
-    id: "range-rover-2020",
-    name: "Range Rover Vogue Autobiography",
-    year: "2020",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "5K Miles",
-    price: 24900000,
-    brand: "Range Rover",
-    body: "SUV",
-    availability: "Available",
-    image: "/cat-wagon.webp",
-  },
-  {
-    id: "range-rover-2019",
-    name: "Range Rover Vogue Autobiography",
-    year: "2019",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "14K km",
-    price: 21900000,
-    brand: "Range Rover",
-    body: "SUV",
-    availability: "Available",
-    image: "/stock-axio.webp",
-  },
-  {
-    id: "mercedes-s560e",
-    name: "Mercedes-Benz S 560e",
-    year: "2019",
-    fuel: "Octane (H)",
-    type: "Pre Owned",
-    mileage: "11K m",
-    price: 18900000,
-    brand: "Mercedes-Benz",
-    body: "Sedan",
-    availability: "Available",
-    image: "/stock-noah-black.webp",
-  },
-  {
-    id: "land-cruiser-zx-v8",
-    name: "Land Cruiser Zx-V8",
-    year: "2015",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "71K km",
-    price: 18900000,
-    brand: "Toyota",
-    body: "SUV",
-    availability: "Available",
-    image: "/stock-noah-white.webp",
-  },
-  {
-    id: "bmw-745le",
-    name: "BMW 745Le",
-    year: "2019",
-    fuel: "Octane",
-    type: "Pre Owned",
-    mileage: "15K km",
-    price: 18900000,
-    brand: "BMW",
-    body: "Sedan",
-    availability: "Available",
-    image: "/stock-noah-pearl.webp",
-  },
-  {
-    id: "toyota-alphard",
-    name: "Toyota Alphard",
-    year: "2024",
-    fuel: "Octane (H)",
-    type: "Reconditioned",
-    mileage: "8K km",
-    price: 16900000,
-    brand: "Toyota",
-    body: "MPV",
-    availability: "Available",
-    image: "/stock-noah-2023.webp",
-  },
-  {
-    id: "land-cruiser-vx-2016",
-    name: "Land Cruiser Vx-V8",
-    year: "2016",
-    fuel: "Diesel",
-    type: "Pre Owned",
-    mileage: "41K km",
-    price: 16900000,
-    brand: "Toyota",
-    body: "SUV",
-    availability: "Available",
-    image: "/cat-suv.webp",
-  },
-  {
-    id: "land-cruiser-vx-2015",
-    name: "Land Cruiser Vx-V8",
-    year: "2015",
-    fuel: "Diesel",
-    type: "Pre Owned",
-    mileage: "74K km",
-    price: 15900000,
-    brand: "Toyota",
-    body: "SUV",
-    availability: "Available",
-    image: "/cat-crossover.webp",
-  },
-  {
-    id: "lexus-rx500h",
-    name: "Lexus RX 500h Turbo",
-    year: "2023",
-    fuel: "Octane (H)",
-    type: "Pre Owned",
-    mileage: "22K km",
-    price: 14900000,
-    brand: "Lexus",
-    body: "Crossover",
-    availability: "Available",
-    image: "/stock-axio.webp",
-  },
-];
-
-function formatPrice(price: number) {
-  return `BDT ${new Intl.NumberFormat("en-IN").format(price)}`;
-}
+import { BrandName, brandOptions } from "./brands";
+import { formatPrice, inventory } from "./inventory";
 
 // Creates a downloadable CSV from the current stock data.
 function downloadStockList() {
@@ -193,9 +31,13 @@ function downloadStockList() {
 }
 
 const filterSections = [
-  { title: "Types", key: "type", options: ["Brand New", "Reconditioned"] },
-  { title: "Classification", key: "body", options: ["Crossover", "MPV", "Passenger Van", "SUV", "Sedan", "Wagon"] },
-  { title: "Brand", key: "brand", options: ["Honda", "Mazda", "Nissan", "Toyota"] },
+  { title: "Types", key: "type", options: ["Brand New", "Pre Owned", "Pre Order", "Reconditioned"] },
+  {
+    title: "Classification",
+    key: "body",
+    options: ["Sedan", "Hatchback", "SUV", "Crossover", "MPV", "Passenger Van", "Wagon"],
+  },
+  { title: "Car Brands", key: "brand", options: brandOptions.map((brand) => brand.name) },
   { title: "Country Origin", key: "origin", options: ["Europe", "Japan"] },
   { title: "Grade", key: "grade", options: ["Grade 3.5", "Grade 4", "Grade 4.5", "Grade 5", "Grade 6", "Grade R", "Grade S"] },
   {
@@ -237,14 +79,20 @@ const filterSections = [
 ] as const;
 
 type StockListingPageProps = {
-  activePage: "car-stocks" | "pre-owned" | "reconditioned";
+  activePage: "car-stocks" | "pre-owned" | "pre-order" | "reconditioned" | "ev" | "send-requirements";
+  bodyFilter?: "Sedan" | "Hatchback" | "SUV" | "Crossover" | "MPV" | "Passenger Van";
+  brandFilter?: BrandName;
+  evOnly?: boolean;
   introCopy?: string;
   title?: string;
-  typeFilter?: "Pre Owned" | "Reconditioned";
+  typeFilter?: "Brand New" | "Pre Owned" | "Pre Order" | "Reconditioned";
 };
 
 export default function StockListingPage({
   activePage,
+  bodyFilter,
+  brandFilter,
+  evOnly = false,
   introCopy = "Glance through the widest collection of reconditioned Japanese models and pre-owned imported units and choose according to your budget and quality preferences.",
   title = "Choose per your preference",
   typeFilter,
@@ -256,8 +104,15 @@ export default function StockListingPage({
   const [newsletter, setNewsletter] = useState("");
 
   const stockInventory = useMemo(() => {
-    return typeFilter ? inventory.filter((car) => car.type === typeFilter) : inventory;
-  }, [typeFilter]);
+    return inventory.filter((car) => {
+      const matchesBody = !bodyFilter || car.body === bodyFilter;
+      const matchesBrand = !brandFilter || car.brand === brandFilter;
+      const matchesType = !typeFilter || car.type === typeFilter;
+      const matchesEv = !evOnly || car.isEv;
+
+      return matchesBody && matchesBrand && matchesType && matchesEv;
+    });
+  }, [bodyFilter, brandFilter, evOnly, typeFilter]);
 
   const filteredCars = useMemo(() => {
     return stockInventory.filter((car) => {
@@ -270,9 +125,7 @@ export default function StockListingPage({
       const matchesPrice = car.price >= minPrice && car.price <= maxPrice;
       const matchesType =
         selectedTypes.length === 0 ||
-        selectedTypes.some((selectedType) =>
-          selectedType === "Brand New" ? car.type === "Pre Owned" : car.type === selectedType,
-        );
+        selectedTypes.some((selectedType) => car.type === selectedType);
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand);
       const matchesBody = selectedBodies.length === 0 || selectedBodies.includes(car.body);
       const matchesYear = selectedYears.length === 0 || selectedYears.includes(car.year);
@@ -313,13 +166,21 @@ export default function StockListingPage({
           <a className={activePage === "car-stocks" ? "active" : ""} href="/car-stocks">
             Car Stocks
           </a>
-          <a className={activePage === "pre-owned" ? "active" : ""} href="/pre-owned">
-            Pre-Owned
-          </a>
           <a className={activePage === "reconditioned" ? "active" : ""} href="/reconditioned">
             Reconditioned
           </a>
-          <a href="/verify-auction-sheet">Verify Auction Sheet</a>
+          <a className={activePage === "ev" ? "active" : ""} href="/ev">
+            EVS
+          </a>
+          <a className={activePage === "pre-owned" ? "active" : ""} href="/pre-owned">
+            Pre-Owner
+          </a>
+          <a className={activePage === "pre-order" ? "active" : ""} href="/pre-order">
+            Pre-Order
+          </a>
+          <a className={activePage === "send-requirements" ? "active" : ""} href="/send-requirements">
+            Send Requirements
+          </a>
         </nav>
         <button className="download-button cars-download" type="button" onClick={downloadStockList}>
           <Download size={17} />
@@ -411,24 +272,28 @@ export default function StockListingPage({
 
           {/* Stock grid: cards update when search, price, brand, body, or availability filters change. */}
           <div className="cars-grid" id="stocks">
-            {filteredCars.map((car) => (
-              <article className="stock-card" key={car.id}>
-                <img src={car.image} alt={car.name} loading="eager" decoding="sync" />
-                <div className="stock-card-body">
-                  <h2>{car.name}</h2>
-                  <p>{car.year}</p>
-                  <div className="stock-meta">
-                    <span>{car.fuel}</span>
-                    <span>{car.type}</span>
-                    <span>{car.mileage}</span>
+            {filteredCars.length > 0 ? (
+              filteredCars.map((car) => (
+                <article className="stock-card" key={car.id}>
+                  <img src={car.image} alt={car.name} loading="eager" decoding="sync" />
+                  <div className="stock-card-body">
+                    <h2>{car.name}</h2>
+                    <p>{car.year}</p>
+                    <div className="stock-meta">
+                      <span>{car.fuel}</span>
+                      <span>{car.type}</span>
+                      <span>{car.mileage}</span>
+                    </div>
+                    <strong>{formatPrice(car.price)}</strong>
+                    <a className="stock-details-link" href={`/car-stocks/${car.id}`}>
+                      Show Details
+                    </a>
                   </div>
-                  <strong>{formatPrice(car.price)}</strong>
-                  <a className="stock-details-link" href={`/car-stocks/${car.id}`}>
-                    Show Details
-                  </a>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))
+            ) : (
+              <p className="cars-empty">No vehicles found for these filters.</p>
+            )}
           </div>
 
           {/* Pagination UI: visual page controls for the current stock listing design. */}
@@ -455,26 +320,30 @@ export default function StockListingPage({
         <div className="footer-main">
           <div className="footer-column">
             <h3>Vehicles</h3>
-            <button type="button">Sedan</button>
             <button type="button">SUV</button>
-            <button type="button">Crossover</button>
+            <button type="button">Sedan</button>
             <button type="button">Wagon</button>
+            <button type="button">Crossover</button>
+            <button type="button">Passenger Van</button>
           </div>
           <div className="footer-column">
             <h3>Support</h3>
-            <button type="button">Contact us</button>
-            <button type="button">FAQs & support</button>
+            <button type="button">About Us</button>
+            <button type="button">Privacy Policy</button>
+            <button type="button">FAQ's & support</button>
+            <button type="button">Import Regulations</button>
             <button type="button">Terms & conditions</button>
-            <button type="button">After-sales</button>
           </div>
           <div className="footer-column">
-            <h3>Reliant Motors</h3>
-            <button type="button">About us</button>
+            <h3>Recon Imports</h3>
             <a href="/car-stocks">Car Stocks</a>
-            <a href="/verify-auction-sheet">Verify Auction Sheet</a>
+            <a href="/sell-your-car">Sell Your Car</a>
+            <a href="/car-stocks">Download Stock List</a>
+            <a href="/send-requirements">Send Your Requirements</a>
+            <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
           </div>
           <div className="footer-newsletter">
-            <h3>Stay updated with Reliant Motors</h3>
+            <h3>Stay updated with Recon Imports</h3>
             <label>
               <input
                 value={newsletter}
@@ -493,16 +362,11 @@ export default function StockListingPage({
         </div>
         <div className="footer-bottom">
           <strong>
-            &copy; 2026 Reliant Motors. All Rights Reserved by{" "}
+            &copy; 2026 Recon Imports. All Rights Reserved by{" "}
             <a className="footer-credit" href="https://backdropinteractive.com/" target="_blank" rel="noreferrer">
               @Backdrop Interactive
             </a>
           </strong>
-          <nav aria-label="Footer legal links">
-            <button type="button">Terms of Service</button>
-            <button type="button">Privacy Policy</button>
-            <button type="button">Terms & conditions</button>
-          </nav>
         </div>
       </footer>
     </main>

@@ -33,13 +33,13 @@ export default function VerifyAuctionSheetPage() {
           <a href="/car-stocks">
             Car Stocks
           </a>
-          <a href="/pre-owned">
-            Pre-Owned
-          </a>
           <a href="/reconditioned">Reconditioned</a>
-          <a className="active" href="/verify-auction-sheet">
-            Verify Auction Sheet
+          <a href="/ev">EVS</a>
+          <a href="/pre-owned">
+            Pre-Owner
           </a>
+          <a href="/pre-order">Pre-Order</a>
+          <a href="/send-requirements">Send Requirements</a>
         </nav>
       </header>
 
@@ -148,26 +148,30 @@ export default function VerifyAuctionSheetPage() {
         <div className="footer-main">
           <div className="footer-column">
             <h3>Vehicles</h3>
-            <button type="button">Sedan</button>
             <button type="button">SUV</button>
-            <button type="button">Crossover</button>
+            <button type="button">Sedan</button>
             <button type="button">Wagon</button>
+            <button type="button">Crossover</button>
+            <button type="button">Passenger Van</button>
           </div>
           <div className="footer-column">
             <h3>Support</h3>
-            <button type="button">Contact us</button>
-            <button type="button">FAQs & support</button>
+            <button type="button">About Us</button>
+            <button type="button">Privacy Policy</button>
+            <button type="button">FAQ's & support</button>
+            <button type="button">Import Regulations</button>
             <button type="button">Terms & conditions</button>
-            <button type="button">After-sales</button>
           </div>
           <div className="footer-column">
-            <h3>Reliant Motors</h3>
-            <button type="button">About us</button>
+            <h3>Recon Imports</h3>
             <a href="/car-stocks">Car Stocks</a>
-            <a href="/verify-auction-sheet">Verify Auction Sheet</a>
+            <a href="/sell-your-car">Sell Your Car</a>
+            <a href="/car-stocks">Download Stock List</a>
+            <a href="/send-requirements">Send Your Requirements</a>
+            <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
           </div>
           <div className="footer-newsletter">
-            <h3>Stay updated with Reliant Motors</h3>
+            <h3>Stay updated with Recon Imports</h3>
             <label>
               <input placeholder="Your Email Address" type="email" />
               <button type="button">Subscribe</button>
@@ -181,16 +185,11 @@ export default function VerifyAuctionSheetPage() {
         </div>
         <div className="footer-bottom">
           <strong>
-            &copy; 2026 Reliant Motors. All Rights Reserved by{" "}
+            &copy; 2026 Recon Imports. All Rights Reserved by{" "}
             <a className="footer-credit" href="https://backdropinteractive.com/" target="_blank" rel="noreferrer">
               @Backdrop Interactive
             </a>
           </strong>
-          <nav aria-label="Footer legal links">
-            <button type="button">Terms of Service</button>
-            <button type="button">Privacy Policy</button>
-            <button type="button">Terms & conditions</button>
-          </nav>
         </div>
       </footer>
     </main>
