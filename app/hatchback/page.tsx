@@ -1,8 +1,10 @@
-import StockListingPage from "../car-stocks/StockListingPage";
+import PublicStockListing from "../car-stocks/PublicStockListing";
+
+export const dynamic = "force-dynamic";
 
 export default function HatchbackPage() {
   return (
-    <StockListingPage
+    <PublicStockListing
       activePage="car-stocks"
       bodyFilter="Hatchback"
       introCopy="Browse hatchback vehicles uploaded with Hatchback selected as the body type."

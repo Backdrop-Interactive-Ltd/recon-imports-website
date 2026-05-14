@@ -1,21 +1,23 @@
 import { notFound } from "next/navigation";
-import { brandOptions, getBrandBySlug } from "../car-stocks/brands";
-import StockListingPage from "../car-stocks/StockListingPage";
+import PublicStockListing from "../car-stocks/PublicStockListing";
+import { getPublicBrandBySlug, getPublicBrandStaticParams } from "../car-stocks/data";
 
-export function generateStaticParams() {
-  return brandOptions.map((brand) => ({ brand: brand.slug }));
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  return getPublicBrandStaticParams();
 }
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand: slug } = await params;
-  const brand = getBrandBySlug(slug);
+  const brand = await getPublicBrandBySlug(slug);
 
   if (!brand) {
     notFound();
   }
 
   return (
-    <StockListingPage
+    <PublicStockListing
       activePage="car-stocks"
       brandFilter={brand.name}
       introCopy={`Browse vehicles uploaded with ${brand.name} selected as the car brand.`}

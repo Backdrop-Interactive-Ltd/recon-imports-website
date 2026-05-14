@@ -2,14 +2,16 @@
 
 import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { useMemo, useState } from "react";
-import { BrandName, brandOptions } from "./brands";
-import { formatPrice, inventory } from "./inventory";
+import Footer from "../components/Footer";
+import { brandOptions as fallbackBrandOptions } from "./brands";
+import { formatPrice, inventory as fallbackInventory, type CarInventoryItem } from "./inventory";
+import type { PublicBrandOption } from "./data";
 
 // Creates a downloadable CSV from the current stock data.
-function downloadStockList() {
+function downloadStockList(stockItems: CarInventoryItem[]) {
   const rows = [
     ["Name", "Year", "Brand", "Body", "Fuel", "Type", "Mileage", "Price"],
-    ...inventory.map((item) => [
+    ...stockItems.map((item) => [
       item.name,
       item.year,
       item.brand,
@@ -30,14 +32,13 @@ function downloadStockList() {
   URL.revokeObjectURL(url);
 }
 
-const filterSections = [
+const staticFilterSections = [
   { title: "Types", key: "type", options: ["Brand New", "Pre Owned", "Pre Order", "Reconditioned"] },
   {
     title: "Classification",
     key: "body",
     options: ["Sedan", "Hatchback", "SUV", "Crossover", "MPV", "Passenger Van", "Wagon"],
   },
-  { title: "Car Brands", key: "brand", options: brandOptions.map((brand) => brand.name) },
   { title: "Country Origin", key: "origin", options: ["Europe", "Japan"] },
   { title: "Grade", key: "grade", options: ["Grade 3.5", "Grade 4", "Grade 4.5", "Grade 5", "Grade 6", "Grade R", "Grade S"] },
   {
@@ -78,11 +79,13 @@ const filterSections = [
   { title: "Year", key: "year", options: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"] },
 ] as const;
 
-type StockListingPageProps = {
+export type StockListingPageProps = {
   activePage: "car-stocks" | "pre-owned" | "pre-order" | "reconditioned" | "ev" | "send-requirements";
+  availableBrands?: PublicBrandOption[];
   bodyFilter?: "Sedan" | "Hatchback" | "SUV" | "Crossover" | "MPV" | "Passenger Van";
-  brandFilter?: BrandName;
+  brandFilter?: string;
   evOnly?: boolean;
+  inventoryItems?: CarInventoryItem[];
   introCopy?: string;
   title?: string;
   typeFilter?: "Brand New" | "Pre Owned" | "Pre Order" | "Reconditioned";
@@ -90,9 +93,11 @@ type StockListingPageProps = {
 
 export default function StockListingPage({
   activePage,
+  availableBrands = [...fallbackBrandOptions],
   bodyFilter,
   brandFilter,
   evOnly = false,
+  inventoryItems = fallbackInventory,
   introCopy = "Glance through the widest collection of reconditioned Japanese models and pre-owned imported units and choose according to your budget and quality preferences.",
   title = "Choose per your preference",
   typeFilter,
@@ -101,10 +106,18 @@ export default function StockListingPage({
   const [priceMaxLakh, setPriceMaxLakh] = useState(500);
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
-  const [newsletter, setNewsletter] = useState("");
+  const filterSections = useMemo(
+    () => [
+      staticFilterSections[0],
+      staticFilterSections[1],
+      { title: "Car Brands", key: "brand", options: availableBrands.map((brand) => brand.name) },
+      ...staticFilterSections.slice(2),
+    ],
+    [availableBrands],
+  );
 
   const stockInventory = useMemo(() => {
-    return inventory.filter((car) => {
+    return inventoryItems.filter((car) => {
       const matchesBody = !bodyFilter || car.body === bodyFilter;
       const matchesBrand = !brandFilter || car.brand === brandFilter;
       const matchesType = !typeFilter || car.type === typeFilter;
@@ -112,7 +125,7 @@ export default function StockListingPage({
 
       return matchesBody && matchesBrand && matchesType && matchesEv;
     });
-  }, [bodyFilter, brandFilter, evOnly, typeFilter]);
+  }, [bodyFilter, brandFilter, evOnly, inventoryItems, typeFilter]);
 
   const filteredCars = useMemo(() => {
     return stockInventory.filter((car) => {
@@ -182,7 +195,7 @@ export default function StockListingPage({
             Send Requirements
           </a>
         </nav>
-        <button className="download-button cars-download" type="button" onClick={downloadStockList}>
+        <button className="download-button cars-download" type="button" onClick={() => downloadStockList(stockInventory)}>
           <Download size={17} />
           Download Stock List
         </button>
@@ -315,60 +328,7 @@ export default function StockListingPage({
         </div>
       </section>
 
-      {/* Footer: dark wave footer with current site links, newsletter signup, and social channels. */}
-      <footer className="footer cars-footer">
-        <div className="footer-main">
-          <div className="footer-column">
-            <h3>Vehicles</h3>
-            <button type="button">SUV</button>
-            <button type="button">Sedan</button>
-            <button type="button">Wagon</button>
-            <button type="button">Crossover</button>
-            <button type="button">Passenger Van</button>
-          </div>
-          <div className="footer-column">
-            <h3>Support</h3>
-            <button type="button">About Us</button>
-            <button type="button">Privacy Policy</button>
-            <button type="button">FAQ's & support</button>
-            <button type="button">Import Regulations</button>
-            <button type="button">Terms & conditions</button>
-          </div>
-          <div className="footer-column">
-            <h3>Recon Imports</h3>
-            <a href="/car-stocks">Car Stocks</a>
-            <a href="/sell-your-car">Sell Your Car</a>
-            <a href="/car-stocks">Download Stock List</a>
-            <a href="/send-requirements">Send Your Requirements</a>
-            <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
-          </div>
-          <div className="footer-newsletter">
-            <h3>Stay updated with Recon Imports</h3>
-            <label>
-              <input
-                value={newsletter}
-                onChange={(event) => setNewsletter(event.target.value)}
-                placeholder="Your Email Address"
-                type="email"
-              />
-              <button type="button">Subscribe</button>
-            </label>
-            <div className="social-links" aria-label="Social links">
-              <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noreferrer">IG</a>
-              <a href="https://www.facebook.com/" aria-label="Facebook" target="_blank" rel="noreferrer">FB</a>
-              <a href="https://www.youtube.com/" aria-label="YouTube" target="_blank" rel="noreferrer">YT</a>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <strong>
-            &copy; 2026 Recon Imports. All Rights Reserved by{" "}
-            <a className="footer-credit" href="https://backdropinteractive.com/" target="_blank" rel="noreferrer">
-              @Backdrop Interactive
-            </a>
-          </strong>
-        </div>
-      </footer>
+      <Footer className="cars-footer" />
     </main>
   );
 }

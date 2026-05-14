@@ -1,0 +1,353 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum VehicleCategoryType {
+  BODY_TYPE
+  STOCK_TYPE
+  PREFERENCE
+}
+
+enum CarBodyType {
+  SEDAN
+  HATCHBACK
+  SUV
+  CROSSOVER
+  MPV
+  PASSENGER_VAN
+  WAGON
+  OTHER
+}
+
+enum FuelType {
+  OCTANE
+  DIESEL
+  ELECTRIC
+  HYBRID
+  OCTANE_HYBRID
+  OTHER
+}
+
+enum TransmissionType {
+  AUTOMATIC
+  MANUAL
+  CVT
+  E_CVT
+  SEMI_AUTOMATIC
+  TIPTRONIC
+  OTHER
+}
+
+enum CarCondition {
+  BRAND_NEW
+  PRE_OWNED
+  RECONDITIONED
+  USED
+}
+
+enum StockType {
+  BRAND_NEW
+  PRE_OWNED
+  PRE_ORDER
+  RECONDITIONED
+}
+
+enum CarFeatureType {
+  FEATURE
+  SAFETY
+}
+
+enum SiteSettingType {
+  STRING
+  TEXT
+  NUMBER
+  BOOLEAN
+  JSON
+  URL
+  IMAGE_URL
+}
+
+enum LeadStatus {
+  NEW
+  REVIEWED
+  CONTACTED
+  IN_PROGRESS
+  CLOSED
+  SPAM
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum AuctionSheetStatus {
+  NEW
+  PROCESSING
+  REPORT_READY
+  COMPLETED
+  CANCELLED
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logoUrl   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cars      Car[]
+
+  @@index([isActive])
+}
+
+model VehicleCategory {
+  id        String              @id @default(cuid())
+  name      String
+  slug      String              @unique
+  imageUrl  String?
+  type      VehicleCategoryType
+  isActive  Boolean             @default(true)
+  sortOrder Int                 @default(0)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model Car {
+  id            String           @id @default(cuid())
+  title         String
+  slug          String           @unique
+  brandId       String
+  model         String
+  year          Int
+  price         Int
+  mileage       String
+  bodyType      CarBodyType
+  fuelType      FuelType
+  transmission  TransmissionType
+  condition     CarCondition
+  origin        String?
+  grade         String?
+  location      String?
+  packageName   String?
+  stockType     StockType
+  exteriorColor String?
+  interiorColor String?
+  engine        String?
+  driveTrain    String?
+  description   String?
+  videoImageUrl String?
+  isFeatured    Boolean          @default(false)
+  isPublished   Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  brand         Brand            @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  images        CarImage[]
+  features      CarFeature[]
+
+  @@index([brandId])
+  @@index([bodyType])
+  @@index([stockType])
+  @@index([condition])
+  @@index([isPublished])
+  @@index([isFeatured])
+  @@index([year])
+  @@index([price])
+}
+
+model CarImage {
+  id        String   @id @default(cuid())
+  carId     String
+  imageUrl  String
+  altText   String?
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@index([isPrimary])
+  @@index([sortOrder])
+}
+
+model CarFeature {
+  id        String         @id @default(cuid())
+  carId     String
+  title     String
+  type      CarFeatureType
+  sortOrder Int            @default(0)
+  car       Car            @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@index([type])
+  @@index([sortOrder])
+}
+
+model HeroSlide {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String
+  ctaText   String?
+  ctaLink   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model SiteSetting {
+  id        String          @id @default(cuid())
+  key       String          @unique
+  value     String
+  type      SiteSettingType @default(STRING)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model SellCarLead {
+  id               String     @id @default(cuid())
+  name             String
+  phone            String
+  carName          String
+  model            String?
+  registrationYear String?
+  mileage          String?
+  offeredPrice     String?
+  imageUrls        String[]   @default([])
+  status           LeadStatus @default(NEW)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model RequirementLead {
+  id        String     @id @default(cuid())
+  name      String
+  phone     String
+  carName   String
+  model     String?
+  modelYear String?
+  mileage   String?
+  details   String?
+  imageUrls String[]   @default([])
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AuctionSheetRequest {
+  id            String             @id @default(cuid())
+  chassisNumber String
+  name          String
+  phone         String
+  email         String
+  feeAmount     Int                @default(800)
+  paymentStatus PaymentStatus      @default(PENDING)
+  status        AuctionSheetStatus @default(NEW)
+  reportUrl     String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([chassisNumber])
+  @@index([email])
+  @@index([paymentStatus])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}

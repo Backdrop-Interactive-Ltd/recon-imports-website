@@ -1,301 +1,39 @@
 import { Download, MessageCircle, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
+import Footer from "../../components/Footer";
+import { getPublicCarDetail, getPublicCarStaticParams } from "../data";
+import { formatPrice } from "../inventory";
 import ShareButton from "./ShareButton";
 import SuggestedCarousel from "./SuggestedCarousel";
 
-const products = [
-  {
-    slug: "byd-atto-3",
-    name: "BYD Atto 3",
-    brand: "BYD",
-    model: "2024",
-    regYear: "2024",
-    mileage: "0 KM",
-    engine: "Electric Motor",
-    transmission: "AUTOMATIC",
-    fuel: "ELECTRIC",
-    drive: "FWD",
-    wheel: "18 inch",
-    exterior: "White",
-    body: "Crossover",
-    price: "BDT 68,00,000",
-    hero: "/cat-crossover.webp",
-    gallery: ["/cat-crossover.webp", "/hero-slide-3.webp", "/cat-suv.webp", "/stock-noah-2023.webp", "/cat-mpv.webp"],
-  },
-  {
-    slug: "toyota-prado-pre-order",
-    name: "Toyota Land Cruiser Prado",
-    brand: "Toyota",
-    model: "2025",
-    regYear: "Pre Order",
-    mileage: "Factory Order",
-    engine: "2700",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "4WD",
-    wheel: "18 inch",
-    exterior: "Pearl White",
-    body: "SUV",
-    price: "BDT 1,45,00,000",
-    hero: "/cat-suv.webp",
-    gallery: ["/cat-suv.webp", "/hero-slide-1.webp", "/stock-noah-2023.webp", "/cat-crossover.webp", "/cat-wagon.webp"],
-  },
-  {
-    slug: "toyota-alphard",
-    name: "Toyota Alphard",
-    brand: "Toyota",
-    model: "2024",
-    regYear: "2024",
-    mileage: "8k KM",
-    engine: "2500",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE+HYBRID",
-    drive: "AWD",
-    wheel: "19 inch",
-    exterior: "Bronze",
-    body: "Minivan / MPV",
-    price: "BDT 1,69,00,000",
-    hero: "/stock-noah-2023.webp",
-    gallery: ["/stock-noah-2023.webp", "/cat-mpv.webp", "/stock-noah-pearl.webp", "/stock-noah-black.webp", "/cat-crossover.webp"],
-  },
-  {
-    slug: "land-cruiser-lc300",
-    name: "Land Cruiser LC300 ZX",
-    brand: "Toyota",
-    model: "2022",
-    regYear: "2022",
-    mileage: "23k KM",
-    engine: "3500",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "4WD",
-    wheel: "20 inch",
-    exterior: "Pearl White",
-    body: "SUV",
-    price: "BDT 3,79,00,000",
-    hero: "/stock-noah-2023.webp",
-    gallery: ["/stock-noah-2023.webp", "/cat-suv.webp", "/stock-noah-white.webp", "/stock-noah-pearl.webp", "/cat-crossover.webp"],
-  },
-  {
-    slug: "bmw-x7-blue",
-    name: "BMW X7",
-    brand: "BMW",
-    model: "2021",
-    regYear: "2021",
-    mileage: "15k KM",
-    engine: "3000",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "AWD",
-    wheel: "21 inch",
-    exterior: "Blue",
-    body: "SUV",
-    price: "BDT 2,79,00,000",
-    hero: "/cat-mpv.webp",
-    gallery: ["/cat-mpv.webp", "/cat-crossover.webp", "/stock-noah-black.webp", "/stock-noah-pearl.webp", "/cat-wagon.webp"],
-  },
-  {
-    slug: "bmw-x7-black",
-    name: "BMW X7 Xdrive40i M-Sport",
-    brand: "BMW",
-    model: "2022",
-    regYear: "2022",
-    mileage: "15k KM",
-    engine: "3000",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "AWD",
-    wheel: "21 inch",
-    exterior: "Black",
-    body: "SUV",
-    price: "BDT 2,69,00,000",
-    hero: "/cat-crossover.webp",
-    gallery: ["/cat-crossover.webp", "/cat-mpv.webp", "/stock-noah-black.webp", "/stock-noah-white.webp", "/cat-suv.webp"],
-  },
-  {
-    slug: "range-rover-2020",
-    name: "Range Rover Vogue Autobiography",
-    brand: "Land Rover",
-    model: "2020",
-    regYear: "2020",
-    mileage: "5k Miles",
-    engine: "3000",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "AWD",
-    wheel: "22 inch",
-    exterior: "White",
-    body: "SUV",
-    price: "BDT 2,49,00,000",
-    hero: "/cat-wagon.webp",
-    gallery: ["/cat-wagon.webp", "/cat-suv.webp", "/stock-axio.webp", "/cat-crossover.webp", "/stock-noah-white.webp"],
-  },
-  {
-    slug: "range-rover-2019",
-    name: "Range Rover Vogue Autobiography",
-    brand: "Land Rover",
-    model: "2019",
-    regYear: "2019",
-    mileage: "14k KM",
-    engine: "3000",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "AWD",
-    wheel: "21 inch",
-    exterior: "White",
-    body: "SUV",
-    price: "BDT 2,19,00,000",
-    hero: "/stock-axio.webp",
-    gallery: ["/stock-axio.webp", "/cat-wagon.webp", "/stock-noah-white.webp", "/cat-suv.webp", "/cat-crossover.webp"],
-  },
-  {
-    slug: "mercedes-s560e",
-    name: "Mercedes-Benz S 560e",
-    brand: "Mercedes-Benz",
-    model: "2019",
-    regYear: "2019",
-    mileage: "11k KM",
-    engine: "3000",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE HYBRID",
-    drive: "RWD",
-    wheel: "20 inch",
-    exterior: "Black",
-    body: "Sedan",
-    price: "BDT 1,89,00,000",
-    hero: "/stock-noah-black.webp",
-    gallery: ["/stock-noah-black.webp", "/stock-noah-pearl.webp", "/stock-axio.webp", "/cat-crossover.webp", "/cat-mpv.webp"],
-  },
-  {
-    slug: "land-cruiser-zx-v8",
-    name: "Land Cruiser Zx-V8",
-    brand: "Toyota",
-    model: "2015",
-    regYear: "2015",
-    mileage: "71k KM",
-    engine: "4600",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE",
-    drive: "4WD",
-    wheel: "20 inch",
-    exterior: "White",
-    body: "SUV",
-    price: "BDT 1,89,00,000",
-    hero: "/stock-noah-white.webp",
-    gallery: ["/stock-noah-white.webp", "/cat-suv.webp", "/cat-crossover.webp", "/stock-noah-2023.webp", "/cat-wagon.webp"],
-  },
-  {
-    slug: "bmw-745le",
-    name: "BMW 745Le",
-    brand: "BMW",
-    model: "2019",
-    regYear: "2019",
-    mileage: "15k KM",
-    engine: "3000",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE HYBRID",
-    drive: "RWD",
-    wheel: "20 inch",
-    exterior: "Pearl",
-    body: "Sedan",
-    price: "BDT 1,89,00,000",
-    hero: "/stock-noah-pearl.webp",
-    gallery: ["/stock-noah-pearl.webp", "/stock-noah-black.webp", "/cat-crossover.webp", "/stock-axio.webp", "/cat-mpv.webp"],
-  },
-  {
-    slug: "land-cruiser-vx-2016",
-    name: "Land Cruiser Vx-V8",
-    brand: "Toyota",
-    model: "2016",
-    regYear: "2016",
-    mileage: "41k KM",
-    engine: "4600",
-    transmission: "AUTOMATIC",
-    fuel: "DIESEL",
-    drive: "4WD",
-    wheel: "20 inch",
-    exterior: "White",
-    body: "SUV",
-    price: "BDT 1,69,00,000",
-    hero: "/cat-suv.webp",
-    gallery: ["/cat-suv.webp", "/stock-noah-white.webp", "/cat-crossover.webp", "/cat-wagon.webp", "/stock-noah-2023.webp"],
-  },
-  {
-    slug: "land-cruiser-vx-2015",
-    name: "Land Cruiser Vx-V8",
-    brand: "Toyota",
-    model: "2015",
-    regYear: "2015",
-    mileage: "74k KM",
-    engine: "4600",
-    transmission: "AUTOMATIC",
-    fuel: "DIESEL",
-    drive: "4WD",
-    wheel: "20 inch",
-    exterior: "Black",
-    body: "SUV",
-    price: "BDT 1,59,00,000",
-    hero: "/cat-crossover.webp",
-    gallery: ["/cat-crossover.webp", "/cat-suv.webp", "/stock-noah-black.webp", "/stock-noah-white.webp", "/cat-wagon.webp"],
-  },
-  {
-    slug: "lexus-rx500h",
-    name: "Lexus RX 500h Turbo",
-    brand: "Lexus",
-    model: "2023",
-    regYear: "2023",
-    mileage: "22k KM",
-    engine: "2400",
-    transmission: "AUTOMATIC",
-    fuel: "OCTANE HYBRID",
-    drive: "AWD",
-    wheel: "21 inch",
-    exterior: "Red",
-    body: "Crossover",
-    price: "BDT 1,49,00,000",
-    hero: "/stock-axio.webp",
-    gallery: ["/stock-axio.webp", "/cat-crossover.webp", "/stock-noah-pearl.webp", "/cat-mpv.webp", "/cat-wagon.webp"],
-  },
-];
+export const dynamic = "force-dynamic";
 
-const suggested = [
-  { name: "BYD Atto 3", image: "/cat-crossover.webp", slug: "byd-atto-3" },
-  { name: "Toyota Land Cruiser Prado", image: "/cat-suv.webp", slug: "toyota-prado-pre-order" },
-  { name: "Toyota Alphard", image: "/stock-noah-2023.webp", slug: "toyota-alphard" },
-  { name: "Land Cruiser LC300 ZX", image: "/cat-suv.webp", slug: "land-cruiser-lc300" },
-  { name: "BMW X7 Xdrive40i M-Sport", image: "/cat-crossover.webp", slug: "bmw-x7-black" },
-  { name: "Range Rover Vogue Autobiography", image: "/cat-wagon.webp", slug: "range-rover-2020" },
-  { name: "Mercedes-Benz S 560e", image: "/stock-noah-black.webp", slug: "mercedes-s560e" },
-  { name: "Lexus RX 500h Turbo", image: "/stock-axio.webp", slug: "lexus-rx500h" },
-];
-
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+export async function generateStaticParams() {
+  return getPublicCarStaticParams();
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = products.find((item) => item.slug === slug);
+  const detail = await getPublicCarDetail(slug);
 
-  if (!product) {
+  if (!detail) {
     notFound();
   }
 
+  const { product, suggestedItems } = detail;
   const specs = [
     ["Brand", product.brand],
     ["Model", product.model],
     ["Reg. Year", product.regYear],
-    ["Mileage", product.mileage],
+    ["Mileage", product.detailMileage],
     ["Engine (CC)", product.engine],
     ["Transmission", product.transmission],
-    ["Fuel Type", product.fuel],
+    ["Fuel Type", product.detailFuel],
     ["Drive Type", product.drive],
     ["Wheel", product.wheel],
     ["Exterior", product.exterior],
-    ["Body Style", product.body],
+    ["Body Style", product.detailBody],
   ];
-  const suggestedItems = suggested.filter((item) => item.slug !== product.slug);
-
   return (
     <main className="product-page">
       <header className="cars-header product-header">
@@ -354,38 +92,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
           <article className="product-description">
             <h2>Description</h2>
-            <p>
-              Indulge in refined comfort with this {product.model} {product.name}, available for purchase from Recon
-              Imports. The vehicle is prepared for buyers who want strong road presence, comfort, and dependable daily
-              usability.
-            </p>
+            <p>{product.description}</p>
             <h3>Features & Options:</h3>
             <ul>
-              <li>Premium cabin with comfortable multi-zone seating</li>
-              <li>Automatic transmission with smooth city and highway response</li>
-              <li>Modern infotainment display with smartphone compatibility</li>
-              <li>LED lighting package with clean exterior finish</li>
-              <li>Power assisted doors, mirrors, and convenience controls</li>
-              <li>Alloy wheels with excellent exterior stance</li>
+              {product.features.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
             </ul>
             <h3>Safety Features:</h3>
             <ul>
-              <li>Pre-collision assistance and stability control systems</li>
-              <li>Multiple airbags and advanced braking support</li>
-              <li>Parking camera support for easier maneuvering</li>
-              <li>Lane support and driver assistance features where equipped</li>
+              {product.safetyFeatures.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
             </ul>
           </article>
 
           <div className="product-video">
-            <img src="/hero-slide-2.webp" alt={`${product.name} video preview`} />
+            <img src={product.videoImage} alt={`${product.name} video preview`} />
             <span>Play</span>
           </div>
         </div>
 
         <aside className="product-contact-card">
           <div className="product-price">
-            <strong>{product.price}</strong>
+            <strong>{formatPrice(product.price)}</strong>
             <span>*Price may be slightly negotiable</span>
           </div>
           <div className="product-help">
@@ -417,60 +147,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <SuggestedCarousel items={suggestedItems} />
       </section>
 
-      <footer className="footer product-footer">
-        <div className="footer-main">
-          <div className="footer-column">
-            <h3>Vehicles</h3>
-            <button type="button">SUV</button>
-            <button type="button">Sedan</button>
-            <button type="button">Wagon</button>
-            <button type="button">Crossover</button>
-            <button type="button">Passenger Van</button>
-          </div>
-          <div className="footer-column">
-            <h3>Support</h3>
-            <button type="button">About Us</button>
-            <button type="button">Privacy Policy</button>
-            <button type="button">FAQ's & support</button>
-            <button type="button">Import Regulations</button>
-            <button type="button">Terms & conditions</button>
-          </div>
-          <div className="footer-column">
-            <h3>Recon Imports</h3>
-            <a href="/car-stocks">Car Stocks</a>
-            <a href="/sell-your-car">Sell Your Car</a>
-            <a href="/car-stocks">Download Stock List</a>
-            <a href="/send-requirements">Send Your Requirements</a>
-            <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
-          </div>
-          <div className="footer-newsletter">
-            <h3>Stay updated with Recon Imports</h3>
-            <label>
-              <input placeholder="Your Email Address" type="email" />
-              <button type="button">Subscribe</button>
-            </label>
-            <div className="social-links" aria-label="Social links">
-              <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noreferrer">
-                IG
-              </a>
-              <a href="https://www.facebook.com/" aria-label="Facebook" target="_blank" rel="noreferrer">
-                FB
-              </a>
-              <a href="https://www.youtube.com/" aria-label="YouTube" target="_blank" rel="noreferrer">
-                YT
-              </a>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <strong>
-            &copy; 2026 Recon Imports. All Rights Reserved by{" "}
-            <a className="footer-credit" href="https://backdropinteractive.com/" target="_blank" rel="noreferrer">
-              @Backdrop Interactive
-            </a>
-          </strong>
-        </div>
-      </footer>
+      <Footer className="product-footer" />
     </main>
   );
 }

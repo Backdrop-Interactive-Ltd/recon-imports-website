@@ -1,8 +1,10 @@
-import StockListingPage from "../car-stocks/StockListingPage";
+import PublicStockListing from "../car-stocks/PublicStockListing";
+
+export const dynamic = "force-dynamic";
 
 export default function EvPage() {
   return (
-    <StockListingPage
+    <PublicStockListing
       activePage="ev"
       evOnly
       title="EVs"

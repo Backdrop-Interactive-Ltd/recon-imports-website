@@ -1,0 +1,109 @@
+.uploadField {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  color: #4c4c51;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.uploadBox {
+  align-items: center;
+  border: 1px solid #d8dade;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 92px minmax(0, 1fr);
+  padding: 12px;
+}
+
+.previewBox {
+  align-items: center;
+  background: #f4f6f7;
+  color: #6e6e74;
+  display: flex;
+  font-size: 12px;
+  font-weight: 800;
+  height: 82px;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+  width: 82px;
+}
+
+.previewBox img {
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+  width: 100%;
+}
+
+.controls {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fileInput {
+  color: #111111;
+  font-size: 14px;
+  max-width: 100%;
+}
+
+.controls p,
+.status,
+.success,
+.error {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.controls p,
+.status {
+  color: #6e6e74;
+}
+
+.success {
+  color: #137333;
+}
+
+.error {
+  color: #9b0010;
+}
+
+.clearButton {
+  background: #f4f6f7;
+  border: 0;
+  color: #111111;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  height: 34px;
+  justify-self: start;
+  letter-spacing: 1px;
+  padding: 0 12px;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.clearButton:hover:not(:disabled) {
+  background: #ad1b28;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.clearButton:disabled,
+.fileInput:disabled {
+  cursor: not-allowed;
+  opacity: 0.66;
+}
+
+@media (max-width: 520px) {
+  .uploadBox {
+    grid-template-columns: 1fr;
+  }
+}

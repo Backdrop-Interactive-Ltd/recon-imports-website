@@ -1,0 +1,146 @@
+"use client";
+
+import { useActionState, useEffect, useState } from "react";
+import type { VehicleCategoryType } from "../../../../lib/generated/prisma/enums";
+import AdminImageUpload from "../_components/AdminImageUpload";
+import { createCategoryAction, updateCategoryAction } from "./actions";
+import styles from "../brands/page.module.css";
+import { categoryTypeOptions, initialCategoryActionState, slugifyCategory } from "./validation";
+
+type EditableCategory = {
+  id: string;
+  imageUrl: string | null;
+  isActive: boolean;
+  name: string;
+  slug: string;
+  sortOrder: number;
+  type: VehicleCategoryType;
+};
+
+type CategoryFormProps = {
+  category?: EditableCategory;
+  mode: "create" | "edit";
+};
+
+function formatCategoryType(value: string) {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => part[0]?.toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+export default function CategoryForm({ category, mode }: CategoryFormProps) {
+  const [state, formAction, isPending] = useActionState(
+    mode === "create" ? createCategoryAction : updateCategoryAction,
+    initialCategoryActionState,
+  );
+  const [isSlugEdited, setIsSlugEdited] = useState(false);
+  const [imageUrl, setImageUrl] = useState(category?.imageUrl ?? "");
+  const [isActive, setIsActive] = useState(category?.isActive ?? true);
+  const [name, setName] = useState(category?.name ?? "");
+  const [slug, setSlug] = useState(category?.slug ?? "");
+  const [sortOrder, setSortOrder] = useState(String(category?.sortOrder ?? 0));
+  const [type, setType] = useState<VehicleCategoryType>(category?.type ?? categoryTypeOptions[0]);
+
+  useEffect(() => {
+    if (mode === "create" && state.status === "success") {
+      setImageUrl("");
+      setIsActive(true);
+      setIsSlugEdited(false);
+      setName("");
+      setSlug("");
+      setSortOrder("0");
+      setType(categoryTypeOptions[0]);
+    }
+  }, [mode, state.status]);
+
+  function handleNameChange(value: string) {
+    setName(value);
+
+    if (!isSlugEdited) {
+      setSlug(slugifyCategory(value));
+    }
+  }
+
+  function handleSlugChange(value: string) {
+    setIsSlugEdited(true);
+    setSlug(slugifyCategory(value));
+  }
+
+  return (
+    <form action={formAction} className={styles.brandForm}>
+      {category ? <input name="id" type="hidden" value={category.id} /> : null}
+
+      <label className={styles.field}>
+        <span>Name</span>
+        <input
+          name="name"
+          onChange={(event) => handleNameChange(event.target.value)}
+          placeholder="SUV"
+          type="text"
+          value={name}
+        />
+        {state.errors?.name ? <small>{state.errors.name}</small> : null}
+      </label>
+
+      <label className={styles.field}>
+        <span>Slug</span>
+        <input
+          name="slug"
+          onChange={(event) => handleSlugChange(event.target.value)}
+          placeholder="suv"
+          type="text"
+          value={slug}
+        />
+        {state.errors?.slug ? <small>{state.errors.slug}</small> : null}
+      </label>
+
+      <AdminImageUpload
+        error={state.errors?.imageUrl}
+        folder="categories"
+        label="Category Image"
+        name="imageUrl"
+        onChange={setImageUrl}
+        value={imageUrl}
+      />
+
+      <label className={styles.field}>
+        <span>Type</span>
+        <select name="type" onChange={(event) => setType(event.target.value as VehicleCategoryType)} value={type}>
+          {categoryTypeOptions.map((option) => (
+            <option key={option} value={option}>
+              {formatCategoryType(option)}
+            </option>
+          ))}
+        </select>
+        {state.errors?.type ? <small>{state.errors.type}</small> : null}
+      </label>
+
+      <label className={styles.field}>
+        <span>Sort Order</span>
+        <input
+          min="0"
+          name="sortOrder"
+          onChange={(event) => setSortOrder(event.target.value)}
+          placeholder="0"
+          type="number"
+          value={sortOrder}
+        />
+        {state.errors?.sortOrder ? <small>{state.errors.sortOrder}</small> : null}
+      </label>
+
+      <label className={styles.checkField}>
+        <input checked={isActive} name="isActive" onChange={(event) => setIsActive(event.target.checked)} type="checkbox" />
+        <span>Category is active</span>
+      </label>
+
+      {state.errors?.form || state.errors?.id ? <p className={styles.formError}>{state.errors.form || state.errors.id}</p> : null}
+      {state.message ? <p className={state.status === "success" ? styles.formSuccess : styles.formError}>{state.message}</p> : null}
+
+      <button className={styles.primaryButton} disabled={isPending} type="submit">
+        {isPending ? "Saving..." : mode === "create" ? "Add Category" : "Save Changes"}
+      </button>
+    </form>
+  );
+}

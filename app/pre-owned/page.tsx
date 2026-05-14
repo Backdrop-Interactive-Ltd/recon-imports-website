@@ -1,8 +1,10 @@
-import StockListingPage from "../car-stocks/StockListingPage";
+import PublicStockListing from "../car-stocks/PublicStockListing";
+
+export const dynamic = "force-dynamic";
 
 export default function PreOwnedPage() {
   return (
-    <StockListingPage
+    <PublicStockListing
       activePage="pre-owned"
       title="Pre-Owned Vehicles"
       introCopy="Browse imported pre-owned vehicles selected for quality, condition, and value. Every pre-owned unit also remains visible in the full Car Stocks page."
