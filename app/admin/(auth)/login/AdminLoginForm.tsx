@@ -2,8 +2,9 @@
 
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import { adminLoginAction, initialAdminLoginActionState } from "./actions";
+import { adminLoginAction } from "./actions";
 import styles from "./page.module.css";
+import { initialAdminLoginActionState } from "./validation";
 
 function getSafeCallbackUrl(value: string | null) {
   if (!value || !value.startsWith("/admin") || value.startsWith("//") || value.startsWith("/admin/login")) {

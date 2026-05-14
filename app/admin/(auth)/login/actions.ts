@@ -4,14 +4,7 @@ import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { signIn } from "../../../../lib/auth";
 import { adminLoginSchema } from "../../../../lib/validations/auth";
-
-export type AdminLoginActionState = {
-  error: string;
-};
-
-export const initialAdminLoginActionState: AdminLoginActionState = {
-  error: "",
-};
+import type { AdminLoginActionState } from "./validation";
 
 function getSafeCallbackUrl(value: FormDataEntryValue | null) {
   if (typeof value !== "string") {
