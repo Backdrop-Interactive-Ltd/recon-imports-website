@@ -31,6 +31,7 @@ export default function AdminLoginForm() {
         <input autoComplete="current-password" name="password" placeholder="Your password" type="password" />
       </label>
       {state.error ? <p className={styles.error}>{state.error}</p> : null}
+      {state.message ? <p className={styles.message}>{state.message}</p> : null}
       <button className={styles.submitButton} disabled={isSubmitting} type="submit">
         {isSubmitting ? "Signing in..." : "Sign in"}
       </button>

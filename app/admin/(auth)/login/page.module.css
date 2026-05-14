@@ -79,6 +79,15 @@
   padding: 12px 14px;
 }
 
+.message {
+  background: #eefbf3;
+  border: 1px solid #bfe9cd;
+  color: #146c2e;
+  font-size: 14px;
+  margin: 0;
+  padding: 12px 14px;
+}
+
 .submitButton {
   background: #111111;
   border: 0;

@@ -5,16 +5,20 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import { adminLoginSchema } from "./validations/auth";
 
+const isProduction = process.env.NODE_ENV === "production";
+const authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/admin/login",
   },
-  secret: process.env.AUTH_SECRET,
+  secret: authSecret,
   session: {
     strategy: "jwt",
   },
   trustHost: true,
+  useSecureCookies: isProduction,
   providers: [
     Credentials({
       credentials: {
