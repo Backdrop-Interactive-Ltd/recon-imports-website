@@ -10,9 +10,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/admin/login",
   },
+  secret: process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",
   },
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {
@@ -50,6 +52,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    redirect({ baseUrl, url }) {
+      if (url.startsWith("/admin") && !url.startsWith("/admin/login")) {
+        return `${baseUrl}${url}`;
+      }
+
+      if (url.startsWith(baseUrl)) {
+        const nextUrl = new URL(url);
+
+        if (nextUrl.pathname.startsWith("/admin") && nextUrl.pathname !== "/admin/login") {
+          return url;
+        }
+      }
+
+      return `${baseUrl}/admin`;
+    },
     jwt({ token, user }) {
       if (user) {
         token.role = (user as { role?: string }).role;

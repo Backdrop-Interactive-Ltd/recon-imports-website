@@ -1,55 +1,26 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { adminLoginSchema } from "../../../../lib/validations/auth";
+import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+import { adminLoginAction, initialAdminLoginActionState } from "./actions";
 import styles from "./page.module.css";
 
-export default function AdminLoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin";
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-
-    const formData = new FormData(event.currentTarget);
-    const parsed = adminLoginSchema.safeParse({
-      email: formData.get("email"),
-      password: formData.get("password"),
-    });
-
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Please check your login details.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const result = await signIn("credentials", {
-      email: parsed.data.email,
-      password: parsed.data.password,
-      redirect: false,
-      callbackUrl,
-    });
-
-    setIsSubmitting(false);
-
-    if (!result || result.error) {
-      setError("Invalid email or password.");
-      return;
-    }
-
-    router.replace(result.url || callbackUrl);
-    router.refresh();
+function getSafeCallbackUrl(value: string | null) {
+  if (!value || !value.startsWith("/admin") || value.startsWith("//") || value.startsWith("/admin/login")) {
+    return "/admin";
   }
 
+  return value;
+}
+
+export default function AdminLoginForm() {
+  const searchParams = useSearchParams();
+  const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
+  const [state, formAction, isSubmitting] = useActionState(adminLoginAction, initialAdminLoginActionState);
+
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form action={formAction} className={styles.form}>
+      <input name="callbackUrl" type="hidden" value={callbackUrl} />
       <label className={styles.field}>
         <span>Email</span>
         <input autoComplete="email" name="email" placeholder="admin@example.com" type="email" />
@@ -58,7 +29,7 @@ export default function AdminLoginForm() {
         <span>Password</span>
         <input autoComplete="current-password" name="password" placeholder="Your password" type="password" />
       </label>
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {state.error ? <p className={styles.error}>{state.error}</p> : null}
       <button className={styles.submitButton} disabled={isSubmitting} type="submit">
         {isSubmitting ? "Signing in..." : "Sign in"}
       </button>
