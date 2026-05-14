@@ -30,10 +30,13 @@ async function getAuctionSheetRequests() {
       feeAmount: true,
       id: true,
       name: true,
+      paymentMethod: true,
       paymentStatus: true,
       phone: true,
       reportUrl: true,
+      senderNumber: true,
       status: true,
+      transactionId: true,
       updatedAt: true,
     },
   });
@@ -117,6 +120,18 @@ export default async function AdminAuctionSheetRequestsPage() {
                     <dd>{request.paymentStatusLabel}</dd>
                   </div>
                   <div>
+                    <dt>Method</dt>
+                    <dd>{request.paymentMethod || "Not set"}</dd>
+                  </div>
+                  <div>
+                    <dt>Sender</dt>
+                    <dd>{request.senderNumber || "Not set"}</dd>
+                  </div>
+                  <div>
+                    <dt>Transaction</dt>
+                    <dd>{request.transactionId || "Not set"}</dd>
+                  </div>
+                  <div>
                     <dt>Fee</dt>
                     <dd>{request.feeAmountLabel}</dd>
                   </div>
@@ -148,6 +163,18 @@ export default async function AdminAuctionSheetRequestsPage() {
                       <dd>
                         <a href={`mailto:${request.email}`}>{request.email}</a>
                       </dd>
+                    </div>
+                    <div>
+                      <dt>Payment Method</dt>
+                      <dd>{request.paymentMethod || "Not set"}</dd>
+                    </div>
+                    <div>
+                      <dt>Sender Number</dt>
+                      <dd>{request.senderNumber || "Not set"}</dd>
+                    </div>
+                    <div>
+                      <dt>Transaction ID</dt>
+                      <dd>{request.transactionId || "Not set"}</dd>
                     </div>
                     <div>
                       <dt>Updated</dt>

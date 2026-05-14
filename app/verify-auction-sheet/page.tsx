@@ -1,12 +1,17 @@
 import Footer from "../components/Footer";
+import { getSiteSettings } from "../../lib/siteSettings";
 import VerifyAuctionSheetForm from "./VerifyAuctionSheetForm";
 
-export default function VerifyAuctionSheetPage() {
+export const dynamic = "force-dynamic";
+
+export default async function VerifyAuctionSheetPage() {
+  const siteSettings = await getSiteSettings();
+
   return (
     <main className="verify-page">
       <header className="cars-header verify-page-header">
         <a className="cars-logo" href="/">
-          <img src="/recon-logo.webp" alt="Recon Imports" />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} />
         </a>
         <nav aria-label="Verify auction sheet navigation">
           <a href="/">Home</a>
@@ -19,9 +24,9 @@ export default function VerifyAuctionSheetPage() {
         </nav>
       </header>
 
-      <VerifyAuctionSheetForm />
+      <VerifyAuctionSheetForm paymentAccounts={siteSettings} />
 
-      <Footer className="verify-footer" />
+      <Footer className="verify-footer" settings={siteSettings} />
     </main>
   );
 }

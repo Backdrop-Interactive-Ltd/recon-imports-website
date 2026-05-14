@@ -5,6 +5,7 @@ import { getPublicCarDetail, getPublicCarStaticParams } from "../data";
 import { formatPrice } from "../inventory";
 import ShareButton from "./ShareButton";
 import SuggestedCarousel from "./SuggestedCarousel";
+import { getPhoneHref, getSiteSettings, getWhatsAppHref } from "../../../lib/siteSettings";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +15,15 @@ export async function generateStaticParams() {
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const detail = await getPublicCarDetail(slug);
+  const [detail, siteSettings] = await Promise.all([getPublicCarDetail(slug), getSiteSettings()]);
 
   if (!detail) {
     notFound();
   }
 
   const { product, suggestedItems } = detail;
+  const phoneHref = getPhoneHref(siteSettings.phoneNumber) || "tel:+8801886589009";
+  const whatsappHref = getWhatsAppHref(siteSettings.whatsappNumber) || "https://wa.me/8801886589009";
   const specs = [
     ["Brand", product.brand],
     ["Model", product.model],
@@ -38,7 +41,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <main className="product-page">
       <header className="cars-header product-header">
         <a className="cars-logo" href="/">
-          <img src="/recon-logo.webp" alt="Recon Imports" />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} />
         </a>
         <nav aria-label="Product page navigation">
           <a href="/">Home</a>
@@ -125,11 +128,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               preference.
             </p>
           </div>
-          <a className="product-action light" href="tel:+8801886589009">
+          <a className="product-action light" href={phoneHref}>
             <Phone size={16} />
             Call Us
           </a>
-          <a className="product-action pale" href="https://wa.me/8801886589009" target="_blank" rel="noreferrer">
+          <a className="product-action pale" href={whatsappHref} target="_blank" rel="noreferrer">
             <MessageCircle size={16} />
             Text Us on WhatsApp
           </a>
@@ -147,7 +150,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <SuggestedCarousel items={suggestedItems} />
       </section>
 
-      <Footer className="product-footer" />
+      <Footer className="product-footer" settings={siteSettings} />
     </main>
   );
 }

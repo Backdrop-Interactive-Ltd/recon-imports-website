@@ -11,6 +11,7 @@ import {
   Mail,
   Settings,
   Tags,
+  UserCog,
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -27,6 +28,7 @@ const adminNavItems = [
   { href: "/admin/requirement-leads", label: "Requirement Leads", icon: ClipboardList },
   { href: "/admin/auction-sheet-requests", label: "Auction Sheets", icon: FileCheck2 },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
+  { href: "/admin/users", label: "Admin Users", icon: UserCog },
   { href: "/admin/site-settings", label: "Site Settings", icon: Settings },
   { href: "/admin/media", label: "Media", icon: Image },
 ];

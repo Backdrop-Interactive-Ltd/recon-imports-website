@@ -1,15 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { subscribeNewsletterAction } from "../newsletter/actions";
+import { initialNewsletterActionState } from "../newsletter/validation";
+import { fallbackSiteSettings, type PublicSiteSettings } from "../../lib/siteSettingsConfig";
 
 type FooterProps = {
   className?: string;
+  settings?: PublicSiteSettings;
 };
 
+function getPhoneHref(phoneNumber: string) {
+  const compactPhone = phoneNumber.replace(/[^\d+]/g, "");
+  return compactPhone ? `tel:${compactPhone}` : "";
+}
+
+const socialLinks = [
+  ["Instagram", "instagramUrl", "IG"],
+  ["Facebook", "facebookUrl", "FB"],
+  ["YouTube", "youtubeUrl", "YT"],
+  ["TikTok", "tiktokUrl", "TT"],
+  ["LinkedIn", "linkedinUrl", "IN"],
+] as const;
+
 // Shared site footer used across all public pages.
-export default function Footer({ className = "" }: FooterProps) {
+export default function Footer({ className = "", settings = fallbackSiteSettings }: FooterProps) {
+  const [state, formAction, isPending] = useActionState(subscribeNewsletterAction, initialNewsletterActionState);
   const [newsletter, setNewsletter] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
   const footerClassName = ["footer", className].filter(Boolean).join(" ");
+  const phoneHref = getPhoneHref(settings.phoneNumber);
+
+  useEffect(() => {
+    if (state.status === "success" && !state.message.includes("already subscribed")) {
+      formRef.current?.reset();
+      setNewsletter("");
+    }
+  }, [state.message, state.status]);
 
   return (
     <footer className={footerClassName}>
@@ -39,37 +66,53 @@ export default function Footer({ className = "" }: FooterProps) {
           <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
         </div>
         <div className="footer-newsletter">
+          {settings.footerLogo ? <img className="footer-logo" src={settings.footerLogo} alt={`${settings.siteName} footer logo`} /> : null}
           <h3>Stay updated with Recon Imports</h3>
-          <label>
-            <input
-              value={newsletter}
-              onChange={(event) => setNewsletter(event.target.value)}
-              placeholder="Your Email Address"
-              type="email"
-              suppressHydrationWarning
-            />
-            <button type="button">Subscribe</button>
-          </label>
+          <form action={formAction} className="newsletter-form" ref={formRef}>
+            <label>
+              <input
+                aria-invalid={Boolean(state.errors?.email)}
+                name="email"
+                value={newsletter}
+                onChange={(event) => setNewsletter(event.target.value)}
+                placeholder="Your Email Address"
+                type="email"
+                suppressHydrationWarning
+              />
+              <button disabled={isPending} type="submit">
+                {isPending ? "Subscribing..." : "Subscribe"}
+              </button>
+            </label>
+            {state.message ? (
+              <p className={state.status === "success" ? "newsletter-success" : "newsletter-error"}>{state.message}</p>
+            ) : null}
+          </form>
+          <div className="footer-contact" aria-label="Contact information">
+            {settings.phoneNumber && phoneHref ? <a href={phoneHref}>{settings.phoneNumber}</a> : null}
+            {settings.email ? <a href={`mailto:${settings.email}`}>{settings.email}</a> : null}
+            {settings.address ? (
+              settings.googleMapsUrl ? (
+                <a href={settings.googleMapsUrl} target="_blank" rel="noreferrer">
+                  {settings.address}
+                </a>
+              ) : (
+                <span>{settings.address}</span>
+              )
+            ) : null}
+          </div>
           <div className="social-links" aria-label="Social links">
-            <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noreferrer">
-              IG
-            </a>
-            <a href="https://www.facebook.com/" aria-label="Facebook" target="_blank" rel="noreferrer">
-              FB
-            </a>
-            <a href="https://www.youtube.com/" aria-label="YouTube" target="_blank" rel="noreferrer">
-              YT
-            </a>
+            {socialLinks.map(([label, key, text]) =>
+              settings[key] ? (
+                <a href={settings[key]} aria-label={label} target="_blank" rel="noreferrer" key={key}>
+                  {text}
+                </a>
+              ) : null,
+            )}
           </div>
         </div>
       </div>
       <div className="footer-bottom">
-        <strong>
-          &copy; 2026 Recon Imports. All Rights Reserved by{" "}
-          <a className="footer-credit" href="https://backdropinteractive.com/" target="_blank" rel="noreferrer">
-            @Backdrop Interactive
-          </a>
-        </strong>
+        <strong>{settings.footerCopyrightText}</strong>
       </div>
     </footer>
   );

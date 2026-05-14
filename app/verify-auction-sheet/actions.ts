@@ -21,8 +21,11 @@ function fieldErrorState(error: ReturnType<typeof auctionSheetRequestFormSchema.
       chassisNumber: flattened.chassisNumber?.[0],
       email: flattened.email?.[0],
       name: flattened.name?.[0],
+      paymentMethod: flattened.paymentMethod?.[0],
       phone: flattened.phone?.[0],
+      senderNumber: flattened.senderNumber?.[0],
       terms: flattened.terms?.[0],
+      transactionId: flattened.transactionId?.[0],
     },
     message: "Please fix the highlighted fields.",
     status: "error",
@@ -34,8 +37,11 @@ function readAuctionSheetRequestForm(formData: FormData) {
     chassisNumber: String(formData.get("chassisNumber") ?? ""),
     email: String(formData.get("email") ?? ""),
     name: String(formData.get("name") ?? ""),
+    paymentMethod: String(formData.get("paymentMethod") ?? ""),
     phone: String(formData.get("phone") ?? ""),
+    senderNumber: String(formData.get("senderNumber") ?? ""),
     terms: formData.get("terms") === "on",
+    transactionId: String(formData.get("transactionId") ?? ""),
   };
 }
 
@@ -55,9 +61,12 @@ export async function submitAuctionSheetRequestAction(
       email: parsed.data.email,
       feeAmount: auctionSheetReportFee,
       name: parsed.data.name,
+      paymentMethod: parsed.data.paymentMethod,
       paymentStatus: PaymentStatus.PENDING,
       phone: parsed.data.phone,
+      senderNumber: parsed.data.senderNumber,
       status: AuctionSheetStatus.NEW,
+      transactionId: parsed.data.transactionId.toUpperCase(),
     },
   });
 
@@ -65,7 +74,7 @@ export async function submitAuctionSheetRequestAction(
   revalidatePath("/admin/auction-sheet-requests");
 
   return {
-    message: "Your auction sheet verification request was submitted successfully. Payment integration will be added later.",
+    message: "Your auction sheet verification request was submitted successfully. Our team will verify your payment manually.",
     status: "success",
   };
 }

@@ -41,6 +41,9 @@ export type AuctionSheetRequestMinAggregateOutputType = {
   phone: string | null
   email: string | null
   feeAmount: number | null
+  paymentMethod: string | null
+  senderNumber: string | null
+  transactionId: string | null
   paymentStatus: $Enums.PaymentStatus | null
   status: $Enums.AuctionSheetStatus | null
   reportUrl: string | null
@@ -55,6 +58,9 @@ export type AuctionSheetRequestMaxAggregateOutputType = {
   phone: string | null
   email: string | null
   feeAmount: number | null
+  paymentMethod: string | null
+  senderNumber: string | null
+  transactionId: string | null
   paymentStatus: $Enums.PaymentStatus | null
   status: $Enums.AuctionSheetStatus | null
   reportUrl: string | null
@@ -69,6 +75,9 @@ export type AuctionSheetRequestCountAggregateOutputType = {
   phone: number
   email: number
   feeAmount: number
+  paymentMethod: number
+  senderNumber: number
+  transactionId: number
   paymentStatus: number
   status: number
   reportUrl: number
@@ -93,6 +102,9 @@ export type AuctionSheetRequestMinAggregateInputType = {
   phone?: true
   email?: true
   feeAmount?: true
+  paymentMethod?: true
+  senderNumber?: true
+  transactionId?: true
   paymentStatus?: true
   status?: true
   reportUrl?: true
@@ -107,6 +119,9 @@ export type AuctionSheetRequestMaxAggregateInputType = {
   phone?: true
   email?: true
   feeAmount?: true
+  paymentMethod?: true
+  senderNumber?: true
+  transactionId?: true
   paymentStatus?: true
   status?: true
   reportUrl?: true
@@ -121,6 +136,9 @@ export type AuctionSheetRequestCountAggregateInputType = {
   phone?: true
   email?: true
   feeAmount?: true
+  paymentMethod?: true
+  senderNumber?: true
+  transactionId?: true
   paymentStatus?: true
   status?: true
   reportUrl?: true
@@ -222,6 +240,9 @@ export type AuctionSheetRequestGroupByOutputType = {
   phone: string
   email: string
   feeAmount: number
+  paymentMethod: string | null
+  senderNumber: string | null
+  transactionId: string | null
   paymentStatus: $Enums.PaymentStatus
   status: $Enums.AuctionSheetStatus
   reportUrl: string | null
@@ -259,6 +280,9 @@ export type AuctionSheetRequestWhereInput = {
   phone?: Prisma.StringFilter<"AuctionSheetRequest"> | string
   email?: Prisma.StringFilter<"AuctionSheetRequest"> | string
   feeAmount?: Prisma.IntFilter<"AuctionSheetRequest"> | number
+  paymentMethod?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
+  senderNumber?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
+  transactionId?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
   paymentStatus?: Prisma.EnumPaymentStatusFilter<"AuctionSheetRequest"> | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusFilter<"AuctionSheetRequest"> | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
@@ -273,6 +297,9 @@ export type AuctionSheetRequestOrderByWithRelationInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   feeAmount?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  senderNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  transactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reportUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -290,6 +317,9 @@ export type AuctionSheetRequestWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringFilter<"AuctionSheetRequest"> | string
   email?: Prisma.StringFilter<"AuctionSheetRequest"> | string
   feeAmount?: Prisma.IntFilter<"AuctionSheetRequest"> | number
+  paymentMethod?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
+  senderNumber?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
+  transactionId?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
   paymentStatus?: Prisma.EnumPaymentStatusFilter<"AuctionSheetRequest"> | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusFilter<"AuctionSheetRequest"> | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.StringNullableFilter<"AuctionSheetRequest"> | string | null
@@ -304,6 +334,9 @@ export type AuctionSheetRequestOrderByWithAggregationInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   feeAmount?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  senderNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  transactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reportUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,6 +359,9 @@ export type AuctionSheetRequestScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringWithAggregatesFilter<"AuctionSheetRequest"> | string
   email?: Prisma.StringWithAggregatesFilter<"AuctionSheetRequest"> | string
   feeAmount?: Prisma.IntWithAggregatesFilter<"AuctionSheetRequest"> | number
+  paymentMethod?: Prisma.StringNullableWithAggregatesFilter<"AuctionSheetRequest"> | string | null
+  senderNumber?: Prisma.StringNullableWithAggregatesFilter<"AuctionSheetRequest"> | string | null
+  transactionId?: Prisma.StringNullableWithAggregatesFilter<"AuctionSheetRequest"> | string | null
   paymentStatus?: Prisma.EnumPaymentStatusWithAggregatesFilter<"AuctionSheetRequest"> | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusWithAggregatesFilter<"AuctionSheetRequest"> | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.StringNullableWithAggregatesFilter<"AuctionSheetRequest"> | string | null
@@ -340,6 +376,9 @@ export type AuctionSheetRequestCreateInput = {
   phone: string
   email: string
   feeAmount?: number
+  paymentMethod?: string | null
+  senderNumber?: string | null
+  transactionId?: string | null
   paymentStatus?: $Enums.PaymentStatus
   status?: $Enums.AuctionSheetStatus
   reportUrl?: string | null
@@ -354,6 +393,9 @@ export type AuctionSheetRequestUncheckedCreateInput = {
   phone: string
   email: string
   feeAmount?: number
+  paymentMethod?: string | null
+  senderNumber?: string | null
+  transactionId?: string | null
   paymentStatus?: $Enums.PaymentStatus
   status?: $Enums.AuctionSheetStatus
   reportUrl?: string | null
@@ -368,6 +410,9 @@ export type AuctionSheetRequestUpdateInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   feeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusFieldUpdateOperationsInput | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -382,6 +427,9 @@ export type AuctionSheetRequestUncheckedUpdateInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   feeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusFieldUpdateOperationsInput | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -396,6 +444,9 @@ export type AuctionSheetRequestCreateManyInput = {
   phone: string
   email: string
   feeAmount?: number
+  paymentMethod?: string | null
+  senderNumber?: string | null
+  transactionId?: string | null
   paymentStatus?: $Enums.PaymentStatus
   status?: $Enums.AuctionSheetStatus
   reportUrl?: string | null
@@ -410,6 +461,9 @@ export type AuctionSheetRequestUpdateManyMutationInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   feeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusFieldUpdateOperationsInput | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -424,6 +478,9 @@ export type AuctionSheetRequestUncheckedUpdateManyInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   feeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   status?: Prisma.EnumAuctionSheetStatusFieldUpdateOperationsInput | $Enums.AuctionSheetStatus
   reportUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -438,6 +495,9 @@ export type AuctionSheetRequestCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   feeAmount?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
+  senderNumber?: Prisma.SortOrder
+  transactionId?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reportUrl?: Prisma.SortOrder
@@ -456,6 +516,9 @@ export type AuctionSheetRequestMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   feeAmount?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
+  senderNumber?: Prisma.SortOrder
+  transactionId?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reportUrl?: Prisma.SortOrder
@@ -470,6 +533,9 @@ export type AuctionSheetRequestMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   feeAmount?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
+  senderNumber?: Prisma.SortOrder
+  transactionId?: Prisma.SortOrder
   paymentStatus?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reportUrl?: Prisma.SortOrder
@@ -498,6 +564,9 @@ export type AuctionSheetRequestSelect<ExtArgs extends runtime.Types.Extensions.I
   phone?: boolean
   email?: boolean
   feeAmount?: boolean
+  paymentMethod?: boolean
+  senderNumber?: boolean
+  transactionId?: boolean
   paymentStatus?: boolean
   status?: boolean
   reportUrl?: boolean
@@ -512,6 +581,9 @@ export type AuctionSheetRequestSelectCreateManyAndReturn<ExtArgs extends runtime
   phone?: boolean
   email?: boolean
   feeAmount?: boolean
+  paymentMethod?: boolean
+  senderNumber?: boolean
+  transactionId?: boolean
   paymentStatus?: boolean
   status?: boolean
   reportUrl?: boolean
@@ -526,6 +598,9 @@ export type AuctionSheetRequestSelectUpdateManyAndReturn<ExtArgs extends runtime
   phone?: boolean
   email?: boolean
   feeAmount?: boolean
+  paymentMethod?: boolean
+  senderNumber?: boolean
+  transactionId?: boolean
   paymentStatus?: boolean
   status?: boolean
   reportUrl?: boolean
@@ -540,6 +615,9 @@ export type AuctionSheetRequestSelectScalar = {
   phone?: boolean
   email?: boolean
   feeAmount?: boolean
+  paymentMethod?: boolean
+  senderNumber?: boolean
+  transactionId?: boolean
   paymentStatus?: boolean
   status?: boolean
   reportUrl?: boolean
@@ -547,7 +625,7 @@ export type AuctionSheetRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AuctionSheetRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "chassisNumber" | "name" | "phone" | "email" | "feeAmount" | "paymentStatus" | "status" | "reportUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["auctionSheetRequest"]>
+export type AuctionSheetRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "chassisNumber" | "name" | "phone" | "email" | "feeAmount" | "paymentMethod" | "senderNumber" | "transactionId" | "paymentStatus" | "status" | "reportUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["auctionSheetRequest"]>
 
 export type $AuctionSheetRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AuctionSheetRequest"
@@ -559,6 +637,9 @@ export type $AuctionSheetRequestPayload<ExtArgs extends runtime.Types.Extensions
     phone: string
     email: string
     feeAmount: number
+    paymentMethod: string | null
+    senderNumber: string | null
+    transactionId: string | null
     paymentStatus: $Enums.PaymentStatus
     status: $Enums.AuctionSheetStatus
     reportUrl: string | null
@@ -993,6 +1074,9 @@ export interface AuctionSheetRequestFieldRefs {
   readonly phone: Prisma.FieldRef<"AuctionSheetRequest", 'String'>
   readonly email: Prisma.FieldRef<"AuctionSheetRequest", 'String'>
   readonly feeAmount: Prisma.FieldRef<"AuctionSheetRequest", 'Int'>
+  readonly paymentMethod: Prisma.FieldRef<"AuctionSheetRequest", 'String'>
+  readonly senderNumber: Prisma.FieldRef<"AuctionSheetRequest", 'String'>
+  readonly transactionId: Prisma.FieldRef<"AuctionSheetRequest", 'String'>
   readonly paymentStatus: Prisma.FieldRef<"AuctionSheetRequest", 'PaymentStatus'>
   readonly status: Prisma.FieldRef<"AuctionSheetRequest", 'AuctionSheetStatus'>
   readonly reportUrl: Prisma.FieldRef<"AuctionSheetRequest", 'String'>

@@ -286,6 +286,20 @@ model SiteSetting {
   updatedAt DateTime        @updatedAt
 }
 
+model Media {
+  id        String   @id @default(cuid())
+  fileUrl   String
+  fileName  String
+  fileType  String
+  folder    String
+  size      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([folder])
+  @@index([createdAt])
+}
+
 model SellCarLead {
   id               String     @id @default(cuid())
   name             String
@@ -329,6 +343,9 @@ model AuctionSheetRequest {
   phone         String
   email         String
   feeAmount     Int                @default(800)
+  paymentMethod String?
+  senderNumber  String?
+  transactionId String?
   paymentStatus PaymentStatus      @default(PENDING)
   status        AuctionSheetStatus @default(NEW)
   reportUrl     String?

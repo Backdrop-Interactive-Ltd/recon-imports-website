@@ -4,13 +4,31 @@ import { Check, Info, Search } from "lucide-react";
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { submitAuctionSheetRequestAction } from "./actions";
 import { auctionSheetReportFee } from "./constants";
-import { initialAuctionSheetRequestActionState } from "./validation";
+import { initialAuctionSheetRequestActionState, paymentMethodOptions } from "./validation";
+import type { PublicSiteSettings } from "../../lib/siteSettingsConfig";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-IN").format(amount);
 }
 
-export default function VerifyAuctionSheetForm() {
+type VerifyAuctionSheetFormProps = {
+  paymentAccounts: Pick<
+    PublicSiteSettings,
+    "bankTransferAccount" | "bkashPaymentNumber" | "nagadPaymentNumber" | "rocketPaymentNumber"
+  >;
+};
+
+const fallbackPaymentAccount = "Payment number/account will be confirmed by Recon Imports after submission.";
+
+function getPaymentAccount(paymentAccounts: VerifyAuctionSheetFormProps["paymentAccounts"], paymentMethod: string) {
+  if (paymentMethod === "bKash") return paymentAccounts.bkashPaymentNumber || fallbackPaymentAccount;
+  if (paymentMethod === "Nagad") return paymentAccounts.nagadPaymentNumber || fallbackPaymentAccount;
+  if (paymentMethod === "Rocket") return paymentAccounts.rocketPaymentNumber || fallbackPaymentAccount;
+  if (paymentMethod === "Bank Transfer") return paymentAccounts.bankTransferAccount || fallbackPaymentAccount;
+  return fallbackPaymentAccount;
+}
+
+export default function VerifyAuctionSheetForm({ paymentAccounts }: VerifyAuctionSheetFormProps) {
   const [state, formAction, isPending] = useActionState(
     submitAuctionSheetRequestAction,
     initialAuctionSheetRequestActionState,
@@ -19,12 +37,17 @@ export default function VerifyAuctionSheetForm() {
   const [chassis, setChassis] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<(typeof paymentMethodOptions)[number]>("bKash");
   const [phone, setPhone] = useState("");
+  const [senderNumber, setSenderNumber] = useState("");
+  const [transactionId, setTransactionId] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
 
   const canProceed = useMemo(() => {
-    return chassis.trim() && name.trim() && phone.trim() && email.trim() && agreed;
-  }, [agreed, chassis, email, name, phone]);
+    return chassis.trim() && name.trim() && phone.trim() && email.trim() && paymentMethod && senderNumber.trim() && transactionId.trim() && agreed;
+  }, [agreed, chassis, email, name, paymentMethod, phone, senderNumber, transactionId]);
+
+  const paymentAccount = getPaymentAccount(paymentAccounts, paymentMethod);
 
   useEffect(() => {
     if (state.status === "success") {
@@ -33,7 +56,10 @@ export default function VerifyAuctionSheetForm() {
       setChassis("");
       setEmail("");
       setName("");
+      setPaymentMethod("bKash");
       setPhone("");
+      setSenderNumber("");
+      setTransactionId("");
     }
   }, [state.status]);
 
@@ -106,13 +132,45 @@ export default function VerifyAuctionSheetForm() {
             <h2>Payment</h2>
           </div>
 
-          <div className="payment-option">
-            <span>Pay BDT {formatCurrency(auctionSheetReportFee)}</span>
-            <span className="payment-marks" aria-label="Accepted card payment methods">
-              <span className="card-mark mastercard" />
-              <span>VISA</span>
-              <span className="card-mark amex" />
-            </span>
+          <div className="payment-instructions">
+            <strong>Amount: BDT {formatCurrency(auctionSheetReportFee)}</strong>
+            <span>{paymentMethod} payment number/account:</span>
+            <p>{paymentAccount}</p>
+          </div>
+
+          <div className="field-stack payment-fields">
+            <select
+              aria-invalid={Boolean(state.errors?.paymentMethod)}
+              name="paymentMethod"
+              onChange={(event) => setPaymentMethod(event.target.value as (typeof paymentMethodOptions)[number])}
+              value={paymentMethod}
+            >
+              {paymentMethodOptions.map((method) => (
+                <option key={method} value={method}>
+                  {method}
+                </option>
+              ))}
+            </select>
+            {state.errors?.paymentMethod ? <small className="verify-form-error">{state.errors.paymentMethod}</small> : null}
+
+            <input
+              aria-invalid={Boolean(state.errors?.senderNumber)}
+              name="senderNumber"
+              onChange={(event) => setSenderNumber(event.target.value)}
+              placeholder="Sender Number"
+              type="tel"
+              value={senderNumber}
+            />
+            {state.errors?.senderNumber ? <small className="verify-form-error">{state.errors.senderNumber}</small> : null}
+
+            <input
+              aria-invalid={Boolean(state.errors?.transactionId)}
+              name="transactionId"
+              onChange={(event) => setTransactionId(event.target.value)}
+              placeholder="Transaction ID"
+              value={transactionId}
+            />
+            {state.errors?.transactionId ? <small className="verify-form-error">{state.errors.transactionId}</small> : null}
           </div>
 
           {state.message ? (
@@ -120,7 +178,7 @@ export default function VerifyAuctionSheetForm() {
           ) : null}
 
           <button className="payment-button" type="submit" disabled={!canProceed || isPending}>
-            {isPending ? "Submitting..." : "Proceed to Payment"}
+            {isPending ? "Submitting..." : "Submit for Manual Verification"}
           </button>
 
           <label className="terms-row">

@@ -1015,6 +1015,19 @@ a {
   margin-bottom: 17px;
 }
 
+.newsletter-form {
+  width: min(100%, 530px);
+}
+
+.footer-logo {
+  display: block;
+  height: auto;
+  margin-bottom: 18px;
+  max-height: 54px;
+  max-width: 190px;
+  object-fit: contain;
+}
+
 .footer-newsletter label {
   align-items: center;
   display: grid;
@@ -1054,6 +1067,46 @@ a {
 .footer-newsletter button:hover {
   background: var(--red-dark);
   transform: translateY(-1px);
+}
+
+.footer-newsletter button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.newsletter-error,
+.newsletter-success {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 10px 0 0;
+}
+
+.newsletter-error {
+  color: #ffd3d8;
+}
+
+.newsletter-success {
+  color: #c7f4d5;
+}
+
+.footer-contact {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  max-width: 520px;
+}
+
+.footer-contact a,
+.footer-contact span {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.footer-contact a:hover {
+  color: #ff6b76;
 }
 
 .social-links {
@@ -2405,7 +2458,8 @@ a {
 }
 
 .lookup-row input,
-.field-stack input {
+.field-stack input,
+.field-stack select {
   background: #ffffff;
   border: 1px solid #dddddd;
   color: #111111;
@@ -2417,12 +2471,14 @@ a {
 }
 
 .lookup-row input:focus,
-.field-stack input:focus {
+.field-stack input:focus,
+.field-stack select:focus {
   border-color: #111111;
 }
 
 .lookup-row input[aria-invalid="true"],
-.field-stack input[aria-invalid="true"] {
+.field-stack input[aria-invalid="true"],
+.field-stack select[aria-invalid="true"] {
   border-color: #ad1b28;
 }
 
@@ -2527,6 +2583,43 @@ a {
   margin-top: 24px;
   min-height: 55px;
   padding: 0 14px 0 16px;
+}
+
+.payment-instructions {
+  border: 1px solid #dddddd;
+  color: #26313d;
+  display: grid;
+  gap: 8px;
+  letter-spacing: 1.2px;
+  line-height: 1.45;
+  margin-top: 24px;
+  padding: 16px;
+}
+
+.payment-instructions strong {
+  color: #111111;
+  font-size: 14px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.payment-instructions span {
+  color: #566477;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.payment-instructions p {
+  color: #111111;
+  font-size: 13px;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.payment-fields {
+  margin-top: 16px;
 }
 
 .payment-marks {

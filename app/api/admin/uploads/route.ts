@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
+import { prisma } from "../../../../lib/prisma";
 import { configureCloudinary, getCloudinaryConfig, uploadImageBuffer } from "../../../../lib/uploads/cloudinary";
 import { validateAdminImageFile } from "../../../../lib/uploads/imageRules";
 
@@ -58,8 +59,29 @@ export async function POST(request: Request) {
     const folder = getSafeFolder(formData.get("folder"));
     const buffer = Buffer.from(await file.arrayBuffer());
     const result = await uploadImageBuffer(buffer, folder);
+    let mediaId: string | undefined;
+
+    try {
+      const media = await prisma.media.create({
+        data: {
+          fileName: file.name,
+          fileType: file.type,
+          fileUrl: result.secure_url,
+          folder,
+          size: file.size,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      mediaId = media.id;
+    } catch (error) {
+      console.error("Image uploaded, but media record creation failed.", error);
+    }
 
     return NextResponse.json({
+      mediaId,
       publicId: result.public_id,
       url: result.secure_url,
     });

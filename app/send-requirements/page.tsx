@@ -1,12 +1,17 @@
 import Footer from "../components/Footer";
+import { getSiteSettings } from "../../lib/siteSettings";
 import SendRequirementsForm from "./SendRequirementsForm";
 
-export default function SendRequirementsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SendRequirementsPage() {
+  const siteSettings = await getSiteSettings();
+
   return (
     <main className="send-requirements-page">
       <header className="cars-header send-requirements-header">
         <a className="cars-logo" href="/">
-          <img src="/recon-logo.webp" alt="Recon Imports" />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} />
         </a>
         <nav aria-label="Send requirements navigation">
           <a href="/">Home</a>
@@ -39,7 +44,7 @@ export default function SendRequirementsPage() {
         <SendRequirementsForm />
       </section>
 
-      <Footer className="send-requirements-footer" />
+      <Footer className="send-requirements-footer" settings={siteSettings} />
     </main>
   );
 }

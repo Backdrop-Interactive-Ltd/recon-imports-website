@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { brandOptions as fallbackBrandOptions } from "./brands";
 import { formatPrice, inventory as fallbackInventory, type CarInventoryItem } from "./inventory";
 import type { PublicBrandOption } from "./data";
+import { fallbackSiteSettings, type PublicSiteSettings } from "../../lib/siteSettingsConfig";
 
 // Creates a downloadable CSV from the current stock data.
 function downloadStockList(stockItems: CarInventoryItem[]) {
@@ -87,6 +88,7 @@ export type StockListingPageProps = {
   evOnly?: boolean;
   inventoryItems?: CarInventoryItem[];
   introCopy?: string;
+  siteSettings?: PublicSiteSettings;
   title?: string;
   typeFilter?: "Brand New" | "Pre Owned" | "Pre Order" | "Reconditioned";
 };
@@ -99,6 +101,7 @@ export default function StockListingPage({
   evOnly = false,
   inventoryItems = fallbackInventory,
   introCopy = "Glance through the widest collection of reconditioned Japanese models and pre-owned imported units and choose according to your budget and quality preferences.",
+  siteSettings = fallbackSiteSettings,
   title = "Choose per your preference",
   typeFilter,
 }: StockListingPageProps) {
@@ -172,7 +175,7 @@ export default function StockListingPage({
       {/* Header: same navigation style used across stock and verification pages. */}
       <header className="cars-header">
         <a className="cars-logo" href="/">
-          <img src="/recon-logo.webp" alt="Recon Imports" />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} />
         </a>
         <nav aria-label="Cars page navigation">
           <a href="/">Home</a>
@@ -328,7 +331,7 @@ export default function StockListingPage({
         </div>
       </section>
 
-      <Footer className="cars-footer" />
+      <Footer className="cars-footer" settings={siteSettings} />
     </main>
   );
 }

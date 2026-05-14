@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { brandOptions } from "./car-stocks/brands";
 import { formatPrice, inventory } from "./car-stocks/inventory";
 import Footer from "./components/Footer";
+import { fallbackSiteSettings, type PublicSiteSettings } from "../lib/siteSettingsConfig";
 
 export type HomepageBrand = {
   logoUrl?: string | null;
@@ -142,6 +143,7 @@ type HomeClientProps = {
   brands?: HomepageBrand[];
   categories?: HomepageCategory[];
   heroSlides?: HomepageHeroSlide[];
+  siteSettings?: PublicSiteSettings;
 };
 
 const fallbackBrands: HomepageBrand[] = brandOptions.map((brand) => ({
@@ -154,6 +156,7 @@ export default function HomeClient({
   brands = fallbackBrands,
   categories = fallbackCategories,
   heroSlides = fallbackHeroSlides,
+  siteSettings = fallbackSiteSettings,
 }: HomeClientProps) {
   const [slide, setSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -205,6 +208,8 @@ export default function HomeClient({
   }, [budget, query]);
   const carouselStock = [...latestStock, ...latestStock];
   const carouselCategories = [...categories, ...categories];
+  const phoneHref = siteSettings.phoneNumber ? `tel:${siteSettings.phoneNumber.replace(/[^\d+]/g, "")}` : "";
+  const whatsappHref = siteSettings.whatsappNumber ? `https://wa.me/${siteSettings.whatsappNumber.replace(/[^\d]/g, "")}` : "";
 
   useEffect(() => {
     let animationFrame = 0;
@@ -644,11 +649,11 @@ export default function HomeClient({
   return (
     <main>
       <div className="top-strip">
-        <a className="phone-link" href="tel:+8801886589009">
+        <a className="phone-link" href={phoneHref || "tel:+8801886589009"}>
           <span className="phone-dot" />
-          +880 1886-589009
+          {siteSettings.phoneNumber || "+880 1886-589009"}
         </a>
-        <a href="tel:+8801886589009">Showroom <ChevronRight size={14} /></a>
+        <a href={phoneHref || "tel:+8801886589009"}>Showroom <ChevronRight size={14} /></a>
       </div>
 
       <header ref={headerRef} className={headerGlass ? "site-header glass" : "site-header"}>
@@ -662,7 +667,7 @@ export default function HomeClient({
         </button>
 
         <button className="brand" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <Image src="/recon-logo.webp" alt="Recon Imports" width={178} height={55} priority suppressHydrationWarning />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} width={178} height={55} />
         </button>
 
         <nav className={mobileMenuOpen ? "nav-links open" : "nav-links"} aria-label="Main navigation">
@@ -889,14 +894,14 @@ export default function HomeClient({
               Our expert sales team is here to assist you to choose your vehicle according to your necessity, choice and
               preference.
             </p>
-            <a href="tel:+8801886589009">Book An Appointment</a>
+            <a href={phoneHref || "tel:+8801886589009"}>Book An Appointment</a>
           </div>
         </section>
       </section>
 
-      <Footer />
+      <Footer settings={siteSettings} />
 
-      <a className="whatsapp" href="https://wa.me/8801886589009" aria-label="Chat on WhatsApp">
+      <a className="whatsapp" href={whatsappHref || "https://wa.me/8801886589009"} aria-label="Chat on WhatsApp">
         <MessageCircle size={28} />
       </a>
 

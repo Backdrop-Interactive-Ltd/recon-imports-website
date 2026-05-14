@@ -63,6 +63,7 @@ export const ModelName = {
   CarFeature: 'CarFeature',
   HeroSlide: 'HeroSlide',
   SiteSetting: 'SiteSetting',
+  Media: 'Media',
   SellCarLead: 'SellCarLead',
   RequirementLead: 'RequirementLead',
   AuctionSheetRequest: 'AuctionSheetRequest',
@@ -261,6 +262,20 @@ export const SiteSettingScalarFieldEnum = {
 export type SiteSettingScalarFieldEnum = (typeof SiteSettingScalarFieldEnum)[keyof typeof SiteSettingScalarFieldEnum]
 
 
+export const MediaScalarFieldEnum = {
+  id: 'id',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  fileType: 'fileType',
+  folder: 'folder',
+  size: 'size',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MediaScalarFieldEnum = (typeof MediaScalarFieldEnum)[keyof typeof MediaScalarFieldEnum]
+
+
 export const SellCarLeadScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -304,6 +319,9 @@ export const AuctionSheetRequestScalarFieldEnum = {
   phone: 'phone',
   email: 'email',
   feeAmount: 'feeAmount',
+  paymentMethod: 'paymentMethod',
+  senderNumber: 'senderNumber',
+  transactionId: 'transactionId',
   paymentStatus: 'paymentStatus',
   status: 'status',
   reportUrl: 'reportUrl',

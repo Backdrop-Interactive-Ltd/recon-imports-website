@@ -102,6 +102,11 @@ export type HeroSlide = Prisma.HeroSlideModel
  */
 export type SiteSetting = Prisma.SiteSettingModel
 /**
+ * Model Media
+ * 
+ */
+export type Media = Prisma.MediaModel
+/**
  * Model SellCarLead
  * 
  */

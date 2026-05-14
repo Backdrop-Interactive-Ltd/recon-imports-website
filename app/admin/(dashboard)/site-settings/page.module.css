@@ -1,0 +1,215 @@
+.settingsPage {
+  display: grid;
+  gap: 22px;
+}
+
+.header,
+.formPanel,
+.summaryGrid > div {
+  background: #ffffff;
+  border: 1px solid #e4e4e6;
+}
+
+.header {
+  padding: 28px;
+}
+
+.header p,
+.panelHeader p {
+  color: #ad1b28;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  font-size: 38px;
+  letter-spacing: 0;
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+
+.header span,
+.field small,
+.formError,
+.formSuccess {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.header span {
+  color: #6e6e74;
+}
+
+.summaryGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.summaryGrid > div {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.summaryGrid span {
+  color: #6e6e74;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.summaryGrid strong {
+  font-size: 24px;
+  letter-spacing: 0;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.formPanel {
+  padding: 24px;
+}
+
+.panelHeader {
+  margin-bottom: 20px;
+}
+
+.panelHeader h2,
+.formSection h2 {
+  font-size: 24px;
+  letter-spacing: 0;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.settingsForm {
+  display: grid;
+  gap: 20px;
+}
+
+.formSection {
+  border: 1px solid #e4e4e6;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.sectionHeader {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.fieldGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: #4c4c51;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.field input,
+.field textarea {
+  border: 1px solid #d8dade;
+  color: #111111;
+  font-size: 15px;
+  outline: 0;
+  padding: 0 13px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+  width: 100%;
+}
+
+.field input {
+  height: 46px;
+}
+
+.field textarea {
+  min-height: 110px;
+  padding-bottom: 13px;
+  padding-top: 13px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #ad1b28;
+  box-shadow: 0 0 0 3px rgba(173, 27, 40, 0.11);
+}
+
+.field small,
+.formError {
+  color: #9b0010;
+}
+
+.formError,
+.formSuccess {
+  margin: 0;
+}
+
+.formSuccess {
+  color: #137333;
+}
+
+.primaryButton {
+  background: #111111;
+  border: 0;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  height: 46px;
+  justify-self: start;
+  letter-spacing: 1px;
+  padding: 0 18px;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: #ad1b28;
+  transform: translateY(-1px);
+}
+
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.66;
+}
+
+@media (max-width: 720px) {
+  .summaryGrid,
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .header,
+  .formPanel {
+    padding: 18px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+  }
+}

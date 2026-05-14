@@ -2,7 +2,7 @@ import { z } from "zod";
 import { AuctionSheetStatus, PaymentStatus } from "../../../../lib/generated/prisma/enums";
 
 export const auctionSheetStatusOptions = Object.values(AuctionSheetStatus);
-export const paymentStatusOptions = Object.values(PaymentStatus);
+export const paymentStatusOptions = [PaymentStatus.PENDING, PaymentStatus.PAID, PaymentStatus.FAILED] as const;
 
 export type AuctionSheetAdminActionState = {
   errors?: Partial<Record<"form" | "id" | "paymentStatus" | "reportUrl" | "status", string>>;
