@@ -2,6 +2,7 @@ import { VehicleCategoryType } from "../lib/generated/prisma/enums";
 import { getOptimizedCloudinaryImageUrl } from "../lib/cloudinaryImages";
 import { prisma } from "../lib/prisma";
 import { getSiteSettings } from "../lib/siteSettings";
+import { getHomepageDealCars } from "./car-stocks/data";
 import HomeClient, { type HomepageBrand, type HomepageCategory, type HomepageHeroSlide } from "./HomeClient";
 
 export const dynamic = "force-dynamic";
@@ -194,12 +195,21 @@ async function getHomepageHeroSlides(): Promise<HomepageHeroSlide[] | undefined>
 }
 
 export default async function Home() {
-  const [brands, categories, heroSlides, siteSettings] = await Promise.all([
+  const [brands, categories, heroSlides, siteSettings, deals] = await Promise.all([
     getHomepageBrands(),
     getHomepageCategories(),
     getHomepageHeroSlides(),
     getSiteSettings(),
+    getHomepageDealCars(),
   ]);
 
-  return <HomeClient brands={brands} categories={categories} heroSlides={heroSlides} siteSettings={siteSettings} />;
+  return (
+    <HomeClient
+      brands={brands}
+      categories={categories}
+      deals={deals}
+      heroSlides={heroSlides}
+      siteSettings={siteSettings}
+    />
+  );
 }

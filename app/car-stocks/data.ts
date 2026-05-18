@@ -168,6 +168,28 @@ async function getPublishedDatabaseCars() {
   });
 }
 
+export async function getHomepageDealCars(): Promise<CarInventoryItem[] | undefined> {
+  try {
+    const databaseCars = await prisma.car.findMany({
+      include: publicCarInclude,
+      orderBy: [
+        { isFeatured: "desc" },
+        { updatedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: 10,
+      where: { isPublished: true },
+    });
+
+    if (databaseCars.length === 0) return undefined;
+
+    return databaseCars.map(mapDatabaseCar);
+  } catch (error) {
+    console.error("Failed to load homepage deal cars from database.", error);
+    return undefined;
+  }
+}
+
 export async function getPublicStockData(): Promise<PublicStockData> {
   try {
     const databaseCars = await getPublishedDatabaseCars();

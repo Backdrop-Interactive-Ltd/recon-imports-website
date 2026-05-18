@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { brandOptions } from "./car-stocks/brands";
-import { formatPrice, inventory } from "./car-stocks/inventory";
+import { formatPrice, inventory, type CarInventoryItem } from "./car-stocks/inventory";
 import Footer from "./components/Footer";
 import { fallbackSiteSettings, type PublicSiteSettings } from "../lib/siteSettingsConfig";
 
@@ -181,6 +181,7 @@ function scrollToSection(id: string) {
 type HomeClientProps = {
   brands?: HomepageBrand[];
   categories?: HomepageCategory[];
+  deals?: CarInventoryItem[];
   heroSlides?: HomepageHeroSlide[];
   siteSettings?: PublicSiteSettings;
 };
@@ -194,6 +195,7 @@ const fallbackBrands: HomepageBrand[] = brandOptions.map((brand) => ({
 export default function HomeClient({
   brands = fallbackBrands,
   categories = fallbackCategories,
+  deals,
   heroSlides = fallbackHeroSlides,
   siteSettings = fallbackSiteSettings,
 }: HomeClientProps) {
@@ -233,7 +235,7 @@ export default function HomeClient({
     () => Array.from({ length: Math.ceil(brands.length / 9) }, (_, index) => brands.slice(index * 9, index * 9 + 9)),
     [brands],
   );
-  const latestStock = useMemo(() => inventory.slice(-10).reverse(), []);
+  const latestStock = useMemo(() => (deals?.length ? deals : inventory.slice(-10).reverse()), [deals]);
   const filteredStock = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return inventory.filter((item) => {
