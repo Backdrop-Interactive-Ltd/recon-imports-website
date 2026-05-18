@@ -247,7 +247,8 @@ export default function HomeClient({
       return matchesBudget && matchesQuery;
     });
   }, [budget, query]);
-  const carouselStock = [...latestStock, ...latestStock];
+  const shouldLoopStock = latestStock.length > 1;
+  const carouselStock = shouldLoopStock ? [...latestStock, ...latestStock] : latestStock;
   const shouldLoopPurposeCategories = categories.length > 1;
   const carouselCategories = shouldLoopPurposeCategories ? [...categories, ...categories] : categories;
   const purposeSectionTitle = siteSettings.homepagePurposeSectionTitle || "Explore vehicles that suit your purpose";
@@ -265,7 +266,7 @@ export default function HomeClient({
         return;
       }
 
-      if (row && latestStock.length > 0 && !stockDragRef.current.active && !stockDragRef.current.hovered) {
+      if (row && shouldLoopStock && !stockDragRef.current.active && !stockDragRef.current.hovered) {
         const resetPoint = row.scrollWidth / 2;
         row.scrollLeft += 0.65;
 
@@ -305,7 +306,7 @@ export default function HomeClient({
       window.removeEventListener("focus", startStockRow);
       document.removeEventListener("visibilitychange", handleVisibleStockRow);
     };
-  }, [latestStock.length]);
+  }, [shouldLoopStock]);
 
   useEffect(() => {
     let animationFrame = 0;
@@ -545,12 +546,14 @@ export default function HomeClient({
     }
     let nextScrollLeft = stockDragRef.current.startScrollLeft - dragDistance * 1.35;
 
-    if (nextScrollLeft < 0) {
-      nextScrollLeft += resetPoint;
-    }
+    if (shouldLoopStock && resetPoint > 0) {
+      if (nextScrollLeft < 0) {
+        nextScrollLeft += resetPoint;
+      }
 
-    if (nextScrollLeft >= resetPoint) {
-      nextScrollLeft -= resetPoint;
+      if (nextScrollLeft >= resetPoint) {
+        nextScrollLeft -= resetPoint;
+      }
     }
 
     row.scrollLeft = nextScrollLeft;
