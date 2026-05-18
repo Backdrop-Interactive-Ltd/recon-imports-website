@@ -10,13 +10,23 @@ import {
 export type { PublicSiteSettings } from "./siteSettingsConfig";
 
 const imageSettingKeys = new Set<SiteSettingKey>(["favicon", "footerLogo", "openGraphImage", "websiteLogo"]);
+const legacyBrandPattern = /Reliant Motors/i;
+const legacyBrandReplacePattern = /Reliant Motors/gi;
 
 function normalizeSiteSettingValue(key: SiteSettingKey, value: string) {
   if (imageSettingKeys.has(key)) {
     return getOptimizedCloudinaryImageUrl(value);
   }
 
-  return value;
+  if (key === "defaultMetaTitle" && legacyBrandPattern.test(value)) {
+    return fallbackSiteSettings.defaultMetaTitle;
+  }
+
+  if (key === "defaultMetaDescription" && legacyBrandPattern.test(value)) {
+    return fallbackSiteSettings.defaultMetaDescription;
+  }
+
+  return value.replace(legacyBrandReplacePattern, "Recon Imports");
 }
 
 export async function getSiteSettings(): Promise<PublicSiteSettings> {
