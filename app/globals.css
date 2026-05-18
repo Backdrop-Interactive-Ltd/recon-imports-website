@@ -98,8 +98,8 @@ a {
   align-items: center;
   background: transparent;
   display: grid;
-  gap: 24px;
-  grid-template-columns: minmax(180px, 230px) minmax(0, 1fr) auto;
+  gap: clamp(12px, 1.4vw, 22px);
+  grid-template-columns: minmax(132px, 178px) minmax(0, 1fr) max-content;
   height: 78px;
   padding: 0 max(48px, env(safe-area-inset-right)) 0 max(48px, env(safe-area-inset-left));
   position: fixed;
@@ -135,6 +135,8 @@ a {
 .footer-brand img {
   display: block;
   height: auto;
+  max-height: 52px;
+  object-fit: contain;
   width: min(178px, 100%);
 }
 
@@ -1282,7 +1284,8 @@ a {
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(17, 17, 17, 0.08);
   display: grid;
-  grid-template-columns: 250px 1fr auto;
+  grid-template-columns: minmax(132px, 178px) minmax(0, 1fr) max-content;
+  gap: clamp(12px, 1.4vw, 22px);
   height: 78px;
   left: 0;
   padding: 0 max(48px, env(safe-area-inset-right)) 0 max(48px, env(safe-area-inset-left));
@@ -1295,7 +1298,9 @@ a {
 .cars-logo img {
   display: block;
   height: auto;
-  width: 178px;
+  max-height: 52px;
+  object-fit: contain;
+  width: min(178px, 100%);
 }
 
 .cars-header nav {
@@ -2913,17 +2918,33 @@ a {
 
 @media (max-width: 1180px) {
   .site-header {
-    grid-template-columns: 210px 1fr 260px;
+    gap: 12px;
+    grid-template-columns: minmax(132px, 160px) minmax(0, 1fr) max-content;
     padding: 0 24px;
   }
 
   .nav-links {
-    gap: 18px;
+    gap: clamp(7px, 0.9vw, 11px);
   }
 
   .nav-links button {
     font-size: 12px;
-    letter-spacing: 2px;
+    letter-spacing: 0.8px;
+  }
+
+  .header-actions {
+    gap: 8px;
+  }
+
+  .site-header .download-button {
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    min-width: 164px;
+    padding: 0 10px;
+  }
+
+  .site-header .search-button {
+    display: none;
   }
 
   .vehicle-card,
@@ -2940,7 +2961,7 @@ a {
   }
 
   .cars-header {
-    grid-template-columns: 210px 1fr;
+    grid-template-columns: minmax(132px, 160px) minmax(0, 1fr);
     padding-inline: 28px;
   }
 
