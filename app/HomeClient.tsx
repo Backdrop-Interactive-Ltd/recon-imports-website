@@ -34,6 +34,7 @@ export type HomepageCategory = {
   copy: string;
   href: string;
   iconKey?: string | null;
+  id: string;
   image: string;
   imageAlt?: string | null;
   title: string;
@@ -86,6 +87,7 @@ const fallbackHeroSlides: HomepageHeroSlide[] = [
 
 const fallbackCategories: HomepageCategory[] = [
   {
+    id: "sedan",
     title: "Sedan",
     href: "/sedan",
     copy: "Comfortable city driving with a refined passenger-first profile.",
@@ -94,6 +96,7 @@ const fallbackCategories: HomepageCategory[] = [
     imageAlt: "Sedan vehicle detail",
   },
   {
+    id: "hatchback",
     title: "Hatchback",
     href: "/hatchback",
     copy: "Compact, practical, and easy to handle for daily movement.",
@@ -102,6 +105,7 @@ const fallbackCategories: HomepageCategory[] = [
     imageAlt: "Hatchback vehicle detail",
   },
   {
+    id: "suv",
     title: "SUV",
     href: "/suv",
     copy: "Spacious and versatile for power and adventure.",
@@ -110,6 +114,7 @@ const fallbackCategories: HomepageCategory[] = [
     imageAlt: "SUV vehicle detail",
   },
   {
+    id: "crossover",
     title: "Crossover",
     href: "/crossover",
     copy: "Blending sedan agility with the versatile, elevated stance of an SUV.",
@@ -118,6 +123,7 @@ const fallbackCategories: HomepageCategory[] = [
     imageAlt: "Crossover vehicle detail",
   },
   {
+    id: "mpv",
     title: "MPV",
     href: "/mpv",
     copy: "Multi-purpose vehicles designed for maximum seating and flexibility.",
@@ -126,6 +132,7 @@ const fallbackCategories: HomepageCategory[] = [
     imageAlt: "MPV vehicle detail",
   },
   {
+    id: "passenger-van",
     title: "Passenger Van",
     href: "/passenger-van",
     copy: "Roomy passenger transport for groups, families, and business needs.",
@@ -239,7 +246,8 @@ export default function HomeClient({
     });
   }, [budget, query]);
   const carouselStock = [...latestStock, ...latestStock];
-  const carouselCategories = [...categories, ...categories];
+  const shouldLoopPurposeCategories = categories.length > 1;
+  const carouselCategories = shouldLoopPurposeCategories ? [...categories, ...categories] : categories;
   const purposeSectionTitle = siteSettings.homepagePurposeSectionTitle || "Explore vehicles that suit your purpose";
   const phoneHref = siteSettings.phoneNumber ? `tel:${siteSettings.phoneNumber.replace(/[^\d+]/g, "")}` : "";
   const whatsappHref = siteSettings.whatsappNumber ? `https://wa.me/${siteSettings.whatsappNumber.replace(/[^\d]/g, "")}` : "";
@@ -309,7 +317,7 @@ export default function HomeClient({
         return;
       }
 
-      if (row) {
+      if (row && shouldLoopPurposeCategories) {
         const resetPoint = row.scrollWidth / 2;
 
         if (!initialized && resetPoint > 0) {
@@ -359,7 +367,7 @@ export default function HomeClient({
       window.removeEventListener("focus", startPurposeRow);
       document.removeEventListener("visibilitychange", handleVisiblePurposeRow);
     };
-  }, []);
+  }, [shouldLoopPurposeCategories]);
 
   useEffect(() => {
     function resetPurposeLoop() {
@@ -371,8 +379,10 @@ export default function HomeClient({
 
       const resetPoint = row.scrollWidth / 2;
 
-      if (resetPoint > 0) {
+      if (shouldLoopPurposeCategories && resetPoint > 0) {
         row.scrollLeft = resetPoint;
+      } else {
+        row.scrollLeft = 0;
       }
     }
 
@@ -380,7 +390,7 @@ export default function HomeClient({
     window.addEventListener("resize", resetPurposeLoop);
 
     return () => window.removeEventListener("resize", resetPurposeLoop);
-  }, []);
+  }, [shouldLoopPurposeCategories]);
 
   useEffect(() => {
     if (stockRowRef.current) {
@@ -807,7 +817,7 @@ export default function HomeClient({
                   className="category-card"
                   draggable={false}
                   href={category.href}
-                  key={`${category.title}-${index}`}
+                  key={`${category.id}-${index}`}
                   onClick={(event) => handlePurposeCardClick(event, category.href)}
                 >
                   <div>
@@ -822,6 +832,7 @@ export default function HomeClient({
                     height={245}
                     draggable={false}
                     suppressHydrationWarning
+                    unoptimized
                   />
                 </a>
               );

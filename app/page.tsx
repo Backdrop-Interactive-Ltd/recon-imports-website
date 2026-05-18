@@ -47,11 +47,47 @@ const categoryImageBySlug: Record<string, string> = {
   wagon: "/cat-wagon.webp",
 };
 
+const defaultCategoryImage = "/cat-suv.webp";
 const heroImageClasses = ["hero-image-default", "hero-image-focus-left", "hero-image-focus-right"];
 const heroTextAnimations = ["hero-text-rise", "hero-text-track", "hero-text-scale"];
 
+function cleanOptionalValue(value?: string | null) {
+  const trimmedValue = value?.trim() ?? "";
+
+  if (!trimmedValue || trimmedValue === "null" || trimmedValue === "undefined") {
+    return "";
+  }
+
+  return trimmedValue;
+}
+
+function isValidImageSrc(value: string) {
+  if (value.startsWith("/")) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function getCategoryHref(slug: string, routePath?: string | null) {
-  return routePath || categoryRouteBySlug[slug] || `/${slug}`;
+  const cleanRoutePath = cleanOptionalValue(routePath);
+
+  return cleanRoutePath || categoryRouteBySlug[slug] || `/${slug}`;
+}
+
+function getCategoryImage(slug: string, imageUrl?: string | null) {
+  const cleanImageUrl = cleanOptionalValue(imageUrl);
+
+  if (cleanImageUrl && isValidImageSrc(cleanImageUrl)) {
+    return cleanImageUrl;
+  }
+
+  return categoryImageBySlug[slug] || defaultCategoryImage;
 }
 
 async function getHomepageBrands(): Promise<HomepageBrand[] | undefined> {
@@ -84,6 +120,7 @@ async function getHomepageCategories(): Promise<HomepageCategory[] | undefined> 
       ],
       select: {
         description: true,
+        id: true,
         iconKey: true,
         imageAlt: true,
         imageUrl: true,
@@ -101,14 +138,15 @@ async function getHomepageCategories(): Promise<HomepageCategory[] | undefined> 
     if (categories.length === 0) return undefined;
 
     return categories.map((category) => ({
+      id: category.id,
       copy:
-        category.description ||
+        cleanOptionalValue(category.description) ||
         categoryCopyBySlug[category.slug] ||
         `Browse vehicles uploaded with ${category.name} selected as the category.`,
       href: getCategoryHref(category.slug, category.routePath),
-      iconKey: category.iconKey || "car",
-      image: category.imageUrl || categoryImageBySlug[category.slug] || "/cat-suv.webp",
-      imageAlt: category.imageAlt || `${category.name} vehicle detail`,
+      iconKey: cleanOptionalValue(category.iconKey) || "car",
+      image: getCategoryImage(category.slug, category.imageUrl),
+      imageAlt: cleanOptionalValue(category.imageAlt) || `${category.name} vehicle detail`,
       title: category.name,
     }));
   } catch (error) {
