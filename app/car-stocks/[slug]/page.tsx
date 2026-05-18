@@ -136,12 +136,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <MessageCircle size={16} />
             Text Us on WhatsApp
           </a>
-          <a className="product-action light" href="/verify-auction-sheet">
+          <a className="product-action light" href="/send-requirements">
             Get a Quote
           </a>
-          <button className="product-appointment" type="button">
+          <a className="product-appointment" href="https://calendly.com/reconimportsltd/30min" target="_blank" rel="noreferrer">
             Book an Appointment
-          </button>
+          </a>
         </aside>
       </section>
 

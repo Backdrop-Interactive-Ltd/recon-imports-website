@@ -2249,6 +2249,10 @@ a {
   margin: 0;
 }
 
+.product-description p {
+  white-space: pre-line;
+}
+
 .product-description ul {
   display: grid;
   gap: 2px;
