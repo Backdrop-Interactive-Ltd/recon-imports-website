@@ -8,10 +8,15 @@ import styles from "../brands/page.module.css";
 import { categoryTypeOptions, initialCategoryActionState, slugifyCategory } from "./validation";
 
 type EditableCategory = {
+  description: string | null;
+  iconKey: string | null;
   id: string;
+  imageAlt: string | null;
   imageUrl: string | null;
   isActive: boolean;
   name: string;
+  routePath: string | null;
+  showOnHomepage: boolean;
   slug: string;
   sortOrder: number;
   type: VehicleCategoryType;
@@ -35,20 +40,32 @@ export default function CategoryForm({ category, mode }: CategoryFormProps) {
     mode === "create" ? createCategoryAction : updateCategoryAction,
     initialCategoryActionState,
   );
+  const [description, setDescription] = useState(category?.description ?? "");
+  const [iconKey, setIconKey] = useState(category?.iconKey ?? "");
+  const [imageAlt, setImageAlt] = useState(category?.imageAlt ?? "");
   const [isSlugEdited, setIsSlugEdited] = useState(false);
+  const [isRoutePathEdited, setIsRoutePathEdited] = useState(Boolean(category?.routePath));
   const [imageUrl, setImageUrl] = useState(category?.imageUrl ?? "");
   const [isActive, setIsActive] = useState(category?.isActive ?? true);
   const [name, setName] = useState(category?.name ?? "");
+  const [routePath, setRoutePath] = useState(category?.routePath ?? (category?.slug ? `/${category.slug}` : ""));
+  const [showOnHomepage, setShowOnHomepage] = useState(category?.showOnHomepage ?? true);
   const [slug, setSlug] = useState(category?.slug ?? "");
   const [sortOrder, setSortOrder] = useState(String(category?.sortOrder ?? 0));
   const [type, setType] = useState<VehicleCategoryType>(category?.type ?? categoryTypeOptions[0]);
 
   useEffect(() => {
     if (mode === "create" && state.status === "success") {
+      setDescription("");
+      setIconKey("");
+      setImageAlt("");
       setImageUrl("");
       setIsActive(true);
+      setIsRoutePathEdited(false);
       setIsSlugEdited(false);
       setName("");
+      setRoutePath("");
+      setShowOnHomepage(true);
       setSlug("");
       setSortOrder("0");
       setType(categoryTypeOptions[0]);
@@ -59,13 +76,28 @@ export default function CategoryForm({ category, mode }: CategoryFormProps) {
     setName(value);
 
     if (!isSlugEdited) {
-      setSlug(slugifyCategory(value));
+      const nextSlug = slugifyCategory(value);
+      setSlug(nextSlug);
+
+      if (!isRoutePathEdited) {
+        setRoutePath(nextSlug ? `/${nextSlug}` : "");
+      }
     }
   }
 
   function handleSlugChange(value: string) {
     setIsSlugEdited(true);
-    setSlug(slugifyCategory(value));
+    const nextSlug = slugifyCategory(value);
+    setSlug(nextSlug);
+
+    if (!isRoutePathEdited) {
+      setRoutePath(nextSlug ? `/${nextSlug}` : "");
+    }
+  }
+
+  function handleRoutePathChange(value: string) {
+    setIsRoutePathEdited(true);
+    setRoutePath(value);
   }
 
   return (
@@ -85,6 +117,17 @@ export default function CategoryForm({ category, mode }: CategoryFormProps) {
       </label>
 
       <label className={styles.field}>
+        <span>Description / Short Copy</span>
+        <textarea
+          name="description"
+          onChange={(event) => setDescription(event.target.value)}
+          placeholder="Spacious and versatile for power and adventure."
+          value={description}
+        />
+        {state.errors?.description ? <small>{state.errors.description}</small> : null}
+      </label>
+
+      <label className={styles.field}>
         <span>Slug</span>
         <input
           name="slug"
@@ -96,6 +139,18 @@ export default function CategoryForm({ category, mode }: CategoryFormProps) {
         {state.errors?.slug ? <small>{state.errors.slug}</small> : null}
       </label>
 
+      <label className={styles.field}>
+        <span>Route Path / Href</span>
+        <input
+          name="routePath"
+          onChange={(event) => handleRoutePathChange(event.target.value)}
+          placeholder="/suv"
+          type="text"
+          value={routePath}
+        />
+        {state.errors?.routePath ? <small>{state.errors.routePath}</small> : null}
+      </label>
+
       <AdminImageUpload
         error={state.errors?.imageUrl}
         folder="categories"
@@ -104,6 +159,30 @@ export default function CategoryForm({ category, mode }: CategoryFormProps) {
         onChange={setImageUrl}
         value={imageUrl}
       />
+
+      <label className={styles.field}>
+        <span>Image Alt Text</span>
+        <input
+          name="imageAlt"
+          onChange={(event) => setImageAlt(event.target.value)}
+          placeholder="SUV vehicle detail"
+          type="text"
+          value={imageAlt}
+        />
+        {state.errors?.imageAlt ? <small>{state.errors.imageAlt}</small> : null}
+      </label>
+
+      <label className={styles.field}>
+        <span>Icon Key</span>
+        <input
+          name="iconKey"
+          onChange={(event) => setIconKey(event.target.value)}
+          placeholder="car"
+          type="text"
+          value={iconKey}
+        />
+        {state.errors?.iconKey ? <small>{state.errors.iconKey}</small> : null}
+      </label>
 
       <label className={styles.field}>
         <span>Type</span>
@@ -133,6 +212,16 @@ export default function CategoryForm({ category, mode }: CategoryFormProps) {
       <label className={styles.checkField}>
         <input checked={isActive} name="isActive" onChange={(event) => setIsActive(event.target.checked)} type="checkbox" />
         <span>Category is active</span>
+      </label>
+
+      <label className={styles.checkField}>
+        <input
+          checked={showOnHomepage}
+          name="showOnHomepage"
+          onChange={(event) => setShowOnHomepage(event.target.checked)}
+          type="checkbox"
+        />
+        <span>Show on homepage</span>
       </label>
 
       {state.errors?.form || state.errors?.id ? <p className={styles.formError}>{state.errors.form || state.errors.id}</p> : null}

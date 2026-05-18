@@ -4,7 +4,9 @@ import Image from "next/image";
 import {
   ArrowRight,
   ArrowUpRight,
+  BusFront,
   Car,
+  CarFront,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -12,7 +14,9 @@ import {
   Menu,
   MessageCircle,
   Search,
+  Truck,
   X,
+  Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { brandOptions } from "./car-stocks/brands";
@@ -29,7 +33,9 @@ export type HomepageBrand = {
 export type HomepageCategory = {
   copy: string;
   href: string;
+  iconKey?: string | null;
   image: string;
+  imageAlt?: string | null;
   title: string;
 };
 
@@ -83,39 +89,65 @@ const fallbackCategories: HomepageCategory[] = [
     title: "Sedan",
     href: "/sedan",
     copy: "Comfortable city driving with a refined passenger-first profile.",
+    iconKey: "car",
     image: "/stock-axio.webp",
+    imageAlt: "Sedan vehicle detail",
   },
   {
     title: "Hatchback",
     href: "/hatchback",
     copy: "Compact, practical, and easy to handle for daily movement.",
+    iconKey: "car",
     image: "/stock-noah-white.webp",
+    imageAlt: "Hatchback vehicle detail",
   },
   {
     title: "SUV",
     href: "/suv",
     copy: "Spacious and versatile for power and adventure.",
+    iconKey: "car",
     image: "/cat-suv.webp",
+    imageAlt: "SUV vehicle detail",
   },
   {
     title: "Crossover",
     href: "/crossover",
     copy: "Blending sedan agility with the versatile, elevated stance of an SUV.",
+    iconKey: "car",
     image: "/cat-crossover.webp",
+    imageAlt: "Crossover vehicle detail",
   },
   {
     title: "MPV",
     href: "/mpv",
     copy: "Multi-purpose vehicles designed for maximum seating and flexibility.",
+    iconKey: "car",
     image: "/cat-mpv.webp",
+    imageAlt: "MPV vehicle detail",
   },
   {
     title: "Passenger Van",
     href: "/passenger-van",
     copy: "Roomy passenger transport for groups, families, and business needs.",
+    iconKey: "car",
     image: "/cat-wagon.webp",
+    imageAlt: "Passenger Van vehicle detail",
   },
 ];
+
+const categoryIconByKey: Record<string, typeof Car> = {
+  bus: BusFront,
+  car: Car,
+  crossover: CarFront,
+  electric: Zap,
+  ev: Zap,
+  mpv: BusFront,
+  "passenger-van": BusFront,
+  sedan: CarFront,
+  suv: Truck,
+  truck: Truck,
+  van: BusFront,
+};
 
 const preferenceOptions = [
   {
@@ -208,6 +240,7 @@ export default function HomeClient({
   }, [budget, query]);
   const carouselStock = [...latestStock, ...latestStock];
   const carouselCategories = [...categories, ...categories];
+  const purposeSectionTitle = siteSettings.homepagePurposeSectionTitle || "Explore vehicles that suit your purpose";
   const phoneHref = siteSettings.phoneNumber ? `tel:${siteSettings.phoneNumber.replace(/[^\d+]/g, "")}` : "";
   const whatsappHref = siteSettings.whatsappNumber ? `https://wa.me/${siteSettings.whatsappNumber.replace(/[^\d]/g, "")}` : "";
 
@@ -748,7 +781,7 @@ export default function HomeClient({
       </section>
 
       <section className="purpose-section" id="purpose">
-        <h2>Explore vehicles that suit your purpose</h2>
+        <h2>{purposeSectionTitle}</h2>
         <div
           ref={purposeRowRef}
           className={purposeDragging ? "category-row dragging" : "category-row"}
@@ -766,29 +799,33 @@ export default function HomeClient({
           }}
         >
           <div className="category-track">
-            {carouselCategories.map((category, index) => (
-              <a
-                className="category-card"
-                draggable={false}
-                href={category.href}
-                key={`${category.title}-${index}`}
-                onClick={(event) => handlePurposeCardClick(event, category.href)}
-              >
-                <div>
-                  <Car size={34} />
-                  <h3>{category.title}</h3>
-                  <p>{category.copy}</p>
-                </div>
-                <Image
-                  src={category.image}
-                  alt={`${category.title} vehicle detail`}
-                  width={430}
-                  height={245}
+            {carouselCategories.map((category, index) => {
+              const CategoryIcon = categoryIconByKey[category.iconKey || "car"] || Car;
+
+              return (
+                <a
+                  className="category-card"
                   draggable={false}
-                  suppressHydrationWarning
-                />
-              </a>
-            ))}
+                  href={category.href}
+                  key={`${category.title}-${index}`}
+                  onClick={(event) => handlePurposeCardClick(event, category.href)}
+                >
+                  <div>
+                    <CategoryIcon size={34} />
+                    <h3>{category.title}</h3>
+                    <p>{category.copy}</p>
+                  </div>
+                  <Image
+                    src={category.image}
+                    alt={category.imageAlt || `${category.title} vehicle detail`}
+                    width={430}
+                    height={245}
+                    draggable={false}
+                    suppressHydrationWarning
+                  />
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>

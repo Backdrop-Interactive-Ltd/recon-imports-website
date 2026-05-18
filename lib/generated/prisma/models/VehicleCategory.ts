@@ -38,8 +38,13 @@ export type VehicleCategoryMinAggregateOutputType = {
   id: string | null
   name: string | null
   slug: string | null
+  description: string | null
   imageUrl: string | null
+  imageAlt: string | null
+  routePath: string | null
+  iconKey: string | null
   type: $Enums.VehicleCategoryType | null
+  showOnHomepage: boolean | null
   isActive: boolean | null
   sortOrder: number | null
   createdAt: Date | null
@@ -50,8 +55,13 @@ export type VehicleCategoryMaxAggregateOutputType = {
   id: string | null
   name: string | null
   slug: string | null
+  description: string | null
   imageUrl: string | null
+  imageAlt: string | null
+  routePath: string | null
+  iconKey: string | null
   type: $Enums.VehicleCategoryType | null
+  showOnHomepage: boolean | null
   isActive: boolean | null
   sortOrder: number | null
   createdAt: Date | null
@@ -62,8 +72,13 @@ export type VehicleCategoryCountAggregateOutputType = {
   id: number
   name: number
   slug: number
+  description: number
   imageUrl: number
+  imageAlt: number
+  routePath: number
+  iconKey: number
   type: number
+  showOnHomepage: number
   isActive: number
   sortOrder: number
   createdAt: number
@@ -84,8 +99,13 @@ export type VehicleCategoryMinAggregateInputType = {
   id?: true
   name?: true
   slug?: true
+  description?: true
   imageUrl?: true
+  imageAlt?: true
+  routePath?: true
+  iconKey?: true
   type?: true
+  showOnHomepage?: true
   isActive?: true
   sortOrder?: true
   createdAt?: true
@@ -96,8 +116,13 @@ export type VehicleCategoryMaxAggregateInputType = {
   id?: true
   name?: true
   slug?: true
+  description?: true
   imageUrl?: true
+  imageAlt?: true
+  routePath?: true
+  iconKey?: true
   type?: true
+  showOnHomepage?: true
   isActive?: true
   sortOrder?: true
   createdAt?: true
@@ -108,8 +133,13 @@ export type VehicleCategoryCountAggregateInputType = {
   id?: true
   name?: true
   slug?: true
+  description?: true
   imageUrl?: true
+  imageAlt?: true
+  routePath?: true
+  iconKey?: true
   type?: true
+  showOnHomepage?: true
   isActive?: true
   sortOrder?: true
   createdAt?: true
@@ -207,8 +237,13 @@ export type VehicleCategoryGroupByOutputType = {
   id: string
   name: string
   slug: string
+  description: string | null
   imageUrl: string | null
+  imageAlt: string | null
+  routePath: string | null
+  iconKey: string | null
   type: $Enums.VehicleCategoryType
+  showOnHomepage: boolean
   isActive: boolean
   sortOrder: number
   createdAt: Date
@@ -242,8 +277,13 @@ export type VehicleCategoryWhereInput = {
   id?: Prisma.StringFilter<"VehicleCategory"> | string
   name?: Prisma.StringFilter<"VehicleCategory"> | string
   slug?: Prisma.StringFilter<"VehicleCategory"> | string
+  description?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
+  imageAlt?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
+  routePath?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
+  iconKey?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
   type?: Prisma.EnumVehicleCategoryTypeFilter<"VehicleCategory"> | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolFilter<"VehicleCategory"> | boolean
   isActive?: Prisma.BoolFilter<"VehicleCategory"> | boolean
   sortOrder?: Prisma.IntFilter<"VehicleCategory"> | number
   createdAt?: Prisma.DateTimeFilter<"VehicleCategory"> | Date | string
@@ -254,8 +294,13 @@ export type VehicleCategoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageAlt?: Prisma.SortOrderInput | Prisma.SortOrder
+  routePath?: Prisma.SortOrderInput | Prisma.SortOrder
+  iconKey?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
+  showOnHomepage?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -269,8 +314,13 @@ export type VehicleCategoryWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.VehicleCategoryWhereInput[]
   NOT?: Prisma.VehicleCategoryWhereInput | Prisma.VehicleCategoryWhereInput[]
   name?: Prisma.StringFilter<"VehicleCategory"> | string
+  description?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
+  imageAlt?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
+  routePath?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
+  iconKey?: Prisma.StringNullableFilter<"VehicleCategory"> | string | null
   type?: Prisma.EnumVehicleCategoryTypeFilter<"VehicleCategory"> | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolFilter<"VehicleCategory"> | boolean
   isActive?: Prisma.BoolFilter<"VehicleCategory"> | boolean
   sortOrder?: Prisma.IntFilter<"VehicleCategory"> | number
   createdAt?: Prisma.DateTimeFilter<"VehicleCategory"> | Date | string
@@ -281,8 +331,13 @@ export type VehicleCategoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageAlt?: Prisma.SortOrderInput | Prisma.SortOrder
+  routePath?: Prisma.SortOrderInput | Prisma.SortOrder
+  iconKey?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
+  showOnHomepage?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -301,8 +356,13 @@ export type VehicleCategoryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"VehicleCategory"> | string
   name?: Prisma.StringWithAggregatesFilter<"VehicleCategory"> | string
   slug?: Prisma.StringWithAggregatesFilter<"VehicleCategory"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"VehicleCategory"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"VehicleCategory"> | string | null
+  imageAlt?: Prisma.StringNullableWithAggregatesFilter<"VehicleCategory"> | string | null
+  routePath?: Prisma.StringNullableWithAggregatesFilter<"VehicleCategory"> | string | null
+  iconKey?: Prisma.StringNullableWithAggregatesFilter<"VehicleCategory"> | string | null
   type?: Prisma.EnumVehicleCategoryTypeWithAggregatesFilter<"VehicleCategory"> | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolWithAggregatesFilter<"VehicleCategory"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"VehicleCategory"> | boolean
   sortOrder?: Prisma.IntWithAggregatesFilter<"VehicleCategory"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"VehicleCategory"> | Date | string
@@ -313,8 +373,13 @@ export type VehicleCategoryCreateInput = {
   id?: string
   name: string
   slug: string
+  description?: string | null
   imageUrl?: string | null
+  imageAlt?: string | null
+  routePath?: string | null
+  iconKey?: string | null
   type: $Enums.VehicleCategoryType
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: number
   createdAt?: Date | string
@@ -325,8 +390,13 @@ export type VehicleCategoryUncheckedCreateInput = {
   id?: string
   name: string
   slug: string
+  description?: string | null
   imageUrl?: string | null
+  imageAlt?: string | null
+  routePath?: string | null
+  iconKey?: string | null
   type: $Enums.VehicleCategoryType
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: number
   createdAt?: Date | string
@@ -337,8 +407,13 @@ export type VehicleCategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iconKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumVehicleCategoryTypeFieldUpdateOperationsInput | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -349,8 +424,13 @@ export type VehicleCategoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iconKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumVehicleCategoryTypeFieldUpdateOperationsInput | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -361,8 +441,13 @@ export type VehicleCategoryCreateManyInput = {
   id?: string
   name: string
   slug: string
+  description?: string | null
   imageUrl?: string | null
+  imageAlt?: string | null
+  routePath?: string | null
+  iconKey?: string | null
   type: $Enums.VehicleCategoryType
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: number
   createdAt?: Date | string
@@ -373,8 +458,13 @@ export type VehicleCategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iconKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumVehicleCategoryTypeFieldUpdateOperationsInput | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -385,8 +475,13 @@ export type VehicleCategoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  routePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  iconKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumVehicleCategoryTypeFieldUpdateOperationsInput | $Enums.VehicleCategoryType
+  showOnHomepage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -397,8 +492,13 @@ export type VehicleCategoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  imageAlt?: Prisma.SortOrder
+  routePath?: Prisma.SortOrder
+  iconKey?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  showOnHomepage?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -413,8 +513,13 @@ export type VehicleCategoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  imageAlt?: Prisma.SortOrder
+  routePath?: Prisma.SortOrder
+  iconKey?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  showOnHomepage?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -425,8 +530,13 @@ export type VehicleCategoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  imageAlt?: Prisma.SortOrder
+  routePath?: Prisma.SortOrder
+  iconKey?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  showOnHomepage?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -455,8 +565,13 @@ export type VehicleCategorySelect<ExtArgs extends runtime.Types.Extensions.Inter
   id?: boolean
   name?: boolean
   slug?: boolean
+  description?: boolean
   imageUrl?: boolean
+  imageAlt?: boolean
+  routePath?: boolean
+  iconKey?: boolean
   type?: boolean
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: boolean
   createdAt?: boolean
@@ -467,8 +582,13 @@ export type VehicleCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   name?: boolean
   slug?: boolean
+  description?: boolean
   imageUrl?: boolean
+  imageAlt?: boolean
+  routePath?: boolean
+  iconKey?: boolean
   type?: boolean
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: boolean
   createdAt?: boolean
@@ -479,8 +599,13 @@ export type VehicleCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   name?: boolean
   slug?: boolean
+  description?: boolean
   imageUrl?: boolean
+  imageAlt?: boolean
+  routePath?: boolean
+  iconKey?: boolean
   type?: boolean
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: boolean
   createdAt?: boolean
@@ -491,15 +616,20 @@ export type VehicleCategorySelectScalar = {
   id?: boolean
   name?: boolean
   slug?: boolean
+  description?: boolean
   imageUrl?: boolean
+  imageAlt?: boolean
+  routePath?: boolean
+  iconKey?: boolean
   type?: boolean
+  showOnHomepage?: boolean
   isActive?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VehicleCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "imageUrl" | "type" | "isActive" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCategory"]>
+export type VehicleCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "imageUrl" | "imageAlt" | "routePath" | "iconKey" | "type" | "showOnHomepage" | "isActive" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicleCategory"]>
 
 export type $VehicleCategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "VehicleCategory"
@@ -508,8 +638,13 @@ export type $VehicleCategoryPayload<ExtArgs extends runtime.Types.Extensions.Int
     id: string
     name: string
     slug: string
+    description: string | null
     imageUrl: string | null
+    imageAlt: string | null
+    routePath: string | null
+    iconKey: string | null
     type: $Enums.VehicleCategoryType
+    showOnHomepage: boolean
     isActive: boolean
     sortOrder: number
     createdAt: Date
@@ -940,8 +1075,13 @@ export interface VehicleCategoryFieldRefs {
   readonly id: Prisma.FieldRef<"VehicleCategory", 'String'>
   readonly name: Prisma.FieldRef<"VehicleCategory", 'String'>
   readonly slug: Prisma.FieldRef<"VehicleCategory", 'String'>
+  readonly description: Prisma.FieldRef<"VehicleCategory", 'String'>
   readonly imageUrl: Prisma.FieldRef<"VehicleCategory", 'String'>
+  readonly imageAlt: Prisma.FieldRef<"VehicleCategory", 'String'>
+  readonly routePath: Prisma.FieldRef<"VehicleCategory", 'String'>
+  readonly iconKey: Prisma.FieldRef<"VehicleCategory", 'String'>
   readonly type: Prisma.FieldRef<"VehicleCategory", 'VehicleCategoryType'>
+  readonly showOnHomepage: Prisma.FieldRef<"VehicleCategory", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"VehicleCategory", 'Boolean'>
   readonly sortOrder: Prisma.FieldRef<"VehicleCategory", 'Int'>
   readonly createdAt: Prisma.FieldRef<"VehicleCategory", 'DateTime'>

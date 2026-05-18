@@ -50,8 +50,8 @@ const categoryImageBySlug: Record<string, string> = {
 const heroImageClasses = ["hero-image-default", "hero-image-focus-left", "hero-image-focus-right"];
 const heroTextAnimations = ["hero-text-rise", "hero-text-track", "hero-text-scale"];
 
-function getCategoryHref(slug: string) {
-  return categoryRouteBySlug[slug] ?? `/${slug}`;
+function getCategoryHref(slug: string, routePath?: string | null) {
+  return routePath || categoryRouteBySlug[slug] || `/${slug}`;
 }
 
 async function getHomepageBrands(): Promise<HomepageBrand[] | undefined> {
@@ -83,12 +83,17 @@ async function getHomepageCategories(): Promise<HomepageCategory[] | undefined> 
         { name: "asc" },
       ],
       select: {
+        description: true,
+        iconKey: true,
+        imageAlt: true,
         imageUrl: true,
         name: true,
+        routePath: true,
         slug: true,
       },
       where: {
         isActive: true,
+        showOnHomepage: true,
         type: VehicleCategoryType.BODY_TYPE,
       },
     });
@@ -96,9 +101,14 @@ async function getHomepageCategories(): Promise<HomepageCategory[] | undefined> 
     if (categories.length === 0) return undefined;
 
     return categories.map((category) => ({
-      copy: categoryCopyBySlug[category.slug] ?? `Browse vehicles uploaded with ${category.name} selected as the category.`,
-      href: getCategoryHref(category.slug),
+      copy:
+        category.description ||
+        categoryCopyBySlug[category.slug] ||
+        `Browse vehicles uploaded with ${category.name} selected as the category.`,
+      href: getCategoryHref(category.slug, category.routePath),
+      iconKey: category.iconKey || "car",
       image: category.imageUrl || categoryImageBySlug[category.slug] || "/cat-suv.webp",
+      imageAlt: category.imageAlt || `${category.name} vehicle detail`,
       title: category.name,
     }));
   } catch (error) {

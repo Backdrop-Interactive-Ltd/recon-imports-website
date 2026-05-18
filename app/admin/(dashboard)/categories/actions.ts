@@ -18,9 +18,14 @@ function fieldErrorState(error: ReturnType<typeof categoryFormSchema.safeParse>)
 
   return {
     errors: {
+      description: flattened.description?.[0],
+      iconKey: flattened.iconKey?.[0],
+      imageAlt: flattened.imageAlt?.[0],
       imageUrl: flattened.imageUrl?.[0],
       isActive: flattened.isActive?.[0],
       name: flattened.name?.[0],
+      routePath: flattened.routePath?.[0],
+      showOnHomepage: flattened.showOnHomepage?.[0],
       slug: flattened.slug?.[0],
       sortOrder: flattened.sortOrder?.[0],
       type: flattened.type?.[0],
@@ -32,9 +37,14 @@ function fieldErrorState(error: ReturnType<typeof categoryFormSchema.safeParse>)
 
 function readCategoryForm(formData: FormData) {
   return {
+    description: String(formData.get("description") ?? ""),
+    iconKey: String(formData.get("iconKey") ?? ""),
+    imageAlt: String(formData.get("imageAlt") ?? ""),
     imageUrl: String(formData.get("imageUrl") ?? ""),
     isActive: formData.get("isActive") === "on",
     name: String(formData.get("name") ?? ""),
+    routePath: String(formData.get("routePath") ?? ""),
+    showOnHomepage: formData.get("showOnHomepage") === "on",
     slug: String(formData.get("slug") ?? ""),
     sortOrder: String(formData.get("sortOrder") ?? "0"),
     type: String(formData.get("type") ?? ""),
@@ -61,6 +71,7 @@ async function isDuplicateSlug(slug: string, currentCategoryId?: string) {
 function revalidateCategoryViews() {
   revalidatePath("/admin");
   revalidatePath("/admin/categories");
+  revalidatePath("/");
 }
 
 export async function createCategoryAction(

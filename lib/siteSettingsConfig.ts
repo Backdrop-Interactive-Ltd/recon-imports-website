@@ -4,6 +4,7 @@ export type SiteSettingKey =
   | "siteName"
   | "siteTagline"
   | "footerCopyrightText"
+  | "homepagePurposeSectionTitle"
   | "phoneNumber"
   | "whatsappNumber"
   | "email"
@@ -58,6 +59,7 @@ export const fallbackSiteSettings: PublicSiteSettings = {
   footerCopyrightText: "© 2026 Recon Imports. All Rights Reserved by @Backdrop Interactive",
   footerLogo: "",
   googleMapsUrl: "",
+  homepagePurposeSectionTitle: "Explore vehicles that suit your purpose",
   instagramUrl: "https://www.instagram.com/",
   linkedinUrl: "",
   nagadPaymentNumber: "",
@@ -81,6 +83,18 @@ export const siteSettingSections: SiteSettingSection[] = [
       { input: "text", key: "siteName", label: "Site name", maxLength: 120, type: "STRING" },
       { input: "text", key: "siteTagline", label: "Site tagline", maxLength: 180, type: "STRING" },
       { input: "textarea", key: "footerCopyrightText", label: "Footer copyright text", maxLength: 240, type: "TEXT" },
+    ],
+  },
+  {
+    title: "Homepage",
+    fields: [
+      {
+        input: "text",
+        key: "homepagePurposeSectionTitle",
+        label: "Purpose section title",
+        maxLength: 140,
+        type: "STRING",
+      },
     ],
   },
   {

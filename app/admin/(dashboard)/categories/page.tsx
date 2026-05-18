@@ -37,10 +37,15 @@ async function getCategories() {
   const categories = await prisma.vehicleCategory.findMany({
     orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
     select: {
+      description: true,
+      iconKey: true,
       id: true,
+      imageAlt: true,
       imageUrl: true,
       isActive: true,
       name: true,
+      routePath: true,
+      showOnHomepage: true,
       slug: true,
       sortOrder: true,
       type: true,
@@ -120,6 +125,9 @@ export default async function AdminCategoriesPage() {
                     <span className={category.isActive ? styles.activeBadge : styles.inactiveBadge}>
                       {category.isActive ? "Active" : "Inactive"}
                     </span>
+                    <span className={category.showOnHomepage ? styles.activeBadge : styles.inactiveBadge}>
+                      {category.showOnHomepage ? "Homepage" : "Hidden"}
+                    </span>
                   </div>
 
                   <dl className={styles.brandMeta}>
@@ -139,8 +147,27 @@ export default async function AdminCategoriesPage() {
 
                   <dl className={styles.brandMeta}>
                     <div>
+                      <dt>Route</dt>
+                      <dd>{category.routePath || `/${category.slug}`}</dd>
+                    </div>
+                    <div>
+                      <dt>Icon</dt>
+                      <dd>{category.iconKey || "car"}</dd>
+                    </div>
+                    <div>
                       <dt>Image URL</dt>
                       <dd>{category.imageUrl || "Not set"}</dd>
+                    </div>
+                  </dl>
+
+                  <dl className={styles.brandMeta}>
+                    <div>
+                      <dt>Image Alt</dt>
+                      <dd>{category.imageAlt || category.name}</dd>
+                    </div>
+                    <div>
+                      <dt>Copy</dt>
+                      <dd>{category.description || "Fallback copy"}</dd>
                     </div>
                   </dl>
 
@@ -148,10 +175,15 @@ export default async function AdminCategoriesPage() {
                     <summary>Edit category</summary>
                     <CategoryForm
                       category={{
+                        description: category.description,
+                        iconKey: category.iconKey,
                         id: category.id,
+                        imageAlt: category.imageAlt,
                         imageUrl: category.imageUrl,
                         isActive: category.isActive,
                         name: category.name,
+                        routePath: category.routePath,
+                        showOnHomepage: category.showOnHomepage,
                         slug: category.slug,
                         sortOrder: category.sortOrder,
                         type: category.type,
