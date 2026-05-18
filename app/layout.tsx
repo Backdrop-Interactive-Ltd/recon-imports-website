@@ -5,6 +5,7 @@ import { getSiteSettings } from "../lib/siteSettings";
 import "./globals.css";
 
 const siteUrl = "https://reconimports.com";
+const defaultOpenGraphImage = `${siteUrl}/hero-slide-1.webp`;
 const defaultMetaTitle = "Recon Imports | Premium Japanese Reconditioned Cars in Bangladesh";
 const defaultMetaDescription =
   "Recon Imports offers Japanese reconditioned cars, car stocks, auction sheet verification, and vehicle import support in Bangladesh.";
@@ -25,10 +26,35 @@ function cleanSeoValue(value: string, fallback: string) {
   return trimmedValue;
 }
 
+function getPublicImageUrl(value: string) {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return defaultOpenGraphImage;
+  }
+
+  if (trimmedValue.startsWith("/")) {
+    return `${siteUrl}${trimmedValue}`;
+  }
+
+  try {
+    const url = new URL(trimmedValue);
+
+    if (url.protocol === "https:") {
+      return url.toString();
+    }
+  } catch {
+    return defaultOpenGraphImage;
+  }
+
+  return defaultOpenGraphImage;
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   const title = cleanSeoValue(settings.defaultMetaTitle, defaultMetaTitle);
   const description = cleanSeoValue(settings.defaultMetaDescription, defaultMetaDescription);
+  const openGraphImage = getPublicImageUrl(settings.openGraphImage);
 
   return {
     alternates: {
@@ -40,7 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     openGraph: {
       description,
-      images: settings.openGraphImage ? [{ url: settings.openGraphImage }] : undefined,
+      images: [{ url: openGraphImage }],
       siteName: "Recon Imports",
       title,
       type: "website",
@@ -48,9 +74,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     title,
     twitter: {
-      card: settings.openGraphImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       description,
-      images: settings.openGraphImage ? [settings.openGraphImage] : undefined,
+      images: [openGraphImage],
       title,
     },
   };
