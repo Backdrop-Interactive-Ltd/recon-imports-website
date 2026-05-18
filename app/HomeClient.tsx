@@ -947,7 +947,9 @@ export default function HomeClient({
               Our expert sales team is here to assist you to choose your vehicle according to your necessity, choice and
               preference.
             </p>
-            <a href={phoneHref || "tel:+8801886589009"}>Book An Appointment</a>
+            <a href="https://calendly.com/reconimportsltd/30min" target="_blank" rel="noreferrer">
+              Book An Appointment
+            </a>
           </div>
         </section>
       </section>
