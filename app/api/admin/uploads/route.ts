@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
-import { configureCloudinary, getCloudinaryConfig, uploadImageBuffer } from "../../../../lib/uploads/cloudinary";
+import {
+  configureCloudinary,
+  getCloudinaryConfig,
+  getUploadedImageDeliveryUrl,
+  uploadImageBuffer,
+} from "../../../../lib/uploads/cloudinary";
 import { validateAdminImageFile } from "../../../../lib/uploads/imageRules";
 
 export const runtime = "nodejs";
@@ -59,6 +64,7 @@ export async function POST(request: Request) {
     const folder = getSafeFolder(formData.get("folder"));
     const buffer = Buffer.from(await file.arrayBuffer());
     const result = await uploadImageBuffer(buffer, folder);
+    const deliveryUrl = getUploadedImageDeliveryUrl(result);
     let mediaId: string | undefined;
 
     try {
@@ -66,7 +72,7 @@ export async function POST(request: Request) {
         data: {
           fileName: file.name,
           fileType: file.type,
-          fileUrl: result.secure_url,
+          fileUrl: deliveryUrl,
           folder,
           size: file.size,
         },
@@ -83,7 +89,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       mediaId,
       publicId: result.public_id,
-      url: result.secure_url,
+      url: deliveryUrl,
     });
   } catch (error) {
     console.error(error);

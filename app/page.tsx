@@ -1,4 +1,5 @@
 import { VehicleCategoryType } from "../lib/generated/prisma/enums";
+import { getOptimizedCloudinaryImageUrl } from "../lib/cloudinaryImages";
 import { prisma } from "../lib/prisma";
 import { getSiteSettings } from "../lib/siteSettings";
 import HomeClient, { type HomepageBrand, type HomepageCategory, type HomepageHeroSlide } from "./HomeClient";
@@ -84,7 +85,7 @@ function getCategoryImage(slug: string, imageUrl?: string | null) {
   const cleanImageUrl = cleanOptionalValue(imageUrl);
 
   if (cleanImageUrl && isValidImageSrc(cleanImageUrl)) {
-    return cleanImageUrl;
+    return getOptimizedCloudinaryImageUrl(cleanImageUrl);
   }
 
   return categoryImageBySlug[slug] || defaultCategoryImage;
@@ -104,7 +105,10 @@ async function getHomepageBrands(): Promise<HomepageBrand[] | undefined> {
 
     if (brands.length === 0) return undefined;
 
-    return brands;
+    return brands.map((brand) => ({
+      ...brand,
+      logoUrl: getOptimizedCloudinaryImageUrl(brand.logoUrl),
+    }));
   } catch (error) {
     console.error("Failed to load homepage brands from database.", error);
     return undefined;
@@ -177,7 +181,7 @@ async function getHomepageHeroSlides(): Promise<HomepageHeroSlide[] | undefined>
     return slides.map((slide, index) => ({
       ctaLink: slide.ctaLink,
       ctaText: slide.ctaText,
-      image: slide.imageUrl,
+      image: getOptimizedCloudinaryImageUrl(slide.imageUrl),
       imageClass: heroImageClasses[index % heroImageClasses.length],
       subtitle: slide.subtitle,
       textAnimation: heroTextAnimations[index % heroTextAnimations.length],

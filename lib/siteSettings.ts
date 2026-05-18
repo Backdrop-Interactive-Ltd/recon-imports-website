@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { getOptimizedCloudinaryImageUrl } from "./cloudinaryImages";
 import {
   fallbackSiteSettings,
   siteSettingKeys,
@@ -7,6 +8,16 @@ import {
 } from "./siteSettingsConfig";
 
 export type { PublicSiteSettings } from "./siteSettingsConfig";
+
+const imageSettingKeys = new Set<SiteSettingKey>(["favicon", "footerLogo", "openGraphImage", "websiteLogo"]);
+
+function normalizeSiteSettingValue(key: SiteSettingKey, value: string) {
+  if (imageSettingKeys.has(key)) {
+    return getOptimizedCloudinaryImageUrl(value);
+  }
+
+  return value;
+}
 
 export async function getSiteSettings(): Promise<PublicSiteSettings> {
   try {
@@ -26,7 +37,8 @@ export async function getSiteSettings(): Promise<PublicSiteSettings> {
 
     for (const row of rows) {
       if (siteSettingKeys.includes(row.key as SiteSettingKey)) {
-        settings[row.key as SiteSettingKey] = row.value;
+        const key = row.key as SiteSettingKey;
+        settings[key] = normalizeSiteSettingValue(key, row.value);
       }
     }
 

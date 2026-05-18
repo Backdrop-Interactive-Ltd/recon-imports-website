@@ -1,4 +1,5 @@
 import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
+import { getOptimizedCloudinaryImageUrl } from "../cloudinaryImages";
 
 export function getCloudinaryConfig() {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
@@ -59,4 +60,8 @@ export function uploadImageBuffer(buffer: Buffer, folder: string): Promise<Uploa
 
     uploadStream.end(buffer);
   });
+}
+
+export function getUploadedImageDeliveryUrl(result: UploadApiResponse) {
+  return getOptimizedCloudinaryImageUrl(result.secure_url);
 }

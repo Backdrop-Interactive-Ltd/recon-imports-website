@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "../../lib/prisma";
-import { configureCloudinary, uploadImageBuffer } from "../../lib/uploads/cloudinary";
+import { configureCloudinary, getUploadedImageDeliveryUrl, uploadImageBuffer } from "../../lib/uploads/cloudinary";
 import { validateAdminImageFile } from "../../lib/uploads/imageRules";
 import { sellCarLeadFormSchema, type SellCarLeadActionState } from "./validation";
 
@@ -91,7 +91,7 @@ async function uploadLeadImages(files: File[]) {
       files.map(async (file) => {
         const buffer = Buffer.from(await file.arrayBuffer());
         const result = await uploadImageBuffer(buffer, "sell-car-leads");
-        return result.secure_url;
+        return getUploadedImageDeliveryUrl(result);
       }),
     );
 

@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { getOptimizedCloudinaryImageUrl, getOptimizedCloudinaryImageUrls } from "../../lib/cloudinaryImages";
 import { CarFeatureType, FuelType, type CarBodyType, type StockType, type TransmissionType } from "../../lib/generated/prisma/enums";
 import type { Prisma } from "../../lib/generated/prisma/client";
 import { brandOptions as fallbackBrandOptions, getBrandBySlug } from "./brands";
@@ -98,7 +99,7 @@ function createDescription(car: PublicCarRecord) {
 
 function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
   const body = bodyLabels[car.bodyType];
-  const gallery = car.images.map((image) => image.imageUrl);
+  const gallery = getOptimizedCloudinaryImageUrls(car.images.map((image) => image.imageUrl));
   const primaryImage = gallery[0] ?? fallbackImagesByBody[body] ?? "/cat-suv.webp";
   const features = car.features
     .filter((feature) => feature.type === CarFeatureType.FEATURE)
@@ -136,7 +137,7 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     suggestedImage: primaryImage,
     transmission: transmissionLabels[car.transmission].toUpperCase(),
     type: stockTypeLabels[car.stockType],
-    videoImage: car.videoImageUrl || primaryImage,
+    videoImage: car.videoImageUrl ? getOptimizedCloudinaryImageUrl(car.videoImageUrl) : primaryImage,
     wheel: "N/A",
     year: String(car.year),
   };
