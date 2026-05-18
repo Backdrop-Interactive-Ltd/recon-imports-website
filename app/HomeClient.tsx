@@ -704,7 +704,7 @@ export default function HomeClient({
         <a href={phoneHref || "tel:+8801886589009"}>Showroom <ChevronRight size={14} /></a>
       </div>
 
-      <header ref={headerRef} className={headerGlass ? "site-header glass" : "site-header"}>
+      <header ref={headerRef} className={headerGlass ? "site-header glass compact" : "site-header"}>
         <button
           className="icon-button menu-button"
           type="button"
