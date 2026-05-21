@@ -1,11 +1,21 @@
 import { z } from "zod";
-import { CarBodyType, CarCondition, CarFeatureType, FuelType, StockType, TransmissionType } from "../../../../lib/generated/prisma/enums";
+import {
+  CarBodyType,
+  CarCondition,
+  CarFeatureType,
+  CarSaleStatus,
+  FuelType,
+  StockType,
+  TransmissionType,
+} from "../../../../lib/generated/prisma/enums";
+import { getYouTubeVideoId } from "../../../../lib/youtube";
 
 export type CarActionState = {
   errors?: Partial<
     Record<
       | "bodyType"
       | "brandId"
+      | "chassisNumber"
       | "condition"
       | "description"
       | "driveTrain"
@@ -26,11 +36,14 @@ export type CarActionState = {
       | "origin"
       | "packageName"
       | "price"
+      | "saleStatus"
       | "slug"
       | "stockType"
       | "title"
       | "transmission"
       | "videoImageUrl"
+      | "wheelSize"
+      | "youtubeVideoUrl"
       | "year",
       string
     >
@@ -49,6 +62,7 @@ export const fuelTypeOptions = Object.values(FuelType);
 export const transmissionOptions = Object.values(TransmissionType);
 export const conditionOptions = Object.values(CarCondition);
 export const stockTypeOptions = Object.values(StockType);
+export const saleStatusOptions = Object.values(CarSaleStatus);
 export const featureTypeOptions = Object.values(CarFeatureType);
 
 export function slugifyCar(value: string) {
@@ -140,6 +154,7 @@ export const carFormSchema = z
   .object({
     bodyType: z.enum(bodyTypeOptions, { error: "Choose a valid body type." }),
     brandId: z.string().trim().min(1, "Brand selection is required."),
+    chassisNumber: z.string().trim().max(80, "Chassis number is too long.").optional(),
     condition: z.enum(conditionOptions, { error: "Choose a valid condition." }),
     description: z.string().trim().max(5000, "Description is too long.").optional(),
     driveTrain: optionalText,
@@ -162,11 +177,14 @@ export const carFormSchema = z
       .int("Price must be a whole number.")
       .min(0, "Price cannot be negative.")
       .max(999999999, "Price is too high."),
+    saleStatus: z.enum(saleStatusOptions, { error: "Choose a valid sale status." }),
     slug: z.string().trim().max(120, "Slug is too long.").optional(),
     stockType: z.enum(stockTypeOptions, { error: "Choose a valid stock type." }),
     title: z.string().trim().min(1, "Title is required.").max(140, "Title is too long."),
     transmission: z.enum(transmissionOptions, { error: "Choose a valid transmission." }),
     videoImageUrl: optionalUrl,
+    wheelSize: z.string().trim().max(80, "Wheel size is too long.").optional(),
+    youtubeVideoUrl: optionalUrl,
     year: z.coerce
       .number({ error: "Year must be a number." })
       .int("Year must be a whole number.")
@@ -191,6 +209,14 @@ export const carFormSchema = z
         path: ["videoImageUrl"],
       });
     }
+
+    if (value.youtubeVideoUrl && !getYouTubeVideoId(value.youtubeVideoUrl)) {
+      context.addIssue({
+        code: "custom",
+        message: "Use a valid YouTube URL from youtube.com, youtu.be, /shorts/, or /embed/.",
+        path: ["youtubeVideoUrl"],
+      });
+    }
   })
   .transform((value) => {
     const images = value.images.map((image, index) => ({
@@ -200,6 +226,7 @@ export const carFormSchema = z
 
     return {
       ...value,
+      chassisNumber: value.chassisNumber || null,
       description: value.description || null,
       driveTrain: value.driveTrain || null,
       engine: value.engine || null,
@@ -212,5 +239,7 @@ export const carFormSchema = z
       packageName: value.packageName || null,
       slug: slugifyCar(value.slug || value.title),
       videoImageUrl: value.videoImageUrl || null,
+      wheelSize: value.wheelSize || null,
+      youtubeVideoUrl: value.youtubeVideoUrl || null,
     };
   });

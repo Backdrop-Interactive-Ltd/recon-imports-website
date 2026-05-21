@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 
 const categoryRouteBySlug: Record<string, string> = {
   crossover: "/crossover",
-  ev: "/ev",
   hatchback: "/hatchback",
   mpv: "/mpv",
   "passenger-van": "/passenger-van",
@@ -23,7 +22,6 @@ const categoryRouteBySlug: Record<string, string> = {
 
 const categoryCopyBySlug: Record<string, string> = {
   crossover: "Blending sedan agility with the versatile, elevated stance of an SUV.",
-  ev: "Efficient, quiet, and future-ready electric driving options.",
   hatchback: "Compact, practical, and easy to handle for daily movement.",
   mpv: "Multi-purpose vehicles designed for maximum seating and flexibility.",
   "passenger-van": "Roomy passenger transport for groups, families, and business needs.",
@@ -37,7 +35,6 @@ const categoryCopyBySlug: Record<string, string> = {
 
 const categoryImageBySlug: Record<string, string> = {
   crossover: "/cat-crossover.webp",
-  ev: "/cat-crossover.webp",
   hatchback: "/stock-noah-white.webp",
   mpv: "/cat-mpv.webp",
   "passenger-van": "/cat-wagon.webp",
@@ -140,9 +137,14 @@ async function getHomepageCategories(): Promise<HomepageCategory[] | undefined> 
       },
     });
 
-    if (categories.length === 0) return undefined;
+    const visibleCategories = categories.filter((category) => {
+      const routePath = getCategoryHref(category.slug, category.routePath);
+      return category.slug !== "ev" && routePath !== "/ev";
+    });
 
-    return categories.map((category) => ({
+    if (visibleCategories.length === 0) return undefined;
+
+    return visibleCategories.map((category) => ({
       id: category.id,
       copy:
         cleanOptionalValue(category.description) ||

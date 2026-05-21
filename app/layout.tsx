@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import type { CSSProperties } from "react";
+import BfcacheRestore from "./components/BfcacheRestore";
 import { getSiteSettings } from "../lib/siteSettings";
 import "./globals.css";
 
@@ -97,18 +97,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body style={themeStyle}>
-        <Script id="home-bfcache-restore" strategy="beforeInteractive">
-          {`
-            window.addEventListener("pageshow", function (event) {
-              var navigationEntries = performance.getEntriesByType ? performance.getEntriesByType("navigation") : [];
-              var navigationType = navigationEntries.length > 0 ? navigationEntries[0].type : "";
-
-              if (window.location.pathname === "/" && (event.persisted || navigationType === "back_forward")) {
-                window.location.reload();
-              }
-            });
-          `}
-        </Script>
+        <BfcacheRestore />
         {children}
       </body>
     </html>

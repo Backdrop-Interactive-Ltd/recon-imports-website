@@ -72,7 +72,7 @@ export default function HeroSlideForm({ mode, slide }: HeroSlideFormProps) {
 
       <label className={styles.field}>
         <span>CTA Link</span>
-        <input name="ctaLink" placeholder="/car-stocks" type="text" defaultValue={slide?.ctaLink ?? ""} />
+        <input name="ctaLink" placeholder="/brand-new" type="text" defaultValue={slide?.ctaLink ?? ""} />
         {state.errors?.ctaLink ? <small>{state.errors.ctaLink}</small> : null}
       </label>
 

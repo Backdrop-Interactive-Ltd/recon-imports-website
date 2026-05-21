@@ -63,6 +63,91 @@
   padding: 20px;
 }
 
+.subnav,
+.filterBar,
+.badgeGroup {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.subnav {
+  background: #ffffff;
+  border: 1px solid #e4e4e6;
+  gap: 8px;
+  padding: 10px;
+}
+
+.subnavLink,
+.secondaryLinkButton {
+  align-items: center;
+  color: #111111;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 42px;
+  justify-content: center;
+  letter-spacing: 1px;
+  padding: 0 16px;
+  text-transform: uppercase;
+}
+
+.subnavLink {
+  background: #f4f6f7;
+}
+
+.secondaryLinkButton {
+  background: #f4f6f7;
+}
+
+.subnavLinkActive,
+.subnavLink:hover,
+.secondaryLinkButton:hover {
+  background: #ad1b28;
+  color: #ffffff;
+}
+
+.actionCardGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.actionCard {
+  background: #ffffff;
+  border: 1px solid #e4e4e6;
+  color: #111111;
+  display: grid;
+  gap: 12px;
+  min-height: 190px;
+  padding: 24px;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.actionCard:hover {
+  border-color: #ad1b28;
+  transform: translateY(-2px);
+}
+
+.actionCard svg {
+  color: #ad1b28;
+}
+
+.actionCard h2 {
+  font-size: 24px;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.actionCard p {
+  color: #6e6e74;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+}
+
 .summaryGrid span,
 .brandMeta dt {
   color: #6e6e74;
@@ -373,6 +458,21 @@
   color: #6e6e74;
 }
 
+.soldBadge {
+  background: #fff1f3;
+  color: #9b0010;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 8px 10px;
+  text-transform: uppercase;
+}
+
+.badgeGroup {
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .brandMeta {
   display: grid;
   gap: 10px;
@@ -442,6 +542,80 @@
   gap: 10px;
 }
 
+.filterBar {
+  border-bottom: 1px solid #e4e4e6;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+.filterBar label {
+  display: grid;
+  gap: 7px;
+  min-width: 150px;
+}
+
+.filterBar span {
+  color: #6e6e74;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.filterBar select {
+  background: #ffffff;
+  border: 1px solid #d7d7db;
+  color: #111111;
+  font: inherit;
+  font-size: 13px;
+  min-height: 42px;
+  padding: 0 10px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.dataTable {
+  border-collapse: collapse;
+  min-width: 1040px;
+  width: 100%;
+}
+
+.dataTable th,
+.dataTable td {
+  border-bottom: 1px solid #e4e4e6;
+  font-size: 13px;
+  padding: 14px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dataTable th {
+  color: #6e6e74;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dataTable td strong,
+.dataTable td span {
+  display: block;
+}
+
+.dataTable td span {
+  color: #6e6e74;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.dataTable a {
+  color: #ad1b28;
+  font-weight: 900;
+}
+
 .inlineForm {
   display: grid;
   gap: 10px;
@@ -503,6 +677,7 @@
 
 @media (max-width: 720px) {
   .summaryGrid,
+  .actionCardGrid,
   .brandMeta,
   .carMeta,
   .fieldGrid,

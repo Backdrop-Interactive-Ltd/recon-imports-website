@@ -10,6 +10,11 @@ export async function generateStaticParams() {
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand: slug } = await params;
+
+  if (slug === "ev") {
+    notFound();
+  }
+
   const brand = await getPublicBrandBySlug(slug);
 
   if (!brand) {
@@ -18,7 +23,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
 
   return (
     <PublicStockListing
-      activePage="car-stocks"
+      activePage="brand-new"
       brandFilter={brand.name}
       introCopy={`Browse vehicles uploaded with ${brand.name} selected as the car brand.`}
       title={`${brand.name} Vehicles`}

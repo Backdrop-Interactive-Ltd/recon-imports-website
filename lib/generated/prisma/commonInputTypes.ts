@@ -271,6 +271,13 @@ export type EnumStockTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumStockTypeFilter<$PrismaModel> | $Enums.StockType
 }
 
+export type EnumCarSaleStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CarSaleStatus | Prisma.EnumCarSaleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCarSaleStatusFilter<$PrismaModel> | $Enums.CarSaleStatus
+}
+
 export type EnumCarBodyTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.CarBodyType | Prisma.EnumCarBodyTypeFieldRefInput<$PrismaModel>
   in?: $Enums.CarBodyType[] | Prisma.ListEnumCarBodyTypeFieldRefInput<$PrismaModel>
@@ -319,6 +326,16 @@ export type EnumStockTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStockTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStockTypeFilter<$PrismaModel>
+}
+
+export type EnumCarSaleStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CarSaleStatus | Prisma.EnumCarSaleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCarSaleStatusWithAggregatesFilter<$PrismaModel> | $Enums.CarSaleStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCarSaleStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCarSaleStatusFilter<$PrismaModel>
 }
 
 export type EnumCarFeatureTypeFilter<$PrismaModel = never> = {
@@ -676,6 +693,13 @@ export type NestedEnumStockTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumStockTypeFilter<$PrismaModel> | $Enums.StockType
 }
 
+export type NestedEnumCarSaleStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CarSaleStatus | Prisma.EnumCarSaleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCarSaleStatusFilter<$PrismaModel> | $Enums.CarSaleStatus
+}
+
 export type NestedEnumCarBodyTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.CarBodyType | Prisma.EnumCarBodyTypeFieldRefInput<$PrismaModel>
   in?: $Enums.CarBodyType[] | Prisma.ListEnumCarBodyTypeFieldRefInput<$PrismaModel>
@@ -724,6 +748,16 @@ export type NestedEnumStockTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStockTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStockTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumCarSaleStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CarSaleStatus | Prisma.EnumCarSaleStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CarSaleStatus[] | Prisma.ListEnumCarSaleStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCarSaleStatusWithAggregatesFilter<$PrismaModel> | $Enums.CarSaleStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCarSaleStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCarSaleStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumCarFeatureTypeFilter<$PrismaModel = never> = {

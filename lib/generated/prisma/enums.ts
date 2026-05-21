@@ -94,6 +94,15 @@ export const CarFeatureType = {
 export type CarFeatureType = (typeof CarFeatureType)[keyof typeof CarFeatureType]
 
 
+export const CarSaleStatus = {
+  AVAILABLE: 'AVAILABLE',
+  RESERVED: 'RESERVED',
+  SOLD: 'SOLD'
+} as const
+
+export type CarSaleStatus = (typeof CarSaleStatus)[keyof typeof CarSaleStatus]
+
+
 export const SiteSettingType = {
   STRING: 'STRING',
   TEXT: 'TEXT',

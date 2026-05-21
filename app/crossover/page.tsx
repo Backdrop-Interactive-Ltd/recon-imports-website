@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export default function CrossoverPage() {
   return (
     <PublicStockListing
-      activePage="car-stocks"
+      activePage="brand-new"
       bodyFilter="Crossover"
       introCopy="Browse crossover vehicles uploaded with Crossover selected as the body type."
       title="Crossover Vehicles"

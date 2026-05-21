@@ -159,10 +159,10 @@ async function getRecentActivity(): Promise<ActivitySection[]> {
   return [
     {
       emptyText: "No cars have been added yet.",
-      href: "/admin/cars",
+      href: "/admin/cars/list",
       items: cars.map((car) => ({
         badge: car.isPublished ? "Published" : "Draft",
-        href: "/admin/cars",
+        href: `/admin/cars/manage/${car.id}`,
         id: car.id,
         meta: `${car.brand.name} | ${car.year} | BDT ${numberFormatter.format(car.price)}`,
         title: car.title,
@@ -221,7 +221,7 @@ async function getRecentActivity(): Promise<ActivitySection[]> {
 }
 
 const quickActions = [
-  { label: "Add Car", href: "/admin/cars", icon: Plus },
+  { label: "Add Car", href: "/admin/cars/add", icon: Plus },
   { label: "Add Brand", href: "/admin/brands", icon: Tags },
   { label: "Manage Hero Slides", href: "/admin/homepage", icon: Activity },
   { label: "Site Settings", href: "/admin/site-settings", icon: Settings },

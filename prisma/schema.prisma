@@ -68,6 +68,12 @@ enum CarFeatureType {
   SAFETY
 }
 
+enum CarSaleStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
 enum SiteSettingType {
   STRING
   TEXT
@@ -201,6 +207,7 @@ model Car {
   title         String
   slug          String           @unique
   brandId       String
+  chassisNumber String?
   model         String
   year          Int
   price         Int
@@ -218,10 +225,13 @@ model Car {
   interiorColor String?
   engine        String?
   driveTrain    String?
+  wheelSize     String?
   description   String?
   videoImageUrl String?
+  youtubeVideoUrl String?
   isFeatured    Boolean          @default(false)
   isPublished   Boolean          @default(false)
+  saleStatus    CarSaleStatus    @default(AVAILABLE)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   brand         Brand            @relation(fields: [brandId], references: [id], onDelete: Restrict)
@@ -229,11 +239,13 @@ model Car {
   features      CarFeature[]
 
   @@index([brandId])
+  @@index([chassisNumber])
   @@index([bodyType])
   @@index([stockType])
   @@index([condition])
   @@index([isPublished])
   @@index([isFeatured])
+  @@index([saleStatus])
   @@index([year])
   @@index([price])
 }

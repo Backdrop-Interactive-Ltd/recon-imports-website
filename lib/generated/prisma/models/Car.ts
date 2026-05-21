@@ -41,6 +41,7 @@ export type CarMinAggregateOutputType = {
   title: string | null
   slug: string | null
   brandId: string | null
+  chassisNumber: string | null
   model: string | null
   year: number | null
   price: number | null
@@ -58,10 +59,13 @@ export type CarMinAggregateOutputType = {
   interiorColor: string | null
   engine: string | null
   driveTrain: string | null
+  wheelSize: string | null
   description: string | null
   videoImageUrl: string | null
+  youtubeVideoUrl: string | null
   isFeatured: boolean | null
   isPublished: boolean | null
+  saleStatus: $Enums.CarSaleStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -71,6 +75,7 @@ export type CarMaxAggregateOutputType = {
   title: string | null
   slug: string | null
   brandId: string | null
+  chassisNumber: string | null
   model: string | null
   year: number | null
   price: number | null
@@ -88,10 +93,13 @@ export type CarMaxAggregateOutputType = {
   interiorColor: string | null
   engine: string | null
   driveTrain: string | null
+  wheelSize: string | null
   description: string | null
   videoImageUrl: string | null
+  youtubeVideoUrl: string | null
   isFeatured: boolean | null
   isPublished: boolean | null
+  saleStatus: $Enums.CarSaleStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -101,6 +109,7 @@ export type CarCountAggregateOutputType = {
   title: number
   slug: number
   brandId: number
+  chassisNumber: number
   model: number
   year: number
   price: number
@@ -118,10 +127,13 @@ export type CarCountAggregateOutputType = {
   interiorColor: number
   engine: number
   driveTrain: number
+  wheelSize: number
   description: number
   videoImageUrl: number
+  youtubeVideoUrl: number
   isFeatured: number
   isPublished: number
+  saleStatus: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -143,6 +155,7 @@ export type CarMinAggregateInputType = {
   title?: true
   slug?: true
   brandId?: true
+  chassisNumber?: true
   model?: true
   year?: true
   price?: true
@@ -160,10 +173,13 @@ export type CarMinAggregateInputType = {
   interiorColor?: true
   engine?: true
   driveTrain?: true
+  wheelSize?: true
   description?: true
   videoImageUrl?: true
+  youtubeVideoUrl?: true
   isFeatured?: true
   isPublished?: true
+  saleStatus?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -173,6 +189,7 @@ export type CarMaxAggregateInputType = {
   title?: true
   slug?: true
   brandId?: true
+  chassisNumber?: true
   model?: true
   year?: true
   price?: true
@@ -190,10 +207,13 @@ export type CarMaxAggregateInputType = {
   interiorColor?: true
   engine?: true
   driveTrain?: true
+  wheelSize?: true
   description?: true
   videoImageUrl?: true
+  youtubeVideoUrl?: true
   isFeatured?: true
   isPublished?: true
+  saleStatus?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -203,6 +223,7 @@ export type CarCountAggregateInputType = {
   title?: true
   slug?: true
   brandId?: true
+  chassisNumber?: true
   model?: true
   year?: true
   price?: true
@@ -220,10 +241,13 @@ export type CarCountAggregateInputType = {
   interiorColor?: true
   engine?: true
   driveTrain?: true
+  wheelSize?: true
   description?: true
   videoImageUrl?: true
+  youtubeVideoUrl?: true
   isFeatured?: true
   isPublished?: true
+  saleStatus?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -320,6 +344,7 @@ export type CarGroupByOutputType = {
   title: string
   slug: string
   brandId: string
+  chassisNumber: string | null
   model: string
   year: number
   price: number
@@ -337,10 +362,13 @@ export type CarGroupByOutputType = {
   interiorColor: string | null
   engine: string | null
   driveTrain: string | null
+  wheelSize: string | null
   description: string | null
   videoImageUrl: string | null
+  youtubeVideoUrl: string | null
   isFeatured: boolean
   isPublished: boolean
+  saleStatus: $Enums.CarSaleStatus
   createdAt: Date
   updatedAt: Date
   _count: CarCountAggregateOutputType | null
@@ -373,6 +401,7 @@ export type CarWhereInput = {
   title?: Prisma.StringFilter<"Car"> | string
   slug?: Prisma.StringFilter<"Car"> | string
   brandId?: Prisma.StringFilter<"Car"> | string
+  chassisNumber?: Prisma.StringNullableFilter<"Car"> | string | null
   model?: Prisma.StringFilter<"Car"> | string
   year?: Prisma.IntFilter<"Car"> | number
   price?: Prisma.IntFilter<"Car"> | number
@@ -390,10 +419,13 @@ export type CarWhereInput = {
   interiorColor?: Prisma.StringNullableFilter<"Car"> | string | null
   engine?: Prisma.StringNullableFilter<"Car"> | string | null
   driveTrain?: Prisma.StringNullableFilter<"Car"> | string | null
+  wheelSize?: Prisma.StringNullableFilter<"Car"> | string | null
   description?: Prisma.StringNullableFilter<"Car"> | string | null
   videoImageUrl?: Prisma.StringNullableFilter<"Car"> | string | null
+  youtubeVideoUrl?: Prisma.StringNullableFilter<"Car"> | string | null
   isFeatured?: Prisma.BoolFilter<"Car"> | boolean
   isPublished?: Prisma.BoolFilter<"Car"> | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFilter<"Car"> | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFilter<"Car"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Car"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
@@ -406,6 +438,7 @@ export type CarOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  chassisNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   model?: Prisma.SortOrder
   year?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -423,10 +456,13 @@ export type CarOrderByWithRelationInput = {
   interiorColor?: Prisma.SortOrderInput | Prisma.SortOrder
   engine?: Prisma.SortOrderInput | Prisma.SortOrder
   driveTrain?: Prisma.SortOrderInput | Prisma.SortOrder
+  wheelSize?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   videoImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  youtubeVideoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
+  saleStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   brand?: Prisma.BrandOrderByWithRelationInput
@@ -442,6 +478,7 @@ export type CarWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CarWhereInput | Prisma.CarWhereInput[]
   title?: Prisma.StringFilter<"Car"> | string
   brandId?: Prisma.StringFilter<"Car"> | string
+  chassisNumber?: Prisma.StringNullableFilter<"Car"> | string | null
   model?: Prisma.StringFilter<"Car"> | string
   year?: Prisma.IntFilter<"Car"> | number
   price?: Prisma.IntFilter<"Car"> | number
@@ -459,10 +496,13 @@ export type CarWhereUniqueInput = Prisma.AtLeast<{
   interiorColor?: Prisma.StringNullableFilter<"Car"> | string | null
   engine?: Prisma.StringNullableFilter<"Car"> | string | null
   driveTrain?: Prisma.StringNullableFilter<"Car"> | string | null
+  wheelSize?: Prisma.StringNullableFilter<"Car"> | string | null
   description?: Prisma.StringNullableFilter<"Car"> | string | null
   videoImageUrl?: Prisma.StringNullableFilter<"Car"> | string | null
+  youtubeVideoUrl?: Prisma.StringNullableFilter<"Car"> | string | null
   isFeatured?: Prisma.BoolFilter<"Car"> | boolean
   isPublished?: Prisma.BoolFilter<"Car"> | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFilter<"Car"> | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFilter<"Car"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Car"> | Date | string
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
@@ -475,6 +515,7 @@ export type CarOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  chassisNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   model?: Prisma.SortOrder
   year?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -492,10 +533,13 @@ export type CarOrderByWithAggregationInput = {
   interiorColor?: Prisma.SortOrderInput | Prisma.SortOrder
   engine?: Prisma.SortOrderInput | Prisma.SortOrder
   driveTrain?: Prisma.SortOrderInput | Prisma.SortOrder
+  wheelSize?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   videoImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  youtubeVideoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
+  saleStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CarCountOrderByAggregateInput
@@ -513,6 +557,7 @@ export type CarScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Car"> | string
   slug?: Prisma.StringWithAggregatesFilter<"Car"> | string
   brandId?: Prisma.StringWithAggregatesFilter<"Car"> | string
+  chassisNumber?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
   model?: Prisma.StringWithAggregatesFilter<"Car"> | string
   year?: Prisma.IntWithAggregatesFilter<"Car"> | number
   price?: Prisma.IntWithAggregatesFilter<"Car"> | number
@@ -530,10 +575,13 @@ export type CarScalarWhereWithAggregatesInput = {
   interiorColor?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
   engine?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
   driveTrain?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
+  wheelSize?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
   videoImageUrl?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
+  youtubeVideoUrl?: Prisma.StringNullableWithAggregatesFilter<"Car"> | string | null
   isFeatured?: Prisma.BoolWithAggregatesFilter<"Car"> | boolean
   isPublished?: Prisma.BoolWithAggregatesFilter<"Car"> | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusWithAggregatesFilter<"Car"> | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Car"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Car"> | Date | string
 }
@@ -542,6 +590,7 @@ export type CarCreateInput = {
   id?: string
   title: string
   slug: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -559,10 +608,13 @@ export type CarCreateInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutCarsInput
@@ -575,6 +627,7 @@ export type CarUncheckedCreateInput = {
   title: string
   slug: string
   brandId: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -592,10 +645,13 @@ export type CarUncheckedCreateInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.CarImageUncheckedCreateNestedManyWithoutCarInput
@@ -606,6 +662,7 @@ export type CarUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -623,10 +680,13 @@ export type CarUpdateInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutCarsNestedInput
@@ -639,6 +699,7 @@ export type CarUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -656,10 +717,13 @@ export type CarUncheckedUpdateInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.CarImageUncheckedUpdateManyWithoutCarNestedInput
@@ -671,6 +735,7 @@ export type CarCreateManyInput = {
   title: string
   slug: string
   brandId: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -688,10 +753,13 @@ export type CarCreateManyInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -700,6 +768,7 @@ export type CarUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -717,10 +786,13 @@ export type CarUpdateManyMutationInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -730,6 +802,7 @@ export type CarUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -747,10 +820,13 @@ export type CarUncheckedUpdateManyInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -770,6 +846,7 @@ export type CarCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  chassisNumber?: Prisma.SortOrder
   model?: Prisma.SortOrder
   year?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -787,10 +864,13 @@ export type CarCountOrderByAggregateInput = {
   interiorColor?: Prisma.SortOrder
   engine?: Prisma.SortOrder
   driveTrain?: Prisma.SortOrder
+  wheelSize?: Prisma.SortOrder
   description?: Prisma.SortOrder
   videoImageUrl?: Prisma.SortOrder
+  youtubeVideoUrl?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
+  saleStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -805,6 +885,7 @@ export type CarMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  chassisNumber?: Prisma.SortOrder
   model?: Prisma.SortOrder
   year?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -822,10 +903,13 @@ export type CarMaxOrderByAggregateInput = {
   interiorColor?: Prisma.SortOrder
   engine?: Prisma.SortOrder
   driveTrain?: Prisma.SortOrder
+  wheelSize?: Prisma.SortOrder
   description?: Prisma.SortOrder
   videoImageUrl?: Prisma.SortOrder
+  youtubeVideoUrl?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
+  saleStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -835,6 +919,7 @@ export type CarMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   brandId?: Prisma.SortOrder
+  chassisNumber?: Prisma.SortOrder
   model?: Prisma.SortOrder
   year?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -852,10 +937,13 @@ export type CarMinOrderByAggregateInput = {
   interiorColor?: Prisma.SortOrder
   engine?: Prisma.SortOrder
   driveTrain?: Prisma.SortOrder
+  wheelSize?: Prisma.SortOrder
   description?: Prisma.SortOrder
   videoImageUrl?: Prisma.SortOrder
+  youtubeVideoUrl?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
+  saleStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -932,6 +1020,10 @@ export type EnumStockTypeFieldUpdateOperationsInput = {
   set?: $Enums.StockType
 }
 
+export type EnumCarSaleStatusFieldUpdateOperationsInput = {
+  set?: $Enums.CarSaleStatus
+}
+
 export type CarCreateNestedOneWithoutImagesInput = {
   create?: Prisma.XOR<Prisma.CarCreateWithoutImagesInput, Prisma.CarUncheckedCreateWithoutImagesInput>
   connectOrCreate?: Prisma.CarCreateOrConnectWithoutImagesInput
@@ -964,6 +1056,7 @@ export type CarCreateWithoutBrandInput = {
   id?: string
   title: string
   slug: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -981,10 +1074,13 @@ export type CarCreateWithoutBrandInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.CarImageCreateNestedManyWithoutCarInput
@@ -995,6 +1091,7 @@ export type CarUncheckedCreateWithoutBrandInput = {
   id?: string
   title: string
   slug: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -1012,10 +1109,13 @@ export type CarUncheckedCreateWithoutBrandInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.CarImageUncheckedCreateNestedManyWithoutCarInput
@@ -1056,6 +1156,7 @@ export type CarScalarWhereInput = {
   title?: Prisma.StringFilter<"Car"> | string
   slug?: Prisma.StringFilter<"Car"> | string
   brandId?: Prisma.StringFilter<"Car"> | string
+  chassisNumber?: Prisma.StringNullableFilter<"Car"> | string | null
   model?: Prisma.StringFilter<"Car"> | string
   year?: Prisma.IntFilter<"Car"> | number
   price?: Prisma.IntFilter<"Car"> | number
@@ -1073,10 +1174,13 @@ export type CarScalarWhereInput = {
   interiorColor?: Prisma.StringNullableFilter<"Car"> | string | null
   engine?: Prisma.StringNullableFilter<"Car"> | string | null
   driveTrain?: Prisma.StringNullableFilter<"Car"> | string | null
+  wheelSize?: Prisma.StringNullableFilter<"Car"> | string | null
   description?: Prisma.StringNullableFilter<"Car"> | string | null
   videoImageUrl?: Prisma.StringNullableFilter<"Car"> | string | null
+  youtubeVideoUrl?: Prisma.StringNullableFilter<"Car"> | string | null
   isFeatured?: Prisma.BoolFilter<"Car"> | boolean
   isPublished?: Prisma.BoolFilter<"Car"> | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFilter<"Car"> | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFilter<"Car"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Car"> | Date | string
 }
@@ -1085,6 +1189,7 @@ export type CarCreateWithoutImagesInput = {
   id?: string
   title: string
   slug: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -1102,10 +1207,13 @@ export type CarCreateWithoutImagesInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutCarsInput
@@ -1117,6 +1225,7 @@ export type CarUncheckedCreateWithoutImagesInput = {
   title: string
   slug: string
   brandId: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -1134,10 +1243,13 @@ export type CarUncheckedCreateWithoutImagesInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   features?: Prisma.CarFeatureUncheckedCreateNestedManyWithoutCarInput
@@ -1163,6 +1275,7 @@ export type CarUpdateWithoutImagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1180,10 +1293,13 @@ export type CarUpdateWithoutImagesInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutCarsNestedInput
@@ -1195,6 +1311,7 @@ export type CarUncheckedUpdateWithoutImagesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1212,10 +1329,13 @@ export type CarUncheckedUpdateWithoutImagesInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   features?: Prisma.CarFeatureUncheckedUpdateManyWithoutCarNestedInput
@@ -1225,6 +1345,7 @@ export type CarCreateWithoutFeaturesInput = {
   id?: string
   title: string
   slug: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -1242,10 +1363,13 @@ export type CarCreateWithoutFeaturesInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   brand: Prisma.BrandCreateNestedOneWithoutCarsInput
@@ -1257,6 +1381,7 @@ export type CarUncheckedCreateWithoutFeaturesInput = {
   title: string
   slug: string
   brandId: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -1274,10 +1399,13 @@ export type CarUncheckedCreateWithoutFeaturesInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.CarImageUncheckedCreateNestedManyWithoutCarInput
@@ -1303,6 +1431,7 @@ export type CarUpdateWithoutFeaturesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1320,10 +1449,13 @@ export type CarUpdateWithoutFeaturesInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   brand?: Prisma.BrandUpdateOneRequiredWithoutCarsNestedInput
@@ -1335,6 +1467,7 @@ export type CarUncheckedUpdateWithoutFeaturesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   brandId?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1352,10 +1485,13 @@ export type CarUncheckedUpdateWithoutFeaturesInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.CarImageUncheckedUpdateManyWithoutCarNestedInput
@@ -1365,6 +1501,7 @@ export type CarCreateManyBrandInput = {
   id?: string
   title: string
   slug: string
+  chassisNumber?: string | null
   model: string
   year: number
   price: number
@@ -1382,10 +1519,13 @@ export type CarCreateManyBrandInput = {
   interiorColor?: string | null
   engine?: string | null
   driveTrain?: string | null
+  wheelSize?: string | null
   description?: string | null
   videoImageUrl?: string | null
+  youtubeVideoUrl?: string | null
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: $Enums.CarSaleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1394,6 +1534,7 @@ export type CarUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1411,10 +1552,13 @@ export type CarUpdateWithoutBrandInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.CarImageUpdateManyWithoutCarNestedInput
@@ -1425,6 +1569,7 @@ export type CarUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1442,10 +1587,13 @@ export type CarUncheckedUpdateWithoutBrandInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.CarImageUncheckedUpdateManyWithoutCarNestedInput
@@ -1456,6 +1604,7 @@ export type CarUncheckedUpdateManyWithoutBrandInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  chassisNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   model?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   price?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1473,10 +1622,13 @@ export type CarUncheckedUpdateManyWithoutBrandInput = {
   interiorColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   engine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   driveTrain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wheelSize?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   videoImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeVideoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saleStatus?: Prisma.EnumCarSaleStatusFieldUpdateOperationsInput | $Enums.CarSaleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1526,6 +1678,7 @@ export type CarSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   title?: boolean
   slug?: boolean
   brandId?: boolean
+  chassisNumber?: boolean
   model?: boolean
   year?: boolean
   price?: boolean
@@ -1543,10 +1696,13 @@ export type CarSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   interiorColor?: boolean
   engine?: boolean
   driveTrain?: boolean
+  wheelSize?: boolean
   description?: boolean
   videoImageUrl?: boolean
+  youtubeVideoUrl?: boolean
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -1560,6 +1716,7 @@ export type CarSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extension
   title?: boolean
   slug?: boolean
   brandId?: boolean
+  chassisNumber?: boolean
   model?: boolean
   year?: boolean
   price?: boolean
@@ -1577,10 +1734,13 @@ export type CarSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extension
   interiorColor?: boolean
   engine?: boolean
   driveTrain?: boolean
+  wheelSize?: boolean
   description?: boolean
   videoImageUrl?: boolean
+  youtubeVideoUrl?: boolean
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -1591,6 +1751,7 @@ export type CarSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extension
   title?: boolean
   slug?: boolean
   brandId?: boolean
+  chassisNumber?: boolean
   model?: boolean
   year?: boolean
   price?: boolean
@@ -1608,10 +1769,13 @@ export type CarSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extension
   interiorColor?: boolean
   engine?: boolean
   driveTrain?: boolean
+  wheelSize?: boolean
   description?: boolean
   videoImageUrl?: boolean
+  youtubeVideoUrl?: boolean
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -1622,6 +1786,7 @@ export type CarSelectScalar = {
   title?: boolean
   slug?: boolean
   brandId?: boolean
+  chassisNumber?: boolean
   model?: boolean
   year?: boolean
   price?: boolean
@@ -1639,15 +1804,18 @@ export type CarSelectScalar = {
   interiorColor?: boolean
   engine?: boolean
   driveTrain?: boolean
+  wheelSize?: boolean
   description?: boolean
   videoImageUrl?: boolean
+  youtubeVideoUrl?: boolean
   isFeatured?: boolean
   isPublished?: boolean
+  saleStatus?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CarOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "brandId" | "model" | "year" | "price" | "mileage" | "bodyType" | "fuelType" | "transmission" | "condition" | "origin" | "grade" | "location" | "packageName" | "stockType" | "exteriorColor" | "interiorColor" | "engine" | "driveTrain" | "description" | "videoImageUrl" | "isFeatured" | "isPublished" | "createdAt" | "updatedAt", ExtArgs["result"]["car"]>
+export type CarOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "brandId" | "chassisNumber" | "model" | "year" | "price" | "mileage" | "bodyType" | "fuelType" | "transmission" | "condition" | "origin" | "grade" | "location" | "packageName" | "stockType" | "exteriorColor" | "interiorColor" | "engine" | "driveTrain" | "wheelSize" | "description" | "videoImageUrl" | "youtubeVideoUrl" | "isFeatured" | "isPublished" | "saleStatus" | "createdAt" | "updatedAt", ExtArgs["result"]["car"]>
 export type CarInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   images?: boolean | Prisma.Car$imagesArgs<ExtArgs>
@@ -1673,6 +1841,7 @@ export type $CarPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     title: string
     slug: string
     brandId: string
+    chassisNumber: string | null
     model: string
     year: number
     price: number
@@ -1690,10 +1859,13 @@ export type $CarPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     interiorColor: string | null
     engine: string | null
     driveTrain: string | null
+    wheelSize: string | null
     description: string | null
     videoImageUrl: string | null
+    youtubeVideoUrl: string | null
     isFeatured: boolean
     isPublished: boolean
+    saleStatus: $Enums.CarSaleStatus
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["car"]>
@@ -2126,6 +2298,7 @@ export interface CarFieldRefs {
   readonly title: Prisma.FieldRef<"Car", 'String'>
   readonly slug: Prisma.FieldRef<"Car", 'String'>
   readonly brandId: Prisma.FieldRef<"Car", 'String'>
+  readonly chassisNumber: Prisma.FieldRef<"Car", 'String'>
   readonly model: Prisma.FieldRef<"Car", 'String'>
   readonly year: Prisma.FieldRef<"Car", 'Int'>
   readonly price: Prisma.FieldRef<"Car", 'Int'>
@@ -2143,10 +2316,13 @@ export interface CarFieldRefs {
   readonly interiorColor: Prisma.FieldRef<"Car", 'String'>
   readonly engine: Prisma.FieldRef<"Car", 'String'>
   readonly driveTrain: Prisma.FieldRef<"Car", 'String'>
+  readonly wheelSize: Prisma.FieldRef<"Car", 'String'>
   readonly description: Prisma.FieldRef<"Car", 'String'>
   readonly videoImageUrl: Prisma.FieldRef<"Car", 'String'>
+  readonly youtubeVideoUrl: Prisma.FieldRef<"Car", 'String'>
   readonly isFeatured: Prisma.FieldRef<"Car", 'Boolean'>
   readonly isPublished: Prisma.FieldRef<"Car", 'Boolean'>
+  readonly saleStatus: Prisma.FieldRef<"Car", 'CarSaleStatus'>
   readonly createdAt: Prisma.FieldRef<"Car", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Car", 'DateTime'>
 }

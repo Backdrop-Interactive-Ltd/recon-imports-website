@@ -1817,6 +1817,7 @@ export const CarScalarFieldEnum = {
   title: 'title',
   slug: 'slug',
   brandId: 'brandId',
+  chassisNumber: 'chassisNumber',
   model: 'model',
   year: 'year',
   price: 'price',
@@ -1834,10 +1835,13 @@ export const CarScalarFieldEnum = {
   interiorColor: 'interiorColor',
   engine: 'engine',
   driveTrain: 'driveTrain',
+  wheelSize: 'wheelSize',
   description: 'description',
   videoImageUrl: 'videoImageUrl',
+  youtubeVideoUrl: 'youtubeVideoUrl',
   isFeatured: 'isFeatured',
   isPublished: 'isPublished',
+  saleStatus: 'saleStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2153,6 +2157,20 @@ export type EnumStockTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'StockType[]'
  */
 export type ListEnumStockTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CarSaleStatus'
+ */
+export type EnumCarSaleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CarSaleStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CarSaleStatus[]'
+ */
+export type ListEnumCarSaleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CarSaleStatus[]'>
     
 
 

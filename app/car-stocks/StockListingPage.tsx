@@ -6,32 +6,8 @@ import Footer from "../components/Footer";
 import { brandOptions as fallbackBrandOptions } from "./brands";
 import { formatPrice, inventory as fallbackInventory, type CarInventoryItem } from "./inventory";
 import type { PublicBrandOption } from "./data";
+import { getCarPublicPath } from "../../lib/carPublicRoutes";
 import { fallbackSiteSettings, type PublicSiteSettings } from "../../lib/siteSettingsConfig";
-
-// Creates a downloadable CSV from the current stock data.
-function downloadStockList(stockItems: CarInventoryItem[]) {
-  const rows = [
-    ["Name", "Year", "Brand", "Body", "Fuel", "Type", "Mileage", "Price"],
-    ...stockItems.map((item) => [
-      item.name,
-      item.year,
-      item.brand,
-      item.body,
-      item.fuel,
-      item.type,
-      item.mileage,
-      formatPrice(item.price),
-    ]),
-  ];
-  const blob = new Blob([rows.map((row) => row.join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = "recon-imports-car-stocks.csv";
-  link.click();
-  URL.revokeObjectURL(url);
-}
 
 const staticFilterSections = [
   { title: "Types", key: "type", options: ["Brand New", "Pre Owned", "Pre Order", "Reconditioned"] },
@@ -81,11 +57,10 @@ const staticFilterSections = [
 ] as const;
 
 export type StockListingPageProps = {
-  activePage: "car-stocks" | "pre-owned" | "pre-order" | "reconditioned" | "ev" | "send-requirements";
+  activePage: "brand-new" | "pre-owned" | "pre-order" | "reconditioned" | "send-requirements";
   availableBrands?: PublicBrandOption[];
   bodyFilter?: "Sedan" | "Hatchback" | "SUV" | "Crossover" | "MPV" | "Passenger Van";
   brandFilter?: string;
-  evOnly?: boolean;
   inventoryItems?: CarInventoryItem[];
   introCopy?: string;
   siteSettings?: PublicSiteSettings;
@@ -98,9 +73,8 @@ export default function StockListingPage({
   availableBrands = [...fallbackBrandOptions],
   bodyFilter,
   brandFilter,
-  evOnly = false,
   inventoryItems = fallbackInventory,
-  introCopy = "Glance through the widest collection of reconditioned Japanese models and pre-owned imported units and choose according to your budget and quality preferences.",
+  introCopy = "Glance through selected vehicles and choose according to your budget and quality preferences.",
   siteSettings = fallbackSiteSettings,
   title = "Choose per your preference",
   typeFilter,
@@ -124,11 +98,10 @@ export default function StockListingPage({
       const matchesBody = !bodyFilter || car.body === bodyFilter;
       const matchesBrand = !brandFilter || car.brand === brandFilter;
       const matchesType = !typeFilter || car.type === typeFilter;
-      const matchesEv = !evOnly || car.isEv;
 
-      return matchesBody && matchesBrand && matchesType && matchesEv;
+      return matchesBody && matchesBrand && matchesType;
     });
-  }, [bodyFilter, brandFilter, evOnly, inventoryItems, typeFilter]);
+  }, [bodyFilter, brandFilter, inventoryItems, typeFilter]);
 
   const filteredCars = useMemo(() => {
     return stockInventory.filter((car) => {
@@ -175,21 +148,18 @@ export default function StockListingPage({
       {/* Header: same navigation style used across stock and verification pages. */}
       <header className="cars-header">
         <a className="cars-logo" href="/">
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} suppressHydrationWarning />
         </a>
         <nav aria-label="Cars page navigation">
           <a href="/">Home</a>
-          <a className={activePage === "car-stocks" ? "active" : ""} href="/car-stocks">
-            Car Stocks
+          <a className={activePage === "brand-new" ? "active" : ""} href="/brand-new">
+            Brand New
           </a>
           <a className={activePage === "reconditioned" ? "active" : ""} href="/reconditioned">
             Reconditioned
           </a>
-          <a className={activePage === "ev" ? "active" : ""} href="/ev">
-            EVS
-          </a>
           <a className={activePage === "pre-owned" ? "active" : ""} href="/pre-owned">
-            Pre-Owner
+            Pre-Owned
           </a>
           <a className={activePage === "pre-order" ? "active" : ""} href="/pre-order">
             Pre-Order
@@ -198,10 +168,10 @@ export default function StockListingPage({
             Send Requirements
           </a>
         </nav>
-        <button className="download-button cars-download" type="button" onClick={() => downloadStockList(stockInventory)}>
+        <a className="download-button cars-download" href="/stock-list.pdf" download>
           <Download size={17} />
           Download Stock List
-        </button>
+        </a>
       </header>
 
       {/* Intro: short page heading and supporting copy above the inventory browser. */}
@@ -291,7 +261,8 @@ export default function StockListingPage({
             {filteredCars.length > 0 ? (
               filteredCars.map((car) => (
                 <article className="stock-card" key={car.id}>
-                  <img src={car.image} alt={car.name} loading="eager" decoding="sync" />
+                  {car.saleStatus === "Sold" ? <span className="stock-sale-badge">Sold</span> : null}
+                  <img src={car.image} alt={car.name} loading="eager" decoding="sync" suppressHydrationWarning />
                   <div className="stock-card-body">
                     <h2>{car.name}</h2>
                     <p>{car.year}</p>
@@ -301,7 +272,7 @@ export default function StockListingPage({
                       <span>{car.mileage}</span>
                     </div>
                     <strong>{formatPrice(car.price)}</strong>
-                    <a className="stock-details-link" href={`/car-stocks/${car.id}`}>
+                    <a className="stock-details-link" href={car.publicPath ?? getCarPublicPath({ id: car.id, type: car.type })}>
                       Show Details
                     </a>
                   </div>

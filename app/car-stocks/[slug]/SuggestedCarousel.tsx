@@ -5,8 +5,21 @@ import { useRef, useState, type MouseEvent, type PointerEvent } from "react";
 type SuggestedItem = {
   image: string;
   name: string;
+  publicPath?: string;
   slug: string;
 };
+
+function getUniqueSuggestedItems(items: SuggestedItem[]) {
+  const uniqueItems = new Map<string, SuggestedItem>();
+
+  items.forEach((item) => {
+    if (!uniqueItems.has(item.slug)) {
+      uniqueItems.set(item.slug, item);
+    }
+  });
+
+  return Array.from(uniqueItems.values());
+}
 
 export default function SuggestedCarousel({ items }: { items: SuggestedItem[] }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -14,7 +27,9 @@ export default function SuggestedCarousel({ items }: { items: SuggestedItem[] })
   const scrollStartX = useRef(0);
   const hasDragged = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
-  const loopItems = [...items, ...items];
+  const uniqueItems = getUniqueSuggestedItems(items);
+  const shouldLoopItems = uniqueItems.length > 4;
+  const loopItems = shouldLoopItems ? [...uniqueItems, ...uniqueItems] : uniqueItems;
 
   function startDrag(event: PointerEvent<HTMLDivElement>) {
     const viewport = viewportRef.current;
@@ -68,12 +83,12 @@ export default function SuggestedCarousel({ items }: { items: SuggestedItem[] })
       onPointerUp={stopDrag}
       ref={viewportRef}
     >
-      <div className="product-suggested-track">
+      <div className={shouldLoopItems ? "product-suggested-track" : "product-suggested-track is-static"}>
         {loopItems.map((item, index) => (
           <a
             className="product-suggested-card"
             draggable={false}
-            href={`/car-stocks/${item.slug}`}
+            href={item.publicPath ?? `/brand-new/${item.slug}`}
             key={`${item.slug}-${index}`}
             onClick={preventClickAfterDrag}
           >

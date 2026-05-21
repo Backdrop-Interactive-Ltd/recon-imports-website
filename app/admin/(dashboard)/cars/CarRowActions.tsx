@@ -1,18 +1,20 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { deleteCarAction, setCarFeaturedAction, setCarPublishedAction } from "./actions";
+import { deleteCarAction, setCarFeaturedAction, setCarPublishedAction, setCarSaleStatusAction } from "./actions";
 import styles from "../brands/page.module.css";
-import type { CarActionState } from "./validation";
+import { formatEnumLabel, saleStatusOptions, type CarActionState } from "./validation";
+import type { CarSaleStatus } from "../../../../lib/generated/prisma/enums";
 
 type CarRowActionsProps = {
   carId: string;
   carTitle: string;
   isFeatured: boolean;
   isPublished: boolean;
+  saleStatus: CarSaleStatus;
 };
 
-export default function CarRowActions({ carId, carTitle, isFeatured, isPublished }: CarRowActionsProps) {
+export default function CarRowActions({ carId, carTitle, isFeatured, isPublished, saleStatus }: CarRowActionsProps) {
   const [message, setMessage] = useState<CarActionState | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -50,6 +52,24 @@ export default function CarRowActions({ carId, carTitle, isFeatured, isPublished
         <button className={styles.dangerButton} disabled={isPending} onClick={handleDelete} type="button">
           Delete
         </button>
+        <select
+          aria-label={`Sale status for ${carTitle}`}
+          className={styles.statusSelect}
+          defaultValue={saleStatus}
+          disabled={isPending}
+          onChange={(event) => {
+            const nextSaleStatus = event.target.value;
+            startTransition(async () => {
+              setMessage(await setCarSaleStatusAction(carId, nextSaleStatus));
+            });
+          }}
+        >
+          {saleStatusOptions.map((option) => (
+            <option key={option} value={option}>
+              {formatEnumLabel(option)}
+            </option>
+          ))}
+        </select>
       </div>
       {message?.message ? (
         <p className={message.status === "success" ? styles.inlineSuccess : styles.inlineError}>{message.message}</p>

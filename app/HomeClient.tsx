@@ -16,12 +16,12 @@ import {
   Search,
   Truck,
   X,
-  Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { brandOptions } from "./car-stocks/brands";
 import { formatPrice, inventory, type CarInventoryItem } from "./car-stocks/inventory";
 import Footer from "./components/Footer";
+import { getCarPublicPath } from "../lib/carPublicRoutes";
 import { fallbackSiteSettings, type PublicSiteSettings } from "../lib/siteSettingsConfig";
 
 export type HomepageBrand = {
@@ -56,10 +56,9 @@ type NavItem =
 
 // Main homepage navigation. Route links open full pages, target links scroll inside the homepage.
 const navItems: NavItem[] = [
-  { label: "Car Stocks", href: "/car-stocks" },
+  { label: "Brand New", href: "/brand-new" },
   { label: "Reconditioned", href: "/reconditioned" },
-  { label: "EVS", href: "/ev" },
-  { label: "Pre-Owner", href: "/pre-owned" },
+  { label: "Pre-Owned", href: "/pre-owned" },
   { label: "Pre-Order", href: "/pre-order" },
   { label: "Send Requirements", href: "/send-requirements" },
 ];
@@ -146,8 +145,6 @@ const categoryIconByKey: Record<string, typeof Car> = {
   bus: BusFront,
   car: Car,
   crossover: CarFront,
-  electric: Zap,
-  ev: Zap,
   mpv: BusFront,
   "passenger-van": BusFront,
   sedan: CarFront,
@@ -192,6 +189,18 @@ const fallbackBrands: HomepageBrand[] = brandOptions.map((brand) => ({
   slug: brand.slug,
 }));
 
+function getUniqueStockItems(items: CarInventoryItem[]) {
+  const uniqueItems = new Map<string, CarInventoryItem>();
+
+  items.forEach((item) => {
+    if (!uniqueItems.has(item.id)) {
+      uniqueItems.set(item.id, item);
+    }
+  });
+
+  return Array.from(uniqueItems.values());
+}
+
 export default function HomeClient({
   brands = fallbackBrands,
   categories = fallbackCategories,
@@ -235,7 +244,10 @@ export default function HomeClient({
     () => Array.from({ length: Math.ceil(brands.length / 9) }, (_, index) => brands.slice(index * 9, index * 9 + 9)),
     [brands],
   );
-  const latestStock = useMemo(() => (deals?.length ? deals : inventory.slice(-10).reverse()), [deals]);
+  const latestStock = useMemo(
+    () => getUniqueStockItems(deals === undefined ? inventory.slice(-10).reverse() : deals),
+    [deals],
+  );
   const filteredStock = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return inventory.filter((item) => {
@@ -247,7 +259,7 @@ export default function HomeClient({
       return matchesBudget && matchesQuery;
     });
   }, [budget, query]);
-  const shouldLoopStock = latestStock.length > 1;
+  const shouldLoopStock = latestStock.length > 5;
   const carouselStock = shouldLoopStock ? [...latestStock, ...latestStock] : latestStock;
   const shouldLoopPurposeCategories = categories.length > 1;
   const carouselCategories = shouldLoopPurposeCategories ? [...categories, ...categories] : categories;
@@ -489,30 +501,6 @@ export default function HomeClient({
     setSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length);
   }
 
-  function downloadStockList() {
-    const rows = [
-      ["Brand", "Model", "Year", "Body", "Type", "Mileage", "Price"],
-      ...inventory.map((item) => [
-        item.brand,
-        item.name,
-        item.year,
-        item.body,
-        item.type,
-        item.mileage,
-        formatPrice(item.price),
-      ]),
-    ];
-    const csv = rows.map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "recon-imports-stock-list.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
   function handleStockPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const row = stockRowRef.current;
 
@@ -715,7 +703,13 @@ export default function HomeClient({
         </button>
 
         <button className="brand" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} width={178} height={55} />
+          <img
+            src={siteSettings.websiteLogo || "/recon-logo.webp"}
+            alt={siteSettings.siteName}
+            width={178}
+            height={55}
+            suppressHydrationWarning
+          />
         </button>
 
         <nav className={mobileMenuOpen ? "nav-links open" : "nav-links"} aria-label="Main navigation">
@@ -741,10 +735,10 @@ export default function HomeClient({
         </nav>
 
         <div className="header-actions">
-          <button className="download-button" type="button" onClick={downloadStockList}>
+          <a className="download-button" href="/stock-list.pdf" download>
             <Download size={17} />
             Download Stock List
-          </button>
+          </a>
           <button className="search-button" type="button" aria-label="Search stock" onClick={() => setSearchOpen(true)}>
             <Search size={29} strokeWidth={1.35} />
           </button>
@@ -830,15 +824,20 @@ export default function HomeClient({
                     <h3>{category.title}</h3>
                     <p>{category.copy}</p>
                   </div>
-                  <Image
-                    src={category.image}
-                    alt={category.imageAlt || `${category.title} vehicle detail`}
-                    width={430}
-                    height={245}
-                    draggable={false}
-                    suppressHydrationWarning
-                    unoptimized
-                  />
+                  <span
+                    className="category-card-image"
+                    style={{ display: "block", height: 245, overflow: "hidden", position: "relative", width: "100%" }}
+                  >
+                    <Image
+                      src={category.image}
+                      alt={category.imageAlt || `${category.title} vehicle detail`}
+                      fill
+                      sizes="(max-width: 860px) 280px, 30vw"
+                      draggable={false}
+                      suppressHydrationWarning
+                      unoptimized
+                    />
+                  </span>
                 </a>
               );
             })}
@@ -851,7 +850,7 @@ export default function HomeClient({
           <h1>Unbeatable Deals</h1>
           <p>Bringing you the best prices with a commitment to customer care.</p>
         </div>
-        <a className="see-all-link" href="/car-stocks">
+        <a className="see-all-link" href="/brand-new">
           See All
         </a>
 
@@ -872,35 +871,40 @@ export default function HomeClient({
           }}
         >
           <div className="stock-track">
-            {carouselStock.map((item, index) => (
-              <a
-                className="stock-card deals-stock-card"
-                draggable={false}
-                href={`/car-stocks/${item.id}`}
-                key={`${item.id}-${index}`}
-                onClick={(event) => handleDealCardClick(event, `/car-stocks/${item.id}`)}
-              >
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  width={340}
-                  height={340}
+            {carouselStock.map((item, index) => {
+              const itemPath = item.publicPath ?? getCarPublicPath({ id: item.id, type: item.type });
+
+              return (
+                <a
+                  className="stock-card deals-stock-card"
                   draggable={false}
-                  suppressHydrationWarning
-                />
-                <div className="stock-card-body">
-                  <h2>{item.name}</h2>
-                  <p>{item.year}</p>
-                  <div className="stock-meta">
-                    <span>{item.fuel}</span>
-                    <span>{item.type}</span>
-                    <span>{item.mileage}</span>
+                  href={itemPath}
+                  key={`${item.id}-${index}`}
+                  onClick={(event) => handleDealCardClick(event, itemPath)}
+                >
+                  {item.saleStatus === "Sold" ? <span className="stock-sale-badge">Sold</span> : null}
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={340}
+                    height={340}
+                    draggable={false}
+                    suppressHydrationWarning
+                  />
+                  <div className="stock-card-body">
+                    <h2>{item.name}</h2>
+                    <p>{item.year}</p>
+                    <div className="stock-meta">
+                      <span>{item.fuel}</span>
+                      <span>{item.type}</span>
+                      <span>{item.mileage}</span>
+                    </div>
+                    <strong>{formatPrice(item.price)}</strong>
+                    <span className="stock-details-link">Show Details</span>
                   </div>
-                  <strong>{formatPrice(item.price)}</strong>
-                  <span className="stock-details-link">Show Details</span>
-                </div>
-              </a>
-            ))}
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -910,7 +914,7 @@ export default function HomeClient({
         <div className="preference-grid">
           {preferenceOptions.map((option) => (
             <a className="preference-card" href={option.href} key={option.title}>
-              <Image src={option.image} alt={option.title} fill sizes="(max-width: 860px) 100vw, 33vw" />
+              <Image src={option.image} alt={option.title} fill sizes="(max-width: 860px) 100vw, 33vw" suppressHydrationWarning />
               <span>{option.title}</span>
               <i aria-hidden="true">
                 <ArrowUpRight size={24} />
@@ -925,7 +929,11 @@ export default function HomeClient({
               <div className="brand-logo-page" key={`brand-page-${pageIndex}`}>
                 {brandPage.map((brand) => (
                   <a className="brand-logo-card" href={`/${brand.slug}`} key={brand.slug}>
-                    {brand.logoUrl ? <img className="brand-logo-image" src={brand.logoUrl} alt={`${brand.name} logo`} /> : <span>{brand.name}</span>}
+                    {brand.logoUrl ? (
+                      <img className="brand-logo-image" src={brand.logoUrl} alt={`${brand.name} logo`} suppressHydrationWarning />
+                    ) : (
+                      <span>{brand.name}</span>
+                    )}
                   </a>
                 ))}
               </div>
@@ -940,7 +948,7 @@ export default function HomeClient({
         </div>
 
         <section className="consult-banner" aria-label="Connect to consult">
-          <Image src="/hero-slide-1.webp" alt="" fill sizes="100vw" />
+          <Image src="/hero-slide-1.webp" alt="" fill sizes="100vw" suppressHydrationWarning />
           <div className="consult-copy">
             <h2>Connect to Consult</h2>
             <p>

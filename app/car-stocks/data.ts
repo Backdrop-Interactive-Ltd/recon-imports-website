@@ -1,6 +1,14 @@
 import { prisma } from "../../lib/prisma";
 import { getOptimizedCloudinaryImageUrl, getOptimizedCloudinaryImageUrls } from "../../lib/cloudinaryImages";
-import { CarFeatureType, FuelType, type CarBodyType, type StockType, type TransmissionType } from "../../lib/generated/prisma/enums";
+import { getCarPublicPath } from "../../lib/carPublicRoutes";
+import {
+  CarFeatureType,
+  CarSaleStatus,
+  FuelType,
+  type CarBodyType,
+  type StockType,
+  type TransmissionType,
+} from "../../lib/generated/prisma/enums";
 import type { Prisma } from "../../lib/generated/prisma/client";
 import { brandOptions as fallbackBrandOptions, getBrandBySlug } from "./brands";
 import { getCarBySlug, getSuggestedCars, inventory, type CarInventoryItem } from "./inventory";
@@ -20,6 +28,7 @@ export type PublicCarDetail = {
   suggestedItems: {
     image: string;
     name: string;
+    publicPath?: string;
     slug: string;
   }[];
 };
@@ -46,6 +55,13 @@ type PublicCarRecord = Prisma.CarGetPayload<{
   include: typeof publicCarInclude;
 }>;
 
+const publicVisibleCarWhere = {
+  isPublished: true,
+  saleStatus: {
+    not: CarSaleStatus.SOLD,
+  },
+} satisfies Prisma.CarWhereInput;
+
 const bodyLabels: Record<CarBodyType, string> = {
   CROSSOVER: "Crossover",
   HATCHBACK: "Hatchback",
@@ -63,6 +79,19 @@ const stockTypeLabels: Record<StockType, CarInventoryItem["type"]> = {
   PRE_OWNED: "Pre Owned",
   RECONDITIONED: "Reconditioned",
 };
+
+const stockTypeByLabel: Record<CarInventoryItem["type"], StockType> = {
+  "Brand New": "BRAND_NEW",
+  "Pre Order": "PRE_ORDER",
+  "Pre Owned": "PRE_OWNED",
+  Reconditioned: "RECONDITIONED",
+};
+
+const saleStatusLabels = {
+  AVAILABLE: "Available",
+  RESERVED: "Reserved",
+  SOLD: "Sold",
+} as const;
 
 const transmissionLabels: Record<TransmissionType, string> = {
   AUTOMATIC: "Automatic",
@@ -114,6 +143,7 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     body,
     brand: car.brand.name,
     brandSlug: car.brand.slug,
+    chassisNumber: car.chassisNumber || "N/A",
     description: car.description || createDescription(car),
     detailBody: body,
     detailFuel: fuel.toUpperCase(),
@@ -132,13 +162,16 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     model: car.model,
     name: car.title,
     price: car.price,
+    publicPath: getCarPublicPath({ slug: car.slug, stockType: car.stockType }),
     regYear: String(car.year),
+    saleStatus: saleStatusLabels[car.saleStatus],
     safetyFeatures,
     suggestedImage: primaryImage,
     transmission: transmissionLabels[car.transmission].toUpperCase(),
     type: stockTypeLabels[car.stockType],
     videoImage: car.videoImageUrl ? getOptimizedCloudinaryImageUrl(car.videoImageUrl) : primaryImage,
-    wheel: "N/A",
+    youtubeVideoUrl: car.youtubeVideoUrl,
+    wheel: car.wheelSize || "N/A",
     year: String(car.year),
   };
 }
@@ -156,6 +189,18 @@ function getBrandsFromCars(cars: CarInventoryItem[]): PublicBrandOption[] {
   return Array.from(brands.values()).sort((first, second) => first.name.localeCompare(second.name));
 }
 
+function getUniqueCars(cars: CarInventoryItem[]) {
+  const uniqueCars = new Map<string, CarInventoryItem>();
+
+  cars.forEach((car) => {
+    if (!uniqueCars.has(car.id)) {
+      uniqueCars.set(car.id, car);
+    }
+  });
+
+  return Array.from(uniqueCars.values());
+}
+
 async function getPublishedDatabaseCars() {
   return prisma.car.findMany({
     include: publicCarInclude,
@@ -164,8 +209,16 @@ async function getPublishedDatabaseCars() {
       { updatedAt: "desc" },
       { createdAt: "desc" },
     ],
+    where: publicVisibleCarWhere,
+  });
+}
+
+async function hasPublishedDatabaseCars() {
+  const publishedCarsCount = await prisma.car.count({
     where: { isPublished: true },
   });
+
+  return publishedCarsCount > 0;
 }
 
 export async function getHomepageDealCars(): Promise<CarInventoryItem[] | undefined> {
@@ -178,12 +231,14 @@ export async function getHomepageDealCars(): Promise<CarInventoryItem[] | undefi
         { createdAt: "desc" },
       ],
       take: 10,
-      where: { isPublished: true },
+      where: publicVisibleCarWhere,
     });
 
-    if (databaseCars.length === 0) return undefined;
+    if (databaseCars.length === 0) {
+      return (await hasPublishedDatabaseCars()) ? [] : undefined;
+    }
 
-    return databaseCars.map(mapDatabaseCar);
+    return getUniqueCars(databaseCars.map(mapDatabaseCar));
   } catch (error) {
     console.error("Failed to load homepage deal cars from database.", error);
     return undefined;
@@ -194,14 +249,14 @@ export async function getPublicStockData(): Promise<PublicStockData> {
   try {
     const databaseCars = await getPublishedDatabaseCars();
 
-    if (databaseCars.length === 0) {
+    if (databaseCars.length === 0 && !(await hasPublishedDatabaseCars())) {
       return {
         brands: [...fallbackBrandOptions],
         cars: inventory,
       };
     }
 
-    const cars = databaseCars.map(mapDatabaseCar);
+    const cars = getUniqueCars(databaseCars.map(mapDatabaseCar));
 
     return {
       brands: getBrandsFromCars(cars),
@@ -221,7 +276,7 @@ export async function getPublicCarDetail(slug: string): Promise<PublicCarDetail 
     const databaseCars = await getPublishedDatabaseCars();
 
     if (databaseCars.length > 0) {
-      const cars = databaseCars.map(mapDatabaseCar);
+      const cars = getUniqueCars(databaseCars.map(mapDatabaseCar));
       const product = cars.find((car) => car.id === slug);
 
       if (!product) return null;
@@ -237,6 +292,7 @@ export async function getPublicCarDetail(slug: string): Promise<PublicCarDetail 
         .map((car) => ({
           image: car.suggestedImage ?? car.image,
           name: car.name,
+          publicPath: car.publicPath,
           slug: car.id,
         }));
 
@@ -244,6 +300,10 @@ export async function getPublicCarDetail(slug: string): Promise<PublicCarDetail 
         product,
         suggestedItems,
       };
+    }
+
+    if (await hasPublishedDatabaseCars()) {
+      return null;
     }
   } catch (error) {
     console.error("Failed to load public car detail from database.", error);
@@ -283,13 +343,17 @@ export async function getPublicBrandStaticParams() {
       select: { slug: true },
       where: {
         cars: {
-          some: { isPublished: true },
+          some: publicVisibleCarWhere,
         },
       },
     });
 
     if (databaseBrands.length > 0) {
       return databaseBrands.map((brand) => ({ brand: brand.slug }));
+    }
+
+    if (await hasPublishedDatabaseCars()) {
+      return [];
     }
   } catch (error) {
     console.error("Failed to load public brand params from database.", error);
@@ -298,19 +362,28 @@ export async function getPublicBrandStaticParams() {
   return fallbackBrandOptions.map((brand) => ({ brand: brand.slug }));
 }
 
-export async function getPublicCarStaticParams() {
+export async function getPublicCarStaticParams(stockType?: StockType) {
   try {
     const databaseCars = await prisma.car.findMany({
       select: { slug: true },
-      where: { isPublished: true },
+      where: {
+        ...publicVisibleCarWhere,
+        ...(stockType ? { stockType } : {}),
+      },
     });
 
     if (databaseCars.length > 0) {
       return databaseCars.map((car) => ({ slug: car.slug }));
     }
+
+    if (await hasPublishedDatabaseCars()) {
+      return [];
+    }
   } catch (error) {
     console.error("Failed to load public car params from database.", error);
   }
 
-  return inventory.map((car) => ({ slug: car.id }));
+  return inventory
+    .filter((car) => !stockType || stockTypeByLabel[car.type] === stockType)
+    .map((car) => ({ slug: car.id }));
 }

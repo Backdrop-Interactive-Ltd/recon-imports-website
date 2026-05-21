@@ -1,19 +1,26 @@
 import { Download, MessageCircle, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
-import Footer from "../../components/Footer";
-import { getPublicCarDetail, getPublicCarStaticParams } from "../data";
-import { formatPrice } from "../inventory";
-import ShareButton from "./ShareButton";
-import SuggestedCarousel from "./SuggestedCarousel";
-import { getPhoneHref, getSiteSettings, getWhatsAppHref } from "../../../lib/siteSettings";
+import { getCarPublicPath } from "../../lib/carPublicRoutes";
+import { getPhoneHref, getSiteSettings, getWhatsAppHref } from "../../lib/siteSettings";
+import { getPublicCarDetail } from "../car-stocks/data";
+import { formatPrice } from "../car-stocks/inventory";
+import ShareButton from "../car-stocks/[slug]/ShareButton";
+import SuggestedCarousel from "../car-stocks/[slug]/SuggestedCarousel";
+import Footer from "./Footer";
+import ProductGallery from "./ProductGallery";
+import ProductVideo from "./ProductVideo";
 
-export const dynamic = "force-dynamic";
+type ProductSection = {
+  href: "/brand-new" | "/reconditioned" | "/pre-owned" | "/pre-order";
+  label: string;
+};
 
-export async function generateStaticParams() {
-  return getPublicCarStaticParams();
-}
+type PublicCarDetailPageProps = {
+  params: Promise<{ slug: string }>;
+  section: ProductSection;
+};
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PublicCarDetailPage({ params, section }: PublicCarDetailPageProps) {
   const { slug } = await params;
   const [detail, siteSettings] = await Promise.all([getPublicCarDetail(slug), getSiteSettings()]);
 
@@ -22,6 +29,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   }
 
   const { product, suggestedItems } = detail;
+  const productPath = product.publicPath ?? getCarPublicPath({ id: product.id, type: product.type });
+
+  if (productPath !== `${section.href}/${slug}`) {
+    notFound();
+  }
+
   const phoneHref = getPhoneHref(siteSettings.phoneNumber) || "tel:+8801886589009";
   const whatsappHref = getWhatsAppHref(siteSettings.whatsappNumber) || "https://wa.me/8801886589009";
   const specs = [
@@ -29,6 +42,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     ["Model", product.model],
     ["Reg. Year", product.regYear],
     ["Mileage", product.detailMileage],
+    ["Chassis Number", product.chassisNumber || "N/A"],
     ["Engine (CC)", product.engine],
     ["Transmission", product.transmission],
     ["Fuel Type", product.detailFuel],
@@ -37,24 +51,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     ["Exterior", product.exterior],
     ["Body Style", product.detailBody],
   ];
+
   return (
     <main className="product-page">
       <header className="cars-header product-header">
         <a className="cars-logo" href="/">
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} />
+          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} suppressHydrationWarning />
         </a>
         <nav aria-label="Product page navigation">
           <a href="/">Home</a>
-          <a className="active" href="/car-stocks">
-            Car Stocks
+          <a className={section.href === "/brand-new" ? "active" : ""} href="/brand-new">
+            Brand New
           </a>
-          <a href="/reconditioned">Reconditioned</a>
-          <a href="/ev">EVS</a>
-          <a href="/pre-owned">Pre-Owner</a>
-          <a href="/pre-order">Pre-Order</a>
+          <a className={section.href === "/reconditioned" ? "active" : ""} href="/reconditioned">
+            Reconditioned
+          </a>
+          <a className={section.href === "/pre-owned" ? "active" : ""} href="/pre-owned">
+            Pre-Owned
+          </a>
+          <a className={section.href === "/pre-order" ? "active" : ""} href="/pre-order">
+            Pre-Order
+          </a>
           <a href="/send-requirements">Send Requirements</a>
         </nav>
-        <a className="download-button cars-download" href="/car-stocks">
+        <a className="download-button cars-download" href="/stock-list.pdf" download>
           <Download size={17} />
           Download Stock List
         </a>
@@ -63,22 +83,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <nav className="product-breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span>/</span>
-        <a href="/car-stocks">Car Stocks</a>
+        <a href={section.href}>{section.label}</a>
         <span>/</span>
         <strong>{product.name}</strong>
       </nav>
 
-      <section className="product-gallery" aria-label={`${product.name} gallery`}>
-        <img className="product-gallery-main" src={product.hero} alt={product.name} />
-        <div className="product-gallery-grid">
-          {product.gallery.slice(1).map((image, index) => (
-            <img src={image} alt={`${product.name} view ${index + 2}`} key={`${image}-${index}`} />
-          ))}
-        </div>
-      </section>
+      <ProductGallery gallery={product.gallery} hero={product.hero} productName={product.name} />
 
       <section className="product-heading-row">
-        <h1>{product.name}</h1>
+        <div>
+          {product.saleStatus === "Sold" ? <span className="product-sale-badge">Sold</span> : null}
+          <h1>{product.name}</h1>
+        </div>
         <ShareButton />
       </section>
 
@@ -110,10 +126,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </ul>
           </article>
 
-          <div className="product-video">
-            <img src={product.videoImage} alt={`${product.name} video preview`} />
-            <span>Play</span>
-          </div>
+          <ProductVideo productName={product.name} youtubeVideoUrl={product.youtubeVideoUrl} />
         </div>
 
         <aside className="product-contact-card">

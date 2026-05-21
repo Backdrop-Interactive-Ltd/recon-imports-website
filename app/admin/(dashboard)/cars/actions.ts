@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
-import { carFormSchema, carIdSchema, type CarActionState } from "./validation";
+import { carFormSchema, carIdSchema, saleStatusOptions, type CarActionState } from "./validation";
 
 function fieldErrorState(error: ReturnType<typeof carFormSchema.safeParse>): CarActionState {
   if (error.success) {
@@ -20,6 +20,7 @@ function fieldErrorState(error: ReturnType<typeof carFormSchema.safeParse>): Car
     errors: {
       bodyType: flattened.bodyType?.[0],
       brandId: flattened.brandId?.[0],
+      chassisNumber: flattened.chassisNumber?.[0],
       condition: flattened.condition?.[0],
       description: flattened.description?.[0],
       driveTrain: flattened.driveTrain?.[0],
@@ -38,11 +39,14 @@ function fieldErrorState(error: ReturnType<typeof carFormSchema.safeParse>): Car
       origin: flattened.origin?.[0],
       packageName: flattened.packageName?.[0],
       price: flattened.price?.[0],
+      saleStatus: flattened.saleStatus?.[0],
       slug: flattened.slug?.[0],
       stockType: flattened.stockType?.[0],
       title: flattened.title?.[0],
       transmission: flattened.transmission?.[0],
       videoImageUrl: flattened.videoImageUrl?.[0],
+      wheelSize: flattened.wheelSize?.[0],
+      youtubeVideoUrl: flattened.youtubeVideoUrl?.[0],
       year: flattened.year?.[0],
     },
     message: "Please fix the highlighted fields.",
@@ -80,6 +84,7 @@ function readCarForm(formData: FormData) {
   return {
     bodyType: String(formData.get("bodyType") ?? ""),
     brandId: String(formData.get("brandId") ?? ""),
+    chassisNumber: String(formData.get("chassisNumber") ?? ""),
     condition: String(formData.get("condition") ?? ""),
     description: String(formData.get("description") ?? ""),
     driveTrain: String(formData.get("driveTrain") ?? ""),
@@ -98,11 +103,14 @@ function readCarForm(formData: FormData) {
     origin: String(formData.get("origin") ?? ""),
     packageName: String(formData.get("packageName") ?? ""),
     price: String(formData.get("price") ?? "0"),
+    saleStatus: String(formData.get("saleStatus") ?? "AVAILABLE"),
     slug: String(formData.get("slug") ?? ""),
     stockType: String(formData.get("stockType") ?? ""),
     title: String(formData.get("title") ?? ""),
     transmission: String(formData.get("transmission") ?? ""),
     videoImageUrl: String(formData.get("videoImageUrl") ?? ""),
+    wheelSize: String(formData.get("wheelSize") ?? ""),
+    youtubeVideoUrl: String(formData.get("youtubeVideoUrl") ?? ""),
     year: String(formData.get("year") ?? ""),
   };
 }
@@ -136,6 +144,25 @@ async function brandExists(brandId: string) {
 function revalidateCarViews() {
   revalidatePath("/admin");
   revalidatePath("/admin/cars");
+  revalidatePath("/admin/cars/add");
+  revalidatePath("/admin/cars/list");
+  revalidatePath("/admin/cars/manage");
+  revalidatePath("/");
+  revalidatePath("/brand-new");
+  revalidatePath("/pre-owned");
+  revalidatePath("/pre-order");
+  revalidatePath("/reconditioned");
+  revalidatePath("/sedan");
+  revalidatePath("/hatchback");
+  revalidatePath("/suv");
+  revalidatePath("/crossover");
+  revalidatePath("/mpv");
+  revalidatePath("/passenger-van");
+  revalidatePath("/brand-new/[slug]", "page");
+  revalidatePath("/pre-owned/[slug]", "page");
+  revalidatePath("/pre-order/[slug]", "page");
+  revalidatePath("/reconditioned/[slug]", "page");
+  revalidatePath("/[brand]", "page");
 }
 
 function normalizePrimaryImages<T extends { isPrimary: boolean }>(images: T[]) {
@@ -173,12 +200,15 @@ export async function createCarAction(_previousState: CarActionState, formData: 
     };
   }
 
-  const { features, images, ...carData } = parsed.data;
+  const { brandId, features, images, ...carData } = parsed.data;
   const normalizedImages = normalizePrimaryImages(images);
 
   await prisma.$transaction(async (transaction) => {
     const car = await transaction.car.create({
-      data: carData,
+      data: {
+        ...carData,
+        brand: { connect: { id: brandId } },
+      },
       select: { id: true },
     });
 
@@ -251,12 +281,15 @@ export async function updateCarAction(_previousState: CarActionState, formData: 
     };
   }
 
-  const { features, images, ...carData } = parsed.data;
+  const { brandId, features, images, ...carData } = parsed.data;
   const normalizedImages = normalizePrimaryImages(images);
 
   await prisma.$transaction(async (transaction) => {
     await transaction.car.update({
-      data: carData,
+      data: {
+        ...carData,
+        brand: { connect: { id: brandId } },
+      },
       where: { id: id.data },
     });
 
@@ -332,6 +365,40 @@ export async function setCarFeaturedAction(carId: string, isFeatured: boolean): 
 
   return {
     message: isFeatured ? "Car marked featured." : "Car removed from featured.",
+    status: "success",
+  };
+}
+
+export async function setCarSaleStatusAction(carId: string, saleStatus: string): Promise<CarActionState> {
+  await requireAdminSession();
+
+  const id = carIdSchema.safeParse(carId);
+
+  if (!id.success) {
+    return {
+      errors: { id: id.error.issues[0]?.message },
+      message: "Car id is missing.",
+      status: "error",
+    };
+  }
+
+  if (!saleStatusOptions.includes(saleStatus as (typeof saleStatusOptions)[number])) {
+    return {
+      errors: { saleStatus: "Choose a valid sale status." },
+      message: "Choose a valid sale status.",
+      status: "error",
+    };
+  }
+
+  await prisma.car.update({
+    data: { saleStatus: saleStatus as (typeof saleStatusOptions)[number] },
+    where: { id: id.data },
+  });
+
+  revalidateCarViews();
+
+  return {
+    message: "Sale status updated.",
     status: "success",
   };
 }

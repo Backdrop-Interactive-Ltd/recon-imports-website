@@ -5,6 +5,7 @@ import type {
   CarBodyType,
   CarCondition,
   CarFeatureType,
+  CarSaleStatus,
   FuelType,
   StockType,
   TransmissionType,
@@ -19,6 +20,7 @@ import {
   formatEnumLabel,
   fuelTypeOptions,
   initialCarActionState,
+  saleStatusOptions,
   slugifyCar,
   stockTypeOptions,
   transmissionOptions,
@@ -45,6 +47,7 @@ type EditableCarFeature = {
 type EditableCar = {
   bodyType: CarBodyType;
   brandId: string;
+  chassisNumber: string | null;
   condition: CarCondition;
   description: string | null;
   driveTrain: string | null;
@@ -64,11 +67,14 @@ type EditableCar = {
   origin: string | null;
   packageName: string | null;
   price: number;
+  saleStatus: CarSaleStatus;
   slug: string;
   stockType: StockType;
   title: string;
   transmission: TransmissionType;
   videoImageUrl: string | null;
+  wheelSize: string | null;
+  youtubeVideoUrl: string | null;
   year: number;
 };
 
@@ -86,27 +92,28 @@ type CarFormProps = {
   mode: "create" | "edit";
 };
 
-function createLocalId() {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+function stableLocalId(prefix: string, index: number, value: string) {
+  return `${prefix}-${index}-${slugifyCar(value).slice(0, 48) || "empty"}`;
 }
 
 function toImageRows(images: EditableCarImage[]): ImageRow[] {
-  return images.map((image) => ({
+  return images.map((image, index) => ({
     ...image,
     altText: image.altText ?? "",
-    localId: createLocalId(),
+    localId: stableLocalId("image", index, image.imageUrl),
   }));
 }
 
 function toFeatureRows(features: EditableCarFeature[]): FeatureRow[] {
-  return features.map((feature) => ({
+  return features.map((feature, index) => ({
     ...feature,
-    localId: createLocalId(),
+    localId: stableLocalId("feature", index, feature.title),
   }));
 }
 
 export default function CarForm({ brands, car, mode }: CarFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const localIdCounterRef = useRef(0);
   const [state, formAction, isPending] = useActionState(
     mode === "create" ? createCarAction : updateCarAction,
     initialCarActionState,
@@ -120,9 +127,9 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
   const [transmission, setTransmission] = useState<TransmissionType>(car?.transmission ?? transmissionOptions[0]);
   const [condition, setCondition] = useState<CarCondition>(car?.condition ?? conditionOptions[0]);
   const [stockType, setStockType] = useState<StockType>(car?.stockType ?? stockTypeOptions[0]);
+  const [saleStatus, setSaleStatus] = useState<CarSaleStatus>(car?.saleStatus ?? saleStatusOptions[0]);
   const [isFeatured, setIsFeatured] = useState(car?.isFeatured ?? false);
   const [isPublished, setIsPublished] = useState(car?.isPublished ?? false);
-  const [videoImageUrl, setVideoImageUrl] = useState(car?.videoImageUrl ?? "");
   const [images, setImages] = useState<ImageRow[]>(() => toImageRows(car?.images ?? []));
   const [features, setFeatures] = useState<FeatureRow[]>(() => toFeatureRows(car?.features ?? []));
 
@@ -138,11 +145,11 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
       setIsFeatured(false);
       setIsPublished(false);
       setIsSlugEdited(false);
+      setSaleStatus(saleStatusOptions[0]);
       setSlug("");
       setStockType(stockTypeOptions[0]);
       setTitle("");
       setTransmission(transmissionOptions[0]);
-      setVideoImageUrl("");
     }
   }, [brands, mode, state.status]);
 
@@ -180,8 +187,14 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
   }
 
   function handleSlugChange(value: string) {
-    setIsSlugEdited(true);
-    setSlug(slugifyCar(value));
+    const nextSlug = slugifyCar(value);
+    setIsSlugEdited(Boolean(nextSlug));
+    setSlug(nextSlug);
+  }
+
+  function createLocalId(prefix: string) {
+    localIdCounterRef.current += 1;
+    return `${prefix}-new-${localIdCounterRef.current}`;
   }
 
   function addImageRow() {
@@ -191,7 +204,7 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
         altText: "",
         imageUrl: "",
         isPrimary: currentImages.length === 0,
-        localId: createLocalId(),
+        localId: createLocalId("image"),
         sortOrder: currentImages.length,
       },
     ]);
@@ -223,7 +236,7 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
     setFeatures((currentFeatures) => [
       ...currentFeatures,
       {
-        localId: createLocalId(),
+        localId: createLocalId("feature"),
         sortOrder: currentFeatures.length,
         title: "",
         type,
@@ -289,6 +302,11 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
             <span>Price</span>
             <input name="price" placeholder="16900000" type="number" defaultValue={car?.price ?? ""} />
             {state.errors?.price ? <small>{state.errors.price}</small> : null}
+          </label>
+          <label className={styles.field}>
+            <span>Chassis Number</span>
+            <input name="chassisNumber" placeholder="ZWR90-1234567" defaultValue={car?.chassisNumber ?? ""} />
+            {state.errors?.chassisNumber ? <small>{state.errors.chassisNumber}</small> : null}
           </label>
         </div>
 
@@ -358,6 +376,17 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
             {state.errors?.stockType ? <small>{state.errors.stockType}</small> : null}
           </label>
           <label className={styles.field}>
+            <span>Sale Status</span>
+            <select name="saleStatus" onChange={(event) => setSaleStatus(event.target.value as CarSaleStatus)} value={saleStatus}>
+              {saleStatusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {formatEnumLabel(option)}
+                </option>
+              ))}
+            </select>
+            {state.errors?.saleStatus ? <small>{state.errors.saleStatus}</small> : null}
+          </label>
+          <label className={styles.field}>
             <span>Origin</span>
             <input name="origin" placeholder="Japan" defaultValue={car?.origin ?? ""} />
           </label>
@@ -389,6 +418,11 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
             <span>Drive Train</span>
             <input name="driveTrain" placeholder="2WD" defaultValue={car?.driveTrain ?? ""} />
           </label>
+          <label className={styles.field}>
+            <span>Wheel Size</span>
+            <input name="wheelSize" placeholder="18 Inch Alloy" defaultValue={car?.wheelSize ?? ""} />
+            {state.errors?.wheelSize ? <small>{state.errors.wheelSize}</small> : null}
+          </label>
         </div>
 
         <label className={styles.field}>
@@ -405,15 +439,17 @@ export default function CarForm({ brands, car, mode }: CarFormProps) {
             Add Image
           </button>
         </div>
-        <AdminImageUpload
-          error={state.errors?.videoImageUrl}
-          folder="cars"
-          label="Video Preview Image"
-          name="videoImageUpload"
-          onChange={setVideoImageUrl}
-          value={videoImageUrl}
-        />
-        <input name="videoImageUrl" type="hidden" value={videoImageUrl} />
+        <label className={styles.field}>
+          <span>YouTube Video URL</span>
+          <input
+            name="youtubeVideoUrl"
+            placeholder="https://www.youtube.com/watch?v=VIDEO_ID"
+            type="url"
+            defaultValue={car?.youtubeVideoUrl ?? ""}
+          />
+          {state.errors?.youtubeVideoUrl ? <small>{state.errors.youtubeVideoUrl}</small> : null}
+        </label>
+        {car?.videoImageUrl ? <input name="videoImageUrl" type="hidden" value={car.videoImageUrl} /> : null}
 
         <div className={styles.nestedList}>
           {images.map((image, index) => (

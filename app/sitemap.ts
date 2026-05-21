@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+import { getCarPublicPath } from "../lib/carPublicRoutes";
+import { CarSaleStatus } from "../lib/generated/prisma/enums";
 import { prisma } from "../lib/prisma";
 
 const siteUrl = "https://reconimports.com";
@@ -6,7 +8,7 @@ const now = new Date();
 
 const staticRoutes = [
   { path: "/", priority: 1 },
-  { path: "/car-stocks", priority: 0.9 },
+  { path: "/brand-new", priority: 0.9 },
   { path: "/sell-your-car", priority: 0.75 },
   { path: "/send-requirements", priority: 0.75 },
   { path: "/verify-auction-sheet", priority: 0.75 },
@@ -16,7 +18,6 @@ const staticRoutes = [
   { path: "/crossover", priority: 0.7 },
   { path: "/mpv", priority: 0.7 },
   { path: "/passenger-van", priority: 0.7 },
-  { path: "/ev", priority: 0.7 },
   { path: "/pre-owned", priority: 0.7 },
   { path: "/pre-order", priority: 0.7 },
   { path: "/reconditioned", priority: 0.7 },
@@ -66,9 +67,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       prisma.car.findMany({
         select: {
           slug: true,
+          stockType: true,
           updatedAt: true,
         },
-        where: { isPublished: true },
+        where: {
+          isPublished: true,
+          saleStatus: {
+            not: CarSaleStatus.SOLD,
+          },
+        },
       }),
       prisma.brand.findMany({
         select: {
@@ -92,11 +99,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly",
         lastModified: car.updatedAt,
         priority: 0.85,
-        url: toAbsoluteUrl(`/car-stocks/${car.slug}`),
+        url: toAbsoluteUrl(getCarPublicPath({ slug: car.slug, stockType: car.stockType })),
       });
     });
 
     brands.forEach((brand) => {
+      if (brand.slug === "ev") return;
+
       addEntry(entries, {
         changeFrequency: "weekly",
         lastModified: brand.updatedAt,
@@ -108,7 +117,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categories.forEach((category) => {
       const routePath = cleanRoutePath(category.routePath, category.slug);
 
-      if (!routePath) return;
+      if (!routePath || routePath === "/ev" || category.slug === "ev") return;
 
       addEntry(entries, {
         changeFrequency: "weekly",

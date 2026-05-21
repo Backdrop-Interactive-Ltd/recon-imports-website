@@ -7,7 +7,7 @@ export default function PreOrderPage() {
     <PublicStockListing
       activePage="pre-order"
       title="Pre-Order Vehicles"
-      introCopy="Browse vehicles available for pre-order. Any vehicle uploaded with the Pre Order type appears here and also remains visible in the full Car Stocks page."
+      introCopy="Browse vehicles available for pre-order. Any vehicle uploaded with the Pre Order type appears here."
       typeFilter="Pre Order"
     />
   );

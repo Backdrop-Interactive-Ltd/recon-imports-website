@@ -93,14 +93,14 @@ export default function AdminImageUpload({ error, folder, label, name, onChange,
 
   return (
     <div className={styles.uploadField}>
-      <input name={name} type="hidden" value={value} />
+      <input name={name} type="hidden" value={value} suppressHydrationWarning />
       <label className={styles.label} htmlFor={inputId}>
         {label}
       </label>
 
       <div className={styles.uploadBox}>
         <div className={styles.previewBox}>
-          {value ? <img alt={`${label} preview`} src={value} /> : <span>No image selected</span>}
+          {value ? <img alt={`${label} preview`} src={value} suppressHydrationWarning /> : <span>No image selected</span>}
         </div>
 
         <div className={styles.controls}>

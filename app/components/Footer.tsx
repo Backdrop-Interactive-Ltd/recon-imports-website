@@ -59,14 +59,18 @@ export default function Footer({ className = "", settings = fallbackSiteSettings
         </div>
         <div className="footer-column">
           <h3>Recon Imports</h3>
-          <a href="/car-stocks">Car Stocks</a>
+          <a href="/brand-new">Brand New</a>
           <a href="/sell-your-car">Sell Your Car</a>
-          <a href="/car-stocks">Download Stock List</a>
+          <a href="/stock-list.pdf" download>
+            Download Stock List
+          </a>
           <a href="/send-requirements">Send Your Requirements</a>
           <a href="/verify-auction-sheet">Verify Car Auction Sheet</a>
         </div>
         <div className="footer-newsletter">
-          {settings.footerLogo ? <img className="footer-logo" src={settings.footerLogo} alt={`${settings.siteName} footer logo`} /> : null}
+          {settings.footerLogo ? (
+            <img className="footer-logo" src={settings.footerLogo} alt={`${settings.siteName} footer logo`} suppressHydrationWarning />
+          ) : null}
           <h3>Stay updated with Recon Imports</h3>
           <form action={formAction} className="newsletter-form" ref={formRef}>
             <label>

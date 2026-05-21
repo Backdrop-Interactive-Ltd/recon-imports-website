@@ -7,7 +7,7 @@ export default function PreOwnedPage() {
     <PublicStockListing
       activePage="pre-owned"
       title="Pre-Owned Vehicles"
-      introCopy="Browse imported pre-owned vehicles selected for quality, condition, and value. Every pre-owned unit also remains visible in the full Car Stocks page."
+      introCopy="Browse imported pre-owned vehicles selected for quality, condition, and value."
       typeFilter="Pre Owned"
     />
   );

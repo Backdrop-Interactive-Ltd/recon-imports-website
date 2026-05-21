@@ -1,3 +1,5 @@
+import { getCarPublicPath } from "../../lib/carPublicRoutes";
+
 type BaseCar = {
   id: string;
   name: string;
@@ -6,8 +8,11 @@ type BaseCar = {
   type: "Brand New" | "Pre Owned" | "Pre Order" | "Reconditioned";
   mileage: string;
   price: number;
+  publicPath?: string;
+  saleStatus?: "Available" | "Reserved" | "Sold";
   brand: string;
   brandSlug?: string;
+  chassisNumber?: string | null;
   body: string;
   availability: string;
   image: string;
@@ -32,6 +37,7 @@ export type CarInventoryItem = BaseCar & {
   features: string[];
   safetyFeatures: string[];
   videoImage: string;
+  youtubeVideoUrl?: string | null;
 };
 
 const defaultFeatures = [
@@ -452,6 +458,7 @@ export function getSuggestedCars(currentSlug: string) {
     .map((car) => ({
       image: car.suggestedImage ?? car.image,
       name: car.name,
+      publicPath: car.publicPath ?? getCarPublicPath({ id: car.id, type: car.type }),
       slug: car.id,
     }));
 }

@@ -186,6 +186,7 @@ export const CarScalarFieldEnum = {
   title: 'title',
   slug: 'slug',
   brandId: 'brandId',
+  chassisNumber: 'chassisNumber',
   model: 'model',
   year: 'year',
   price: 'price',
@@ -203,10 +204,13 @@ export const CarScalarFieldEnum = {
   interiorColor: 'interiorColor',
   engine: 'engine',
   driveTrain: 'driveTrain',
+  wheelSize: 'wheelSize',
   description: 'description',
   videoImageUrl: 'videoImageUrl',
+  youtubeVideoUrl: 'youtubeVideoUrl',
   isFeatured: 'isFeatured',
   isPublished: 'isPublished',
+  saleStatus: 'saleStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
