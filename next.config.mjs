@@ -10,24 +10,37 @@ const nextConfig = {
     ],
   },
   async headers() {
+    const privateHeaders = [
+      {
+        key: "Cache-Control",
+        value: "no-store, no-cache, must-revalidate, proxy-revalidate",
+      },
+      {
+        key: "Pragma",
+        value: "no-cache",
+      },
+      {
+        key: "Expires",
+        value: "0",
+      },
+    ];
+
     return [
       {
-        // Local preview should always fetch the latest page and JS chunks after rebuilds.
-        source: "/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "no-store, no-cache, must-revalidate, proxy-revalidate",
-          },
-          {
-            key: "Pragma",
-            value: "no-cache",
-          },
-          {
-            key: "Expires",
-            value: "0",
-          },
-        ],
+        source: "/admin",
+        headers: privateHeaders,
+      },
+      {
+        source: "/admin/:path*",
+        headers: privateHeaders,
+      },
+      {
+        source: "/api",
+        headers: privateHeaders,
+      },
+      {
+        source: "/api/:path*",
+        headers: privateHeaders,
       },
     ];
   },

@@ -6,6 +6,8 @@ import { prisma } from "../lib/prisma";
 const siteUrl = "https://reconimports.com";
 const now = new Date();
 
+export const revalidate = 3600;
+
 const staticRoutes = [
   { path: "/", priority: 1 },
   { path: "/brand-new", priority: 0.9 },

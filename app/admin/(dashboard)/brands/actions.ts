@@ -57,6 +57,13 @@ async function isDuplicateSlug(slug: string, currentBrandId?: string) {
 function revalidateBrandViews() {
   revalidatePath("/admin");
   revalidatePath("/admin/brands");
+  revalidatePath("/");
+  revalidatePath("/brand-new");
+  revalidatePath("/pre-owned");
+  revalidatePath("/pre-order");
+  revalidatePath("/reconditioned");
+  revalidatePath("/[brand]", "page");
+  revalidatePath("/sitemap.xml");
 }
 
 export async function createBrandAction(_previousState: BrandActionState, formData: FormData): Promise<BrandActionState> {

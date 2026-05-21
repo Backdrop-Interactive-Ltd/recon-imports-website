@@ -163,6 +163,7 @@ function revalidateCarViews() {
   revalidatePath("/pre-order/[slug]", "page");
   revalidatePath("/reconditioned/[slug]", "page");
   revalidatePath("/[brand]", "page");
+  revalidatePath("/sitemap.xml");
 }
 
 function normalizePrimaryImages<T extends { isPrimary: boolean }>(images: T[]) {

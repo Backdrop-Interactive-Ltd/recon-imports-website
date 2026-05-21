@@ -756,7 +756,6 @@ export default function HomeClient({
                 fill
                 priority={index === 0}
                 suppressHydrationWarning
-                unoptimized
               />
             </div>
           ))}
@@ -835,7 +834,6 @@ export default function HomeClient({
                       sizes="(max-width: 860px) 280px, 30vw"
                       draggable={false}
                       suppressHydrationWarning
-                      unoptimized
                     />
                   </span>
                 </a>

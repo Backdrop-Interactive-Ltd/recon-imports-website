@@ -1,7 +1,7 @@
 import PublicCarDetailPage from "../../components/PublicCarDetailPage";
 import { getPublicCarStaticParams } from "../../car-stocks/data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return getPublicCarStaticParams("BRAND_NEW");

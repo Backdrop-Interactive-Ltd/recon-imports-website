@@ -5,7 +5,7 @@ import { getSiteSettings } from "../lib/siteSettings";
 import { getHomepageDealCars } from "./car-stocks/data";
 import HomeClient, { type HomepageBrand, type HomepageCategory, type HomepageHeroSlide } from "./HomeClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const categoryRouteBySlug: Record<string, string> = {
   crossover: "/crossover",

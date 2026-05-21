@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import PublicStockListing from "../car-stocks/PublicStockListing";
 import { getPublicBrandBySlug, getPublicBrandStaticParams } from "../car-stocks/data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return getPublicBrandStaticParams();

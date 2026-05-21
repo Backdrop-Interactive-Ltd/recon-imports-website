@@ -72,6 +72,13 @@ function revalidateCategoryViews() {
   revalidatePath("/admin");
   revalidatePath("/admin/categories");
   revalidatePath("/");
+  revalidatePath("/sedan");
+  revalidatePath("/hatchback");
+  revalidatePath("/suv");
+  revalidatePath("/crossover");
+  revalidatePath("/mpv");
+  revalidatePath("/passenger-van");
+  revalidatePath("/sitemap.xml");
 }
 
 export async function createCategoryAction(

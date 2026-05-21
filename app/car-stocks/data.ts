@@ -23,6 +23,12 @@ export type PublicStockData = {
   cars: CarInventoryItem[];
 };
 
+export type PublicStockFilters = {
+  bodyFilter?: CarInventoryItem["body"];
+  brandFilter?: string;
+  typeFilter?: CarInventoryItem["type"];
+};
+
 export type PublicCarDetail = {
   product: CarInventoryItem;
   suggestedItems: {
@@ -73,6 +79,16 @@ const bodyLabels: Record<CarBodyType, string> = {
   WAGON: "Wagon",
 };
 
+const bodyTypeByLabel: Partial<Record<CarInventoryItem["body"], CarBodyType>> = {
+  Crossover: "CROSSOVER",
+  Hatchback: "HATCHBACK",
+  MPV: "MPV",
+  "Passenger Van": "PASSENGER_VAN",
+  Sedan: "SEDAN",
+  SUV: "SUV",
+  Wagon: "WAGON",
+};
+
 const stockTypeLabels: Record<StockType, CarInventoryItem["type"]> = {
   BRAND_NEW: "Brand New",
   PRE_ORDER: "Pre Order",
@@ -112,6 +128,15 @@ const fallbackImagesByBody: Record<string, string> = {
   SUV: "/cat-suv.webp",
   Wagon: "/cat-wagon.webp",
 };
+
+function getPublicCarWhere(filters: PublicStockFilters = {}): Prisma.CarWhereInput {
+  return {
+    ...publicVisibleCarWhere,
+    ...(filters.bodyFilter ? { bodyType: bodyTypeByLabel[filters.bodyFilter] } : {}),
+    ...(filters.typeFilter ? { stockType: stockTypeByLabel[filters.typeFilter] } : {}),
+    ...(filters.brandFilter ? { brand: { name: filters.brandFilter } } : {}),
+  };
+}
 
 function fuelLabel(fuelType: PublicCarRecord["fuelType"]) {
   if (fuelType === FuelType.OCTANE_HYBRID) return "Octane (H)";
@@ -201,7 +226,7 @@ function getUniqueCars(cars: CarInventoryItem[]) {
   return Array.from(uniqueCars.values());
 }
 
-async function getPublishedDatabaseCars() {
+async function getPublishedDatabaseCars(filters: PublicStockFilters = {}) {
   return prisma.car.findMany({
     include: publicCarInclude,
     orderBy: [
@@ -209,7 +234,7 @@ async function getPublishedDatabaseCars() {
       { updatedAt: "desc" },
       { createdAt: "desc" },
     ],
-    where: publicVisibleCarWhere,
+    where: getPublicCarWhere(filters),
   });
 }
 
@@ -245,9 +270,9 @@ export async function getHomepageDealCars(): Promise<CarInventoryItem[] | undefi
   }
 }
 
-export async function getPublicStockData(): Promise<PublicStockData> {
+export async function getPublicStockData(filters: PublicStockFilters = {}): Promise<PublicStockData> {
   try {
-    const databaseCars = await getPublishedDatabaseCars();
+    const databaseCars = await getPublishedDatabaseCars(filters);
 
     if (databaseCars.length === 0 && !(await hasPublishedDatabaseCars())) {
       return {
@@ -273,22 +298,52 @@ export async function getPublicStockData(): Promise<PublicStockData> {
 
 export async function getPublicCarDetail(slug: string): Promise<PublicCarDetail | null> {
   try {
-    const databaseCars = await getPublishedDatabaseCars();
+    const databaseProduct = await prisma.car.findFirst({
+      include: publicCarInclude,
+      where: {
+        ...publicVisibleCarWhere,
+        slug,
+      },
+    });
 
-    if (databaseCars.length > 0) {
-      const cars = getUniqueCars(databaseCars.map(mapDatabaseCar));
-      const product = cars.find((car) => car.id === slug);
+    if (databaseProduct) {
+      const product = mapDatabaseCar(databaseProduct);
+      const matchingSuggestedCars = await prisma.car.findMany({
+        include: publicCarInclude,
+        orderBy: [
+          { isFeatured: "desc" },
+          { updatedAt: "desc" },
+          { createdAt: "desc" },
+        ],
+        take: 8,
+        where: {
+          ...publicVisibleCarWhere,
+          id: { not: databaseProduct.id },
+          OR: [
+            { brandId: databaseProduct.brandId },
+            { bodyType: databaseProduct.bodyType },
+          ],
+        },
+      });
+      const matchingSuggestedIds = matchingSuggestedCars.map((car) => car.id);
+      const remainingSuggestedCars =
+        matchingSuggestedCars.length >= 8
+          ? []
+          : await prisma.car.findMany({
+              include: publicCarInclude,
+              orderBy: [
+                { isFeatured: "desc" },
+                { updatedAt: "desc" },
+                { createdAt: "desc" },
+              ],
+              take: 8 - matchingSuggestedCars.length,
+              where: {
+                ...publicVisibleCarWhere,
+                id: { notIn: [databaseProduct.id, ...matchingSuggestedIds] },
+              },
+            });
 
-      if (!product) return null;
-
-      const suggestedItems = cars
-        .filter((car) => car.id !== product.id)
-        .sort((first, second) => {
-          const firstScore = Number(first.brand === product.brand) + Number(first.body === product.body);
-          const secondScore = Number(second.brand === product.brand) + Number(second.body === product.body);
-          return secondScore - firstScore;
-        })
-        .slice(0, 8)
+      const suggestedItems = getUniqueCars([...matchingSuggestedCars, ...remainingSuggestedCars].map(mapDatabaseCar))
         .map((car) => ({
           image: car.suggestedImage ?? car.image,
           name: car.name,
