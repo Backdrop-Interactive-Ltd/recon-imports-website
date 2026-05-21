@@ -56,7 +56,13 @@ export default async function PublicCarDetailPage({ params, section }: PublicCar
     <main className="product-page">
       <header className="cars-header product-header">
         <a className="cars-logo" href="/">
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} suppressHydrationWarning />
+          <img
+            src={siteSettings.websiteLogo || "/recon-logo.webp"}
+            alt={siteSettings.siteName}
+            width={178}
+            height={55}
+            suppressHydrationWarning
+          />
         </a>
         <nav aria-label="Product page navigation">
           <a href="/">Home</a>

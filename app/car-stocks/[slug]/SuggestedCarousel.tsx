@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState, type MouseEvent, type PointerEvent } from "react";
 
 type SuggestedItem = {
@@ -92,7 +93,16 @@ export default function SuggestedCarousel({ items }: { items: SuggestedItem[] })
             key={`${item.slug}-${index}`}
             onClick={preventClickAfterDrag}
           >
-            <img draggable={false} src={item.image} alt={item.name} />
+            <Image
+              draggable={false}
+              src={item.image}
+              alt={item.name}
+              width={600}
+              height={600}
+              loading="lazy"
+              sizes="(max-width: 860px) 70vw, 260px"
+              suppressHydrationWarning
+            />
             <h3>{item.name}</h3>
           </a>
         ))}

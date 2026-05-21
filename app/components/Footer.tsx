@@ -69,7 +69,15 @@ export default function Footer({ className = "", settings = fallbackSiteSettings
         </div>
         <div className="footer-newsletter">
           {settings.footerLogo ? (
-            <img className="footer-logo" src={settings.footerLogo} alt={`${settings.siteName} footer logo`} suppressHydrationWarning />
+            <img
+              className="footer-logo"
+              src={settings.footerLogo}
+              alt={`${settings.siteName} footer logo`}
+              width={260}
+              height={80}
+              loading="lazy"
+              suppressHydrationWarning
+            />
           ) : null}
           <h3>Stay updated with Recon Imports</h3>
           <form action={formAction} className="newsletter-form" ref={formRef}>

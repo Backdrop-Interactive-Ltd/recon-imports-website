@@ -11,7 +11,13 @@ export default async function VerifyAuctionSheetPage() {
     <main className="verify-page">
       <header className="cars-header verify-page-header">
         <a className="cars-logo" href="/">
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} suppressHydrationWarning />
+          <img
+            src={siteSettings.websiteLogo || "/recon-logo.webp"}
+            alt={siteSettings.siteName}
+            width={178}
+            height={55}
+            suppressHydrationWarning
+          />
         </a>
         <nav aria-label="Verify auction sheet navigation">
           <a href="/">Home</a>

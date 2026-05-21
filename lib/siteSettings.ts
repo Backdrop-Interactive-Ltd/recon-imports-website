@@ -1,5 +1,5 @@
 import { prisma } from "./prisma";
-import { getOptimizedCloudinaryImageUrl } from "./cloudinaryImages";
+import { getLogoImageUrl, getOptimizedCloudinaryImageUrl } from "./cloudinaryImages";
 import {
   fallbackSiteSettings,
   siteSettingKeys,
@@ -10,12 +10,13 @@ import {
 export type { PublicSiteSettings } from "./siteSettingsConfig";
 
 const imageSettingKeys = new Set<SiteSettingKey>(["favicon", "footerLogo", "openGraphImage", "websiteLogo"]);
+const logoSettingKeys = new Set<SiteSettingKey>(["footerLogo", "websiteLogo"]);
 const legacyBrandPattern = /Reliant Motors/i;
 const legacyBrandReplacePattern = /Reliant Motors/gi;
 
 function normalizeSiteSettingValue(key: SiteSettingKey, value: string) {
   if (imageSettingKeys.has(key)) {
-    return getOptimizedCloudinaryImageUrl(value);
+    return logoSettingKeys.has(key) ? getLogoImageUrl(value) : getOptimizedCloudinaryImageUrl(value);
   }
 
   if (key === "defaultMetaTitle" && legacyBrandPattern.test(value)) {

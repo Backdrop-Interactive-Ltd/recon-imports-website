@@ -1,5 +1,9 @@
 import { prisma } from "../../lib/prisma";
-import { getOptimizedCloudinaryImageUrl, getOptimizedCloudinaryImageUrls } from "../../lib/cloudinaryImages";
+import {
+  getCarCardImageUrl,
+  getOptimizedCloudinaryImageUrl,
+  getOptimizedCloudinaryImageUrls,
+} from "../../lib/cloudinaryImages";
 import { getCarPublicPath } from "../../lib/carPublicRoutes";
 import {
   CarFeatureType,
@@ -154,7 +158,8 @@ function createDescription(car: PublicCarRecord) {
 function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
   const body = bodyLabels[car.bodyType];
   const gallery = getOptimizedCloudinaryImageUrls(car.images.map((image) => image.imageUrl));
-  const primaryImage = gallery[0] ?? fallbackImagesByBody[body] ?? "/cat-suv.webp";
+  const primaryGalleryImage = gallery[0] ?? fallbackImagesByBody[body] ?? "/cat-suv.webp";
+  const cardImage = getCarCardImageUrl(primaryGalleryImage);
   const features = car.features
     .filter((feature) => feature.type === CarFeatureType.FEATURE)
     .map((feature) => feature.title);
@@ -178,10 +183,10 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     exterior: car.exteriorColor || "N/A",
     features,
     fuel,
-    gallery: gallery.length > 0 ? gallery : [primaryImage],
-    hero: primaryImage,
+    gallery: gallery.length > 0 ? gallery : [primaryGalleryImage],
+    hero: primaryGalleryImage,
     id: car.slug,
-    image: primaryImage,
+    image: cardImage,
     isEv: car.fuelType === FuelType.ELECTRIC,
     mileage: car.mileage,
     model: car.model,
@@ -191,10 +196,10 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     regYear: String(car.year),
     saleStatus: saleStatusLabels[car.saleStatus],
     safetyFeatures,
-    suggestedImage: primaryImage,
+    suggestedImage: cardImage,
     transmission: transmissionLabels[car.transmission].toUpperCase(),
     type: stockTypeLabels[car.stockType],
-    videoImage: car.videoImageUrl ? getOptimizedCloudinaryImageUrl(car.videoImageUrl) : primaryImage,
+    videoImage: car.videoImageUrl ? getOptimizedCloudinaryImageUrl(car.videoImageUrl) : cardImage,
     youtubeVideoUrl: car.youtubeVideoUrl,
     wheel: car.wheelSize || "N/A",
     year: String(car.year),

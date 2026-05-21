@@ -755,6 +755,7 @@ export default function HomeClient({
                 alt={heroSlide.title}
                 fill
                 priority={index === 0}
+                sizes="100vw"
                 suppressHydrationWarning
               />
             </div>
@@ -886,6 +887,8 @@ export default function HomeClient({
                     alt={item.name}
                     width={340}
                     height={340}
+                    loading="lazy"
+                    sizes="(max-width: 760px) 78vw, 340px"
                     draggable={false}
                     suppressHydrationWarning
                   />
@@ -928,7 +931,15 @@ export default function HomeClient({
                 {brandPage.map((brand) => (
                   <a className="brand-logo-card" href={`/${brand.slug}`} key={brand.slug}>
                     {brand.logoUrl ? (
-                      <img className="brand-logo-image" src={brand.logoUrl} alt={`${brand.name} logo`} suppressHydrationWarning />
+                      <img
+                        className="brand-logo-image"
+                        src={brand.logoUrl}
+                        alt={`${brand.name} logo`}
+                        width={240}
+                        height={120}
+                        loading="lazy"
+                        suppressHydrationWarning
+                      />
                     ) : (
                       <span>{brand.name}</span>
                     )}

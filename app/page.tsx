@@ -1,5 +1,5 @@
 import { VehicleCategoryType } from "../lib/generated/prisma/enums";
-import { getOptimizedCloudinaryImageUrl } from "../lib/cloudinaryImages";
+import { getBrandLogoImageUrl, getCarCardImageUrl, getHeroImageUrl } from "../lib/cloudinaryImages";
 import { prisma } from "../lib/prisma";
 import { getSiteSettings } from "../lib/siteSettings";
 import { getHomepageDealCars } from "./car-stocks/data";
@@ -83,7 +83,7 @@ function getCategoryImage(slug: string, imageUrl?: string | null) {
   const cleanImageUrl = cleanOptionalValue(imageUrl);
 
   if (cleanImageUrl && isValidImageSrc(cleanImageUrl)) {
-    return getOptimizedCloudinaryImageUrl(cleanImageUrl);
+    return getCarCardImageUrl(cleanImageUrl);
   }
 
   return categoryImageBySlug[slug] || defaultCategoryImage;
@@ -105,7 +105,7 @@ async function getHomepageBrands(): Promise<HomepageBrand[] | undefined> {
 
     return brands.map((brand) => ({
       ...brand,
-      logoUrl: getOptimizedCloudinaryImageUrl(brand.logoUrl),
+      logoUrl: getBrandLogoImageUrl(brand.logoUrl),
     }));
   } catch (error) {
     console.error("Failed to load homepage brands from database.", error);
@@ -184,7 +184,7 @@ async function getHomepageHeroSlides(): Promise<HomepageHeroSlide[] | undefined>
     return slides.map((slide, index) => ({
       ctaLink: slide.ctaLink,
       ctaText: slide.ctaText,
-      image: getOptimizedCloudinaryImageUrl(slide.imageUrl),
+      image: getHeroImageUrl(slide.imageUrl),
       imageClass: heroImageClasses[index % heroImageClasses.length],
       subtitle: slide.subtitle,
       textAnimation: heroTextAnimations[index % heroTextAnimations.length],

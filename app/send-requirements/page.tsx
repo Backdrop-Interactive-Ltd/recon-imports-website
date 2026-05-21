@@ -11,7 +11,13 @@ export default async function SendRequirementsPage() {
     <main className="send-requirements-page">
       <header className="cars-header send-requirements-header">
         <a className="cars-logo" href="/">
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} suppressHydrationWarning />
+          <img
+            src={siteSettings.websiteLogo || "/recon-logo.webp"}
+            alt={siteSettings.siteName}
+            width={178}
+            height={55}
+            suppressHydrationWarning
+          />
         </a>
         <nav aria-label="Send requirements navigation">
           <a href="/">Home</a>

@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import Footer from "../components/Footer";
 import { brandOptions as fallbackBrandOptions } from "./brands";
@@ -148,7 +149,13 @@ export default function StockListingPage({
       {/* Header: same navigation style used across stock and verification pages. */}
       <header className="cars-header">
         <a className="cars-logo" href="/">
-          <img src={siteSettings.websiteLogo || "/recon-logo.webp"} alt={siteSettings.siteName} suppressHydrationWarning />
+          <img
+            src={siteSettings.websiteLogo || "/recon-logo.webp"}
+            alt={siteSettings.siteName}
+            width={178}
+            height={55}
+            suppressHydrationWarning
+          />
         </a>
         <nav aria-label="Cars page navigation">
           <a href="/">Home</a>
@@ -262,7 +269,15 @@ export default function StockListingPage({
               filteredCars.map((car) => (
                 <article className="stock-card" key={car.id}>
                   {car.saleStatus === "Sold" ? <span className="stock-sale-badge">Sold</span> : null}
-                  <img src={car.image} alt={car.name} loading="eager" decoding="sync" suppressHydrationWarning />
+                  <Image
+                    src={car.image}
+                    alt={car.name}
+                    width={600}
+                    height={600}
+                    loading="lazy"
+                    sizes="(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 33vw"
+                    suppressHydrationWarning
+                  />
                   <div className="stock-card-body">
                     <h2>{car.name}</h2>
                     <p>{car.year}</p>
