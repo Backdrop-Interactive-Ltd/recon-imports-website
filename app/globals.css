@@ -1339,6 +1339,7 @@ a {
   grid-template-columns: minmax(132px, 178px) minmax(0, 1fr) max-content;
   gap: clamp(12px, 1.4vw, 22px);
   height: 78px;
+  min-height: 78px;
   left: 0;
   padding: 0 max(48px, env(safe-area-inset-right)) 0 max(48px, env(safe-area-inset-left));
   position: sticky;
@@ -1670,6 +1671,7 @@ a {
   grid-template-columns: minmax(300px, 360px) 1fr;
   margin: 0 auto;
   max-width: 1710px;
+  min-height: 760px;
   padding-bottom: 48px;
 }
 
@@ -2147,6 +2149,7 @@ a {
 
 .product-gallery {
   align-items: stretch;
+  aspect-ratio: 1337.01 / 498.54;
   display: grid;
   gap: 4px;
   grid-template-columns: minmax(0, 662.49fr) minmax(0, 674.52fr);
@@ -2158,6 +2161,7 @@ a {
 }
 
 .product-gallery-single {
+  aspect-ratio: 4 / 3;
   grid-template-columns: minmax(0, 1fr);
   max-width: 1500px;
 }
@@ -3129,8 +3133,10 @@ a {
   }
 
   .product-gallery {
+    aspect-ratio: auto;
     grid-template-columns: 1fr;
     max-width: 100%;
+    min-height: calc((100vw - 56px) * 0.9375 + 4px);
   }
 
   .product-gallery-single {
@@ -3370,6 +3376,7 @@ a {
     grid-template-columns: 1fr;
     height: auto;
     justify-items: center;
+    min-height: 178px;
     padding: 15px max(18px, env(safe-area-inset-right)) 15px max(18px, env(safe-area-inset-left));
   }
 
@@ -3393,6 +3400,7 @@ a {
 
   .cars-layout {
     display: block;
+    min-height: 1120px;
     padding-bottom: 34px;
   }
 
@@ -3622,6 +3630,10 @@ a {
 
   .product-gallery-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .product-gallery {
+    min-height: calc((100vw - 36px) * 1.5 + 4px);
   }
 
   .product-spec-card {

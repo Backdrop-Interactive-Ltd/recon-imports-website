@@ -1,9 +1,16 @@
-import { VehicleCategoryType } from "../lib/generated/prisma/enums";
+import { CarSaleStatus, VehicleCategoryType } from "../lib/generated/prisma/enums";
 import { getBrandLogoImageUrl, getCarCardImageUrl, getHeroImageUrl } from "../lib/cloudinaryImages";
+import { getCarPublicPath } from "../lib/carPublicRoutes";
 import { prisma } from "../lib/prisma";
 import { getSiteSettings } from "../lib/siteSettings";
 import { getHomepageDealCars } from "./car-stocks/data";
-import HomeClient, { type HomepageBrand, type HomepageCategory, type HomepageHeroSlide } from "./HomeClient";
+import { inventory } from "./car-stocks/inventory";
+import HomeClient, {
+  type HomepageBrand,
+  type HomepageCategory,
+  type HomepageHeroSlide,
+  type HomepageSearchItem,
+} from "./HomeClient";
 
 export const revalidate = 60;
 
@@ -49,6 +56,29 @@ const categoryImageBySlug: Record<string, string> = {
 const defaultCategoryImage = "/cat-suv.webp";
 const heroImageClasses = ["hero-image-default", "hero-image-focus-left", "hero-image-focus-right"];
 const heroTextAnimations = ["hero-text-rise", "hero-text-track", "hero-text-scale"];
+const bodyLabels = {
+  CROSSOVER: "Crossover",
+  HATCHBACK: "Hatchback",
+  MPV: "MPV",
+  OTHER: "Other",
+  PASSENGER_VAN: "Passenger Van",
+  SEDAN: "Sedan",
+  SUV: "SUV",
+  WAGON: "Wagon",
+} as const;
+const conditionLabels = {
+  BRAND_NEW: "Brand New",
+  PRE_OWNED: "Pre Owned",
+  RECONDITIONED: "Reconditioned",
+  USED: "Used",
+} as const;
+const stockTypeLabels = {
+  BRAND_NEW: "Brand New",
+  PRE_ORDER: "Pre Order",
+  PRE_OWNED: "Pre Owned",
+  RECONDITIONED: "Reconditioned",
+} as const;
+const fallbackSearchImage = "/cat-suv.webp";
 
 function cleanOptionalValue(value?: string | null) {
   const trimmedValue = value?.trim() ?? "";
@@ -196,13 +226,105 @@ async function getHomepageHeroSlides(): Promise<HomepageHeroSlide[] | undefined>
   }
 }
 
+function getFallbackSearchItems(): HomepageSearchItem[] {
+  return inventory.slice(0, 100).map((car) => ({
+    brand: car.brand,
+    condition: car.type,
+    href: car.publicPath || getCarPublicPath({ id: car.id, type: car.type }),
+    image: getCarCardImageUrl(car.image || fallbackSearchImage),
+    name: car.name,
+    price: car.price,
+    searchText: `${car.brand} ${car.name} ${car.year} ${car.body} ${car.type}`.toLowerCase(),
+    slug: car.id,
+    stockType: car.type,
+    year: car.year,
+  }));
+}
+
+async function getHomepageSearchItems(): Promise<HomepageSearchItem[] | undefined> {
+  try {
+    const cars = await prisma.car.findMany({
+      orderBy: [
+        { isFeatured: "desc" },
+        { updatedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      select: {
+        bodyType: true,
+        brand: {
+          select: {
+            name: true,
+          },
+        },
+        condition: true,
+        images: {
+          orderBy: [
+            { isPrimary: "desc" },
+            { sortOrder: "asc" },
+            { createdAt: "asc" },
+          ],
+          select: {
+            imageUrl: true,
+          },
+          take: 1,
+        },
+        price: true,
+        slug: true,
+        stockType: true,
+        title: true,
+        year: true,
+      },
+      take: 100,
+      where: {
+        isPublished: true,
+        saleStatus: {
+          not: CarSaleStatus.SOLD,
+        },
+      },
+    });
+
+    if (cars.length === 0) {
+      const publishedCarsCount = await prisma.car.count({
+        where: { isPublished: true },
+      });
+
+      return publishedCarsCount > 0 ? [] : undefined;
+    }
+
+    return cars.map((car) => {
+      const brand = car.brand.name;
+      const body = bodyLabels[car.bodyType];
+      const condition = conditionLabels[car.condition];
+      const stockType = stockTypeLabels[car.stockType];
+      const year = String(car.year);
+
+      return {
+        brand,
+        condition,
+        href: getCarPublicPath({ slug: car.slug, stockType: car.stockType }),
+        image: getCarCardImageUrl(car.images[0]?.imageUrl || fallbackSearchImage),
+        name: car.title,
+        price: car.price,
+        searchText: `${brand} ${car.title} ${year} ${body} ${stockType} ${condition}`.toLowerCase(),
+        slug: car.slug,
+        stockType,
+        year,
+      };
+    });
+  } catch (error) {
+    console.error("Failed to load homepage search items from database.", error);
+    return undefined;
+  }
+}
+
 export default async function Home() {
-  const [brands, categories, heroSlides, siteSettings, deals] = await Promise.all([
+  const [brands, categories, heroSlides, siteSettings, deals, searchItems] = await Promise.all([
     getHomepageBrands(),
     getHomepageCategories(),
     getHomepageHeroSlides(),
     getSiteSettings(),
     getHomepageDealCars(),
+    getHomepageSearchItems(),
   ]);
 
   return (
@@ -211,6 +333,7 @@ export default async function Home() {
       categories={categories}
       deals={deals}
       heroSlides={heroSlides}
+      searchItems={searchItems ?? getFallbackSearchItems()}
       siteSettings={siteSettings}
     />
   );

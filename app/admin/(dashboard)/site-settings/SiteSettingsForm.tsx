@@ -7,7 +7,7 @@ import styles from "./page.module.css";
 import {
   initialSiteSettingsActionState,
   siteSettingSections,
-} from "./validation";
+} from "./formOptions";
 import type { PublicSiteSettings, SiteSettingKey } from "../../../../lib/siteSettingsConfig";
 
 type SiteSettingsFormProps = {

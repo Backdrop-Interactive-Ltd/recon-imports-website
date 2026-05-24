@@ -1,23 +1,10 @@
 import { z } from "zod";
 import {
   siteSettingFields,
-  siteSettingSections,
   type PublicSiteSettings,
   type SiteSettingKey,
 } from "../../../../lib/siteSettingsConfig";
-
-export { siteSettingSections };
-
-export type SiteSettingsActionState = {
-  errors?: Partial<Record<SiteSettingKey | "form", string>>;
-  message: string;
-  status: "idle" | "error" | "success";
-};
-
-export const initialSiteSettingsActionState: SiteSettingsActionState = {
-  message: "",
-  status: "idle",
-};
+export type { SiteSettingsActionState } from "./formOptions";
 
 function isValidUrl(value: string) {
   if (!value) return true;

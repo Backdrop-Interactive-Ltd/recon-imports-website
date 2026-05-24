@@ -1,14 +1,20 @@
+import Link from "next/link";
+import AdminPagination from "../_components/AdminPagination";
+import { createPaginatedResult, getPaginationState, getStringParam } from "../_components/listParams";
 import { AuctionSheetStatus, PaymentStatus } from "../../../../lib/generated/prisma/enums";
 import { prisma } from "../../../../lib/prisma";
+import type { Prisma } from "../../../../lib/generated/prisma/client";
 import styles from "../brands/page.module.css";
 import AuctionSheetRequestRowActions from "./AuctionSheetRequestRowActions";
-import { formatEnumLabel } from "./validation";
+import { auctionSheetStatusOptions, formatEnumLabel, paymentStatusOptions } from "./formOptions";
 
 export const metadata = {
   title: "Auction Sheet Requests | Recon Imports Admin",
 };
 
 export const dynamic = "force-dynamic";
+
+const paymentMethodOptions = ["bKash", "Nagad", "Rocket", "Bank Transfer"] as const;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "2-digit",
@@ -20,42 +26,123 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 
 const numberFormatter = new Intl.NumberFormat("en-IN");
 
-async function getAuctionSheetRequests() {
-  const requests = await prisma.auctionSheetRequest.findMany({
-    orderBy: { createdAt: "desc" },
-    select: {
-      chassisNumber: true,
-      createdAt: true,
-      email: true,
-      feeAmount: true,
-      id: true,
-      name: true,
-      paymentMethod: true,
-      paymentStatus: true,
-      phone: true,
-      reportUrl: true,
-      senderNumber: true,
-      status: true,
-      transactionId: true,
-      updatedAt: true,
-    },
-  });
+type AuctionSheetFilters = {
+  page?: string;
+  pageSize?: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
+  q?: string;
+  sort?: string;
+  status?: string;
+};
 
-  return requests.map((request) => ({
-    ...request,
-    createdAtLabel: dateFormatter.format(request.createdAt),
-    feeAmountLabel: `BDT ${numberFormatter.format(request.feeAmount)}`,
-    paymentStatusLabel: formatEnumLabel(request.paymentStatus),
-    statusLabel: formatEnumLabel(request.status),
-    updatedAtLabel: dateFormatter.format(request.updatedAt),
-  }));
+function getAuctionSheetWhere(filters: AuctionSheetFilters) {
+  const where: Prisma.AuctionSheetRequestWhereInput = {};
+  const query = filters.q?.trim();
+
+  if (filters.status && Object.values(AuctionSheetStatus).includes(filters.status as AuctionSheetStatus)) {
+    where.status = filters.status as AuctionSheetStatus;
+  }
+
+  if (filters.paymentStatus && Object.values(PaymentStatus).includes(filters.paymentStatus as PaymentStatus)) {
+    where.paymentStatus = filters.paymentStatus as PaymentStatus;
+  }
+
+  if (filters.paymentMethod) {
+    where.paymentMethod = filters.paymentMethod;
+  }
+
+  if (query) {
+    where.OR = [
+      { chassisNumber: { contains: query } },
+      { name: { contains: query } },
+      { phone: { contains: query } },
+      { email: { contains: query } },
+      { transactionId: { contains: query } },
+    ];
+  }
+
+  return where;
 }
 
-export default async function AdminAuctionSheetRequestsPage() {
-  const requests = await getAuctionSheetRequests();
-  const pendingPayments = requests.filter((request) => request.paymentStatus === PaymentStatus.PENDING).length;
-  const processingRequests = requests.filter((request) => request.status === AuctionSheetStatus.PROCESSING).length;
-  const completedRequests = requests.filter((request) => request.status === AuctionSheetStatus.COMPLETED).length;
+async function getAuctionSheetRequests(filters: AuctionSheetFilters) {
+  const pagination = getPaginationState(filters);
+  const where = getAuctionSheetWhere(filters);
+  const [total, requests] = await Promise.all([
+    prisma.auctionSheetRequest.count({ where }),
+    prisma.auctionSheetRequest.findMany({
+      orderBy: { createdAt: filters.sort === "oldest" ? "asc" : "desc" },
+      skip: pagination.skip,
+      take: pagination.take,
+      where,
+      select: {
+        chassisNumber: true,
+        createdAt: true,
+        email: true,
+        feeAmount: true,
+        id: true,
+        name: true,
+        paymentMethod: true,
+        paymentStatus: true,
+        phone: true,
+        reportUrl: true,
+        senderNumber: true,
+        status: true,
+        transactionId: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  return createPaginatedResult(
+    requests.map((request) => ({
+      ...request,
+      createdAtLabel: dateFormatter.format(request.createdAt),
+      feeAmountLabel: `BDT ${numberFormatter.format(request.feeAmount)}`,
+      paymentStatusLabel: formatEnumLabel(request.paymentStatus),
+      statusLabel: formatEnumLabel(request.status),
+      updatedAtLabel: dateFormatter.format(request.updatedAt),
+    })),
+    total,
+    pagination,
+  );
+}
+
+async function getAuctionSheetStats() {
+  const [total, pendingPayments, processingRequests, completedRequests] = await Promise.all([
+    prisma.auctionSheetRequest.count(),
+    prisma.auctionSheetRequest.count({ where: { paymentStatus: PaymentStatus.PENDING } }),
+    prisma.auctionSheetRequest.count({ where: { status: AuctionSheetStatus.PROCESSING } }),
+    prisma.auctionSheetRequest.count({ where: { status: AuctionSheetStatus.COMPLETED } }),
+  ]);
+
+  return { completedRequests, pendingPayments, processingRequests, total };
+}
+
+export default async function AdminAuctionSheetRequestsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = (await searchParams) ?? {};
+  const filters: AuctionSheetFilters = {
+    page: getStringParam(params.page),
+    pageSize: getStringParam(params.pageSize),
+    paymentMethod: getStringParam(params.paymentMethod),
+    paymentStatus: getStringParam(params.paymentStatus),
+    q: getStringParam(params.q),
+    sort: getStringParam(params.sort),
+    status: getStringParam(params.status),
+  };
+  const [requestsPage, stats] = await Promise.all([getAuctionSheetRequests(filters), getAuctionSheetStats()]);
+  const requests = requestsPage.items;
+  const pageParams = {
+    paymentMethod: filters.paymentMethod,
+    paymentStatus: filters.paymentStatus,
+    q: filters.q,
+    sort: filters.sort,
+    status: filters.status,
+  };
 
   return (
     <section className={styles.brandsPage}>
@@ -70,29 +157,90 @@ export default async function AdminAuctionSheetRequestsPage() {
       <div className={styles.summaryGrid}>
         <div>
           <span>Total Requests</span>
-          <strong>{requests.length}</strong>
+          <strong>{stats.total}</strong>
         </div>
         <div>
           <span>Pending Payment</span>
-          <strong>{pendingPayments}</strong>
+          <strong>{stats.pendingPayments}</strong>
         </div>
         <div>
           <span>Processing</span>
-          <strong>{processingRequests}</strong>
+          <strong>{stats.processingRequests}</strong>
         </div>
         <div>
           <span>Completed</span>
-          <strong>{completedRequests}</strong>
+          <strong>{stats.completedRequests}</strong>
         </div>
       </div>
 
       <section className={styles.listPanel}>
+        <form className={styles.filterBar} method="get">
+          <label>
+            <span>Search</span>
+            <input name="q" defaultValue={filters.q ?? ""} placeholder="Chassis, name, phone, email, transaction" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select name="status" defaultValue={filters.status ?? ""}>
+              <option value="">All</option>
+              {auctionSheetStatusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {formatEnumLabel(option)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Payment</span>
+            <select name="paymentStatus" defaultValue={filters.paymentStatus ?? ""}>
+              <option value="">All</option>
+              {paymentStatusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {formatEnumLabel(option)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Method</span>
+            <select name="paymentMethod" defaultValue={filters.paymentMethod ?? ""}>
+              <option value="">All</option>
+              {paymentMethodOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Sort</span>
+            <select name="sort" defaultValue={filters.sort ?? ""}>
+              <option value="">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </label>
+          <label>
+            <span>Page size</span>
+            <select name="pageSize" defaultValue={filters.pageSize || "20"}>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+          <button className={styles.secondaryButton} type="submit">
+            Apply
+          </button>
+          <Link className={styles.secondaryLinkButton} href="/admin/auction-sheet-requests">
+            Reset
+          </Link>
+        </form>
+
         <div className={styles.listHeader}>
           <div>
             <p>Request Inbox</p>
             <h2>Database auction sheet requests</h2>
           </div>
-          <span>{requests.length} total</span>
+          <span>{requests.length} shown of {requestsPage.total}</span>
         </div>
 
         {requests.length > 0 ? (
@@ -207,10 +355,18 @@ export default async function AdminAuctionSheetRequestsPage() {
           </div>
         ) : (
           <div className={styles.emptyState}>
-            <strong>No auction sheet requests yet</strong>
-            <p>Submitted Verify Auction Sheet forms will appear here.</p>
+            <strong>No auction sheet requests found</strong>
+            <p>Adjust the filters or wait for new Verify Auction Sheet submissions.</p>
           </div>
         )}
+        <AdminPagination
+          basePath="/admin/auction-sheet-requests"
+          page={requestsPage.page}
+          pageSize={requestsPage.pageSize}
+          params={pageParams}
+          total={requestsPage.total}
+          totalPages={requestsPage.totalPages}
+        />
       </section>
     </section>
   );

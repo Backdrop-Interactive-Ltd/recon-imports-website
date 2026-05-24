@@ -8,6 +8,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const siteUrl = "https://reconimports.com";
+const cacheTtlMs = 60_000;
+const imageFetchTimeoutMs = 3_500;
+const imageFetchConcurrency = 5;
 const fallbackLogoText = "RECON IMPORTS";
 const pageMargin = 30;
 const tableLeft = 30;
@@ -30,6 +33,15 @@ const tableWidth = columns.reduce((total, column) => total + column.width, 0);
 
 type StockCar = Awaited<ReturnType<typeof getStockCars>>[number];
 type PdfImageData = ArrayBuffer;
+type PdfImageCache = Map<string, PdfImageData | null>;
+
+let stockListPdfCache:
+  | {
+      buffer: Buffer;
+      expiresAt: number;
+      filename: string;
+    }
+  | undefined;
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-IN").format(price);
@@ -98,8 +110,14 @@ function getErrorMessage(error: unknown) {
 async function fetchPdfImage(url: string, label: string) {
   if (!url) return null;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), imageFetchTimeoutMs);
+
   try {
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetch(url, {
+      cache: "force-cache",
+      signal: controller.signal,
+    });
 
     if (!response.ok) {
       console.warn("[stock-list.pdf] Skipping image fetch", { label, status: response.status, url });
@@ -117,23 +135,37 @@ async function fetchPdfImage(url: string, label: string) {
   } catch (error) {
     console.warn("[stock-list.pdf] Skipping image after fetch error", { error: getErrorMessage(error), label, url });
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
 async function getStockCars() {
   return prisma.car.findMany({
-    include: {
+    select: {
       brand: {
         select: {
           name: true,
         },
       },
+      chassisNumber: true,
+      exteriorColor: true,
+      grade: true,
+      id: true,
       images: {
         orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
         select: {
           imageUrl: true,
         },
+        take: 1,
       },
+      packageName: true,
+      price: true,
+      slug: true,
+      stockType: true,
+      title: true,
+      updatedAt: true,
+      year: true,
     },
     orderBy: [
       { brand: { name: "asc" } },
@@ -148,6 +180,53 @@ async function getStockCars() {
       },
     },
   });
+}
+
+function createConcurrencyLimiter(limit: number) {
+  let active = 0;
+  const queue: (() => void)[] = [];
+
+  async function runNext<T>(task: () => Promise<T>): Promise<T> {
+    if (active >= limit) {
+      await new Promise<void>((resolve) => queue.push(resolve));
+    }
+
+    active += 1;
+
+    try {
+      return await task();
+    } finally {
+      active -= 1;
+      queue.shift()?.();
+    }
+  }
+
+  return runNext;
+}
+
+async function loadPdfImages(cars: StockCar[], logoUrl: string, assetOrigin: string) {
+  const imageCache: PdfImageCache = new Map();
+  const limitImageFetch = createConcurrencyLimiter(imageFetchConcurrency);
+  const logoImageUrl = toPdfImageUrl(logoUrl, assetOrigin);
+  const uniquePhotoUrls = Array.from(
+    new Set(cars.map((car) => toPdfImageUrl(car.images[0]?.imageUrl, assetOrigin, "f_jpg,q_auto,w_120,h_90,c_fill")).filter(Boolean)),
+  );
+
+  const [logoBuffer] = await Promise.all([
+    limitImageFetch(() => fetchPdfImage(logoImageUrl, "site-logo")),
+    Promise.all(
+      uniquePhotoUrls.map((photoUrl) =>
+        limitImageFetch(async () => {
+          imageCache.set(photoUrl, await fetchPdfImage(photoUrl, `car:${photoUrl}`));
+        }),
+      ),
+    ),
+  ]);
+
+  return {
+    imageCache,
+    logoBuffer,
+  };
 }
 
 function groupCarsByBrand(cars: StockCar[]) {
@@ -227,7 +306,7 @@ async function drawCarRow(
   car: StockCar,
   serial: number,
   y: number,
-  imageCache: Map<string, PdfImageData | null>,
+  imageCache: PdfImageCache,
   assetOrigin: string,
 ) {
   const rowFill = "#ffffff";
@@ -254,10 +333,6 @@ async function drawCarRow(
   const photoUrl = toPdfImageUrl(car.images[0]?.imageUrl, assetOrigin, "f_jpg,q_auto,w_120,h_90,c_fill");
 
   if (photoUrl) {
-    if (!imageCache.has(photoUrl)) {
-      imageCache.set(photoUrl, await fetchPdfImage(photoUrl, `car:${car.id}`));
-    }
-
     const imageBuffer = imageCache.get(photoUrl);
 
     if (imageBuffer) {
@@ -325,8 +400,7 @@ async function buildPdfBuffer(cars: StockCar[], logoUrl: string, assetOrigin: st
     size: "A4",
   });
   const chunks: Buffer[] = [];
-  const imageCache = new Map<string, PdfImageData | null>();
-  const logoBuffer = await fetchPdfImage(toPdfImageUrl(logoUrl, assetOrigin), "site-logo");
+  const { imageCache, logoBuffer } = await loadPdfImages(cars, logoUrl, assetOrigin);
 
   doc.on("data", (chunk: Buffer) => chunks.push(chunk));
   const done = new Promise<Buffer>((resolve) => {
@@ -363,15 +437,33 @@ async function buildPdfBuffer(cars: StockCar[], logoUrl: string, assetOrigin: st
 
 export async function GET(request: Request) {
   try {
+    if (stockListPdfCache && stockListPdfCache.expiresAt > Date.now()) {
+      return new Response(new Uint8Array(stockListPdfCache.buffer), {
+        headers: {
+          "Cache-Control": "private, max-age=60",
+          "Content-Disposition": `attachment; filename="${stockListPdfCache.filename}"`,
+          "Content-Type": "application/pdf",
+          "X-Stock-List-Cache": "HIT",
+        },
+      });
+    }
+
     const requestUrl = new URL(request.url);
     const [settings, cars] = await Promise.all([getSiteSettings(), getStockCars()]);
     const pdfBuffer = await buildPdfBuffer(cars, settings.websiteLogo || "/recon-logo.webp", requestUrl.origin);
+    const filename = formatDownloadFilename();
+    stockListPdfCache = {
+      buffer: pdfBuffer,
+      expiresAt: Date.now() + cacheTtlMs,
+      filename,
+    };
 
     return new Response(new Uint8Array(pdfBuffer), {
       headers: {
-        "Cache-Control": "no-store",
-        "Content-Disposition": `attachment; filename="${formatDownloadFilename()}"`,
+        "Cache-Control": "private, max-age=60",
+        "Content-Disposition": `attachment; filename="${filename}"`,
         "Content-Type": "application/pdf",
+        "X-Stock-List-Cache": "MISS",
       },
     });
   } catch (error) {

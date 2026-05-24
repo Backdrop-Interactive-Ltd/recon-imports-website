@@ -1,15 +1,5 @@
 import { z } from "zod";
-
-export type RequirementLeadActionState = {
-  errors?: Partial<Record<"carName" | "details" | "form" | "images" | "mileage" | "model" | "modelYear" | "name" | "phone", string>>;
-  message: string;
-  status: "idle" | "error" | "success";
-};
-
-export const initialRequirementLeadActionState: RequirementLeadActionState = {
-  message: "",
-  status: "idle",
-};
+export type { RequirementLeadActionState } from "./formState";
 
 export const requirementLeadFormSchema = z.object({
   carName: z.string().trim().min(1, "Car name is required.").max(100, "Car name is too long."),

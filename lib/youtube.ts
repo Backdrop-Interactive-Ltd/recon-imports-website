@@ -43,7 +43,6 @@ export function getYouTubeThumbnailUrl(videoId: string) {
 
 export function getYouTubeThumbnailUrls(videoId: string) {
   return [
-    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
     `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
     `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
   ];

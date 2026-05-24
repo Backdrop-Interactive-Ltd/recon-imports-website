@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitSellCarLeadAction } from "./actions";
-import { initialSellCarLeadActionState } from "./validation";
+import { initialSellCarLeadActionState } from "./formState";
 
 export default function SellYourCarForm() {
   const [state, formAction, isPending] = useActionState(submitSellCarLeadAction, initialSellCarLeadActionState);

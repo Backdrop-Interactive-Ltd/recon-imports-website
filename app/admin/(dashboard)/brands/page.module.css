@@ -65,7 +65,8 @@
 
 .subnav,
 .filterBar,
-.badgeGroup {
+.badgeGroup,
+.pagination {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -571,6 +572,39 @@
   font-size: 13px;
   min-height: 42px;
   padding: 0 10px;
+}
+
+.filterBar input {
+  background: #ffffff;
+  border: 1px solid #d7d7db;
+  color: #111111;
+  font: inherit;
+  font-size: 13px;
+  min-height: 42px;
+  padding: 0 10px;
+}
+
+.pagination {
+  border-top: 1px solid #e4e4e6;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.pageSummary,
+.disabledPagination {
+  color: #6e6e74;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.disabledPagination {
+  background: #f4f6f7;
+  opacity: 0.58;
+  padding: 13px 16px;
 }
 
 .tableWrap {

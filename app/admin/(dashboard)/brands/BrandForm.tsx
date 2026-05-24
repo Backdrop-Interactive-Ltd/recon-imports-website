@@ -4,7 +4,7 @@ import { useActionState, useEffect, useState } from "react";
 import AdminImageUpload from "../_components/AdminImageUpload";
 import { createBrandAction, updateBrandAction } from "./actions";
 import styles from "./page.module.css";
-import { initialBrandActionState, slugifyBrand } from "./validation";
+import { initialBrandActionState, slugifyBrand } from "./formOptions";
 
 type EditableBrand = {
   id: string;

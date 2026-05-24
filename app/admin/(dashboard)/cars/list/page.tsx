@@ -1,6 +1,8 @@
 import Link from "next/link";
+import AdminPagination from "../../_components/AdminPagination";
+import { getStringParam } from "../../_components/listParams";
 import CarsSubnav from "../CarsSubnav";
-import { formatEnumLabel, saleStatusOptions, stockTypeOptions } from "../validation";
+import { formatEnumLabel, saleStatusOptions, stockTypeOptions } from "../formOptions";
 import { formatCarPrice, getAdminCars, getCarBrands, type AdminCarListFilters } from "../queries";
 import styles from "../../brands/page.module.css";
 
@@ -9,10 +11,6 @@ export const metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-function getStringParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
-}
 
 export default async function CarsListPage({
   searchParams,
@@ -23,12 +21,25 @@ export default async function CarsListPage({
   const filters: AdminCarListFilters = {
     brandId: getStringParam(params.brandId),
     featured: getStringParam(params.featured),
+    page: getStringParam(params.page),
+    pageSize: getStringParam(params.pageSize),
     published: getStringParam(params.published),
+    q: getStringParam(params.q),
     saleStatus: getStringParam(params.saleStatus),
     sort: getStringParam(params.sort),
     stockType: getStringParam(params.stockType),
   };
-  const [brands, cars] = await Promise.all([getCarBrands(), getAdminCars(filters)]);
+  const [brands, carsPage] = await Promise.all([getCarBrands(), getAdminCars(filters)]);
+  const cars = carsPage.items;
+  const pageParams = {
+    brandId: filters.brandId,
+    featured: filters.featured,
+    published: filters.published,
+    q: filters.q,
+    saleStatus: filters.saleStatus,
+    sort: filters.sort,
+    stockType: filters.stockType,
+  };
 
   return (
     <section className={styles.brandsPage}>
@@ -44,6 +55,10 @@ export default async function CarsListPage({
 
       <section className={styles.listPanel}>
         <form className={styles.filterBar} method="get">
+          <label>
+            <span>Search</span>
+            <input name="q" defaultValue={filters.q ?? ""} placeholder="Title, slug, brand, chassis, model" />
+          </label>
           <label>
             <span>Sale</span>
             <select name="saleStatus" defaultValue={filters.saleStatus ?? ""}>
@@ -79,6 +94,7 @@ export default async function CarsListPage({
             <select name="featured" defaultValue={filters.featured ?? ""}>
               <option value="">All</option>
               <option value="true">Featured</option>
+              <option value="false">Not featured</option>
             </select>
           </label>
           <label>
@@ -95,11 +111,20 @@ export default async function CarsListPage({
           <label>
             <span>Sort</span>
             <select name="sort" defaultValue={filters.sort ?? ""}>
-              <option value="">Default</option>
+              <option value="">Newest</option>
+              <option value="oldest">Oldest</option>
               <option value="price-asc">Price low to high</option>
               <option value="price-desc">Price high to low</option>
-              <option value="year-asc">Year old to new</option>
-              <option value="year-desc">Year new to old</option>
+              <option value="year-asc">Year low to high</option>
+              <option value="year-desc">Year high to low</option>
+            </select>
+          </label>
+          <label>
+            <span>Page size</span>
+            <select name="pageSize" defaultValue={filters.pageSize || "20"}>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
             </select>
           </label>
           <button className={styles.secondaryButton} type="submit">
@@ -115,7 +140,7 @@ export default async function CarsListPage({
             <p>Car List</p>
             <h2>Database inventory</h2>
           </div>
-          <span>{cars.length} shown</span>
+          <span>{cars.length} shown of {carsPage.total}</span>
         </div>
 
         {cars.length > 0 ? (
@@ -164,6 +189,14 @@ export default async function CarsListPage({
             <p>Adjust the filters or add a new car.</p>
           </div>
         )}
+        <AdminPagination
+          basePath="/admin/cars/list"
+          page={carsPage.page}
+          pageSize={carsPage.pageSize}
+          params={pageParams}
+          total={carsPage.total}
+          totalPages={carsPage.totalPages}
+        />
       </section>
     </section>
   );

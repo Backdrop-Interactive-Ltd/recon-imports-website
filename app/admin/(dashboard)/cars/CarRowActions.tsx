@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { deleteCarAction, setCarFeaturedAction, setCarPublishedAction, setCarSaleStatusAction } from "./actions";
 import styles from "../brands/page.module.css";
-import { formatEnumLabel, saleStatusOptions, type CarActionState } from "./validation";
+import { formatEnumLabel, saleStatusOptions, type CarActionState } from "./formOptions";
 import type { CarSaleStatus } from "../../../../lib/generated/prisma/enums";
 
 type CarRowActionsProps = {

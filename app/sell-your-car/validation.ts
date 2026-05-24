@@ -1,17 +1,5 @@
 import { z } from "zod";
-
-export type SellCarLeadActionState = {
-  errors?: Partial<
-    Record<"carName" | "form" | "images" | "mileage" | "model" | "name" | "offeredPrice" | "phone" | "registrationYear" | "terms", string>
-  >;
-  message: string;
-  status: "idle" | "error" | "success";
-};
-
-export const initialSellCarLeadActionState: SellCarLeadActionState = {
-  message: "",
-  status: "idle",
-};
+export type { SellCarLeadActionState } from "./formState";
 
 export const sellCarLeadFormSchema = z.object({
   carName: z.string().trim().min(1, "Car name is required.").max(100, "Car name is too long."),

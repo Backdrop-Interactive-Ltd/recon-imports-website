@@ -3,6 +3,7 @@ import {
   getCarCardImageUrl,
   getOptimizedCloudinaryImageUrl,
   getOptimizedCloudinaryImageUrls,
+  getSuggestedCarImageUrl,
 } from "../../lib/cloudinaryImages";
 import { getCarPublicPath } from "../../lib/carPublicRoutes";
 import {
@@ -160,6 +161,7 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
   const gallery = getOptimizedCloudinaryImageUrls(car.images.map((image) => image.imageUrl));
   const primaryGalleryImage = gallery[0] ?? fallbackImagesByBody[body] ?? "/cat-suv.webp";
   const cardImage = getCarCardImageUrl(primaryGalleryImage);
+  const suggestedImage = getSuggestedCarImageUrl(primaryGalleryImage);
   const features = car.features
     .filter((feature) => feature.type === CarFeatureType.FEATURE)
     .map((feature) => feature.title);
@@ -196,7 +198,7 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     regYear: String(car.year),
     saleStatus: saleStatusLabels[car.saleStatus],
     safetyFeatures,
-    suggestedImage: cardImage,
+    suggestedImage,
     transmission: transmissionLabels[car.transmission].toUpperCase(),
     type: stockTypeLabels[car.stockType],
     videoImage: car.videoImageUrl ? getOptimizedCloudinaryImageUrl(car.videoImageUrl) : cardImage,
@@ -229,6 +231,16 @@ function getUniqueCars(cars: CarInventoryItem[]) {
   });
 
   return Array.from(uniqueCars.values());
+}
+
+function filterFallbackInventory(filters: PublicStockFilters = {}) {
+  return inventory.filter((car) => {
+    const matchesBody = !filters.bodyFilter || car.body === filters.bodyFilter;
+    const matchesBrand = !filters.brandFilter || car.brand === filters.brandFilter;
+    const matchesType = !filters.typeFilter || car.type === filters.typeFilter;
+
+    return matchesBody && matchesBrand && matchesType;
+  });
 }
 
 async function getPublishedDatabaseCars(filters: PublicStockFilters = {}) {
@@ -280,9 +292,11 @@ export async function getPublicStockData(filters: PublicStockFilters = {}): Prom
     const databaseCars = await getPublishedDatabaseCars(filters);
 
     if (databaseCars.length === 0 && !(await hasPublishedDatabaseCars())) {
+      const fallbackCars = filterFallbackInventory(filters);
+
       return {
-        brands: [...fallbackBrandOptions],
-        cars: inventory,
+        brands: getBrandsFromCars(fallbackCars),
+        cars: fallbackCars,
       };
     }
 
@@ -296,7 +310,7 @@ export async function getPublicStockData(filters: PublicStockFilters = {}): Prom
     console.error("Failed to load public stock from database.", error);
     return {
       brands: [...fallbackBrandOptions],
-      cars: inventory,
+      cars: filterFallbackInventory(filters),
     };
   }
 }

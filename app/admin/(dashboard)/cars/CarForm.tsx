@@ -24,7 +24,7 @@ import {
   slugifyCar,
   stockTypeOptions,
   transmissionOptions,
-} from "./validation";
+} from "./formOptions";
 
 type BrandOption = {
   id: string;

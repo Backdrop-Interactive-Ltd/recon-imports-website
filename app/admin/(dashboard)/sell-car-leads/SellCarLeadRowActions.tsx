@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import type { LeadStatus } from "../../../../lib/generated/prisma/enums";
 import styles from "../brands/page.module.css";
 import { deleteSellCarLeadAction, updateSellCarLeadStatusAction } from "./actions";
-import { formatLeadStatus, sellCarLeadStatusOptions, type SellCarLeadActionState } from "./validation";
+import { formatLeadStatus, sellCarLeadStatusOptions, type SellCarLeadActionState } from "./formOptions";
 
 type SellCarLeadRowActionsProps = {
   leadId: string;

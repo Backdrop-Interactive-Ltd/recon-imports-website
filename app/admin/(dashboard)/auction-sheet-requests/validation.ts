@@ -1,14 +1,6 @@
 import { z } from "zod";
-import { AuctionSheetStatus, PaymentStatus } from "../../../../lib/generated/prisma/enums";
-
-export const auctionSheetStatusOptions = Object.values(AuctionSheetStatus);
-export const paymentStatusOptions = [PaymentStatus.PENDING, PaymentStatus.PAID, PaymentStatus.FAILED] as const;
-
-export type AuctionSheetAdminActionState = {
-  errors?: Partial<Record<"form" | "id" | "paymentStatus" | "reportUrl" | "status", string>>;
-  message: string;
-  status: "idle" | "error" | "success";
-};
+import { auctionSheetStatusOptions, paymentStatusOptions } from "./formOptions";
+export type { AuctionSheetAdminActionState } from "./formOptions";
 
 export const auctionSheetRequestIdSchema = z.string().trim().min(1, "Request id is required.");
 
@@ -41,11 +33,3 @@ export const reportUrlSchema = z
       message: "Use a full http/https URL or a site-relative path starting with /.",
     });
   });
-
-export function formatEnumLabel(value: string) {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}

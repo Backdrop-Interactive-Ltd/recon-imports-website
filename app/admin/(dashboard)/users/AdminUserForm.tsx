@@ -8,7 +8,7 @@ import {
   adminUserRoleOptions,
   formatAdminRole,
   initialAdminUserActionState,
-} from "./validation";
+} from "./formOptions";
 
 type EditableAdminUser = {
   email: string;

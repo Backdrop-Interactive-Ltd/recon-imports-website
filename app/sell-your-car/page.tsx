@@ -1,4 +1,5 @@
 import Footer from "../components/Footer";
+import PublicLogoImage from "../components/PublicLogoImage";
 import { getSiteSettings } from "../../lib/siteSettings";
 import SellYourCarForm from "./SellYourCarForm";
 
@@ -11,12 +12,12 @@ export default async function SellYourCarPage() {
     <main className="send-requirements-page">
       <header className="cars-header send-requirements-header">
         <a className="cars-logo" href="/">
-          <img
+          <PublicLogoImage
             src={siteSettings.websiteLogo || "/recon-logo.webp"}
             alt={siteSettings.siteName}
             width={178}
             height={55}
-            suppressHydrationWarning
+            sizes="178px"
           />
         </a>
         <nav aria-label="Sell your car navigation">

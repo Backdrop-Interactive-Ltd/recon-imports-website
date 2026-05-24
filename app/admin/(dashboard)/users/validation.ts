@@ -1,18 +1,6 @@
 import { z } from "zod";
-import { AdminRole } from "../../../../lib/generated/prisma/enums";
-
-export const adminUserRoleOptions = [AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.EDITOR] as const;
-
-export type AdminUserActionState = {
-  errors?: Partial<Record<"email" | "form" | "id" | "isActive" | "name" | "password" | "role", string>>;
-  message: string;
-  status: "idle" | "error" | "success";
-};
-
-export const initialAdminUserActionState: AdminUserActionState = {
-  message: "",
-  status: "idle",
-};
+import { adminUserRoleOptions } from "./formOptions";
+export type { AdminUserActionState } from "./formOptions";
 
 export const adminUserIdSchema = z.string().trim().min(1, "Admin user id is required.");
 
@@ -37,11 +25,3 @@ export const updateAdminUserSchema = baseAdminUserSchema.extend({
     .transform((value) => value?.trim() ?? "")
     .refine((value) => !value || value.length >= 8, "Password must be at least 8 characters."),
 });
-
-export function formatAdminRole(role: AdminRole) {
-  return role
-    .toLowerCase()
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}

@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import { getCarPublicPath } from "../../lib/carPublicRoutes";
 import { getPhoneHref, getSiteSettings, getWhatsAppHref } from "../../lib/siteSettings";
 import { getPublicCarDetail } from "../car-stocks/data";
-import { formatPrice } from "../car-stocks/inventory";
+import { formatPrice } from "../../lib/formatPrice";
 import ShareButton from "../car-stocks/[slug]/ShareButton";
 import SuggestedCarousel from "../car-stocks/[slug]/SuggestedCarousel";
 import Footer from "./Footer";
 import ProductGallery from "./ProductGallery";
 import ProductVideo from "./ProductVideo";
+import PublicLogoImage from "./PublicLogoImage";
 
 type ProductSection = {
   href: "/brand-new" | "/reconditioned" | "/pre-owned" | "/pre-order";
@@ -56,12 +57,14 @@ export default async function PublicCarDetailPage({ params, section }: PublicCar
     <main className="product-page">
       <header className="cars-header product-header">
         <a className="cars-logo" href="/">
-          <img
+          <PublicLogoImage
             src={siteSettings.websiteLogo || "/recon-logo.webp"}
             alt={siteSettings.siteName}
             width={178}
             height={55}
-            suppressHydrationWarning
+            loading="eager"
+            priority
+            sizes="178px"
           />
         </a>
         <nav aria-label="Product page navigation">

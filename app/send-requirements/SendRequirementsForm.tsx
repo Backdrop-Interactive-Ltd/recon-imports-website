@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitRequirementLeadAction } from "./actions";
-import { initialRequirementLeadActionState } from "./validation";
+import { initialRequirementLeadActionState } from "./formState";
 
 export default function SendRequirementsForm() {
   const [state, formAction, isPending] = useActionState(submitRequirementLeadAction, initialRequirementLeadActionState);

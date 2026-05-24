@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
+import { createPaginatedResult, getPaginationState, type PaginatedResult } from "../_components/listParams";
 import { prisma } from "../../../../lib/prisma";
 import { type Prisma } from "../../../../lib/generated/prisma/client";
 import { CarSaleStatus, StockType } from "../../../../lib/generated/prisma/enums";
-import { formatEnumLabel } from "./validation";
+import { formatEnumLabel } from "./formOptions";
 
 export const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "2-digit",
@@ -14,7 +15,7 @@ export function formatCarPrice(price: number) {
   return `BDT ${new Intl.NumberFormat("en-IN").format(price)}`;
 }
 
-const carInclude = {
+const carDetailInclude = {
   brand: {
     select: {
       id: true,
@@ -42,19 +43,45 @@ const carInclude = {
 } satisfies Prisma.CarInclude;
 
 type CarWithRelations = Prisma.CarGetPayload<{
-  include: typeof carInclude;
+  include: typeof carDetailInclude;
 }>;
 
 export type AdminCar = ReturnType<typeof mapAdminCar>;
+export type AdminCarListItem = ReturnType<typeof mapAdminCarListItem>;
 
 export type AdminCarListFilters = {
   brandId?: string;
   featured?: string;
+  page?: string;
+  pageSize?: string;
   published?: string;
+  q?: string;
   saleStatus?: string;
   sort?: string;
   stockType?: string;
 };
+
+const carListInclude = {
+  brand: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+    },
+  },
+  images: {
+    orderBy: [{ isPrimary: "desc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+    select: {
+      imageUrl: true,
+      isPrimary: true,
+    },
+    take: 1,
+  },
+} satisfies Prisma.CarInclude;
+
+type CarListRecord = Prisma.CarGetPayload<{
+  include: typeof carListInclude;
+}>;
 
 function mapAdminCar(car: CarWithRelations) {
   return {
@@ -70,11 +97,36 @@ function mapAdminCar(car: CarWithRelations) {
   };
 }
 
+function mapAdminCarListItem(car: CarListRecord) {
+  return {
+    ...car,
+    bodyTypeLabel: formatEnumLabel(car.bodyType),
+    conditionLabel: formatEnumLabel(car.condition),
+    fuelTypeLabel: formatEnumLabel(car.fuelType),
+    primaryImage: car.images[0]?.imageUrl ?? "",
+    saleStatusLabel: formatEnumLabel(car.saleStatus),
+    stockTypeLabel: formatEnumLabel(car.stockType),
+    transmissionLabel: formatEnumLabel(car.transmission),
+    updatedAtLabel: dateFormatter.format(car.updatedAt),
+  };
+}
+
 function getCarWhere(filters: AdminCarListFilters = {}) {
   const where: Prisma.CarWhereInput = {};
+  const query = filters.q?.trim();
 
   if (filters.brandId) {
     where.brandId = filters.brandId;
+  }
+
+  if (query) {
+    where.OR = [
+      { title: { contains: query } },
+      { slug: { contains: query } },
+      { chassisNumber: { contains: query } },
+      { model: { contains: query } },
+      { brand: { name: { contains: query } } },
+    ];
   }
 
   if (filters.saleStatus && Object.values(CarSaleStatus).includes(filters.saleStatus as CarSaleStatus)) {
@@ -97,10 +149,15 @@ function getCarWhere(filters: AdminCarListFilters = {}) {
     where.isFeatured = true;
   }
 
+  if (filters.featured === "false") {
+    where.isFeatured = false;
+  }
+
   return where;
 }
 
 function getCarOrderBy(sort?: string): Prisma.CarOrderByWithRelationInput[] {
+  if (sort === "oldest") return [{ createdAt: "asc" }];
   if (sort === "price-asc") return [{ price: "asc" }, { updatedAt: "desc" }];
   if (sort === "price-desc") return [{ price: "desc" }, { updatedAt: "desc" }];
   if (sort === "year-asc") return [{ year: "asc" }, { updatedAt: "desc" }];
@@ -119,9 +176,26 @@ export async function getCarBrands() {
   });
 }
 
-export async function getAdminCars(filters: AdminCarListFilters = {}) {
+export async function getAdminCars(filters: AdminCarListFilters = {}): Promise<PaginatedResult<AdminCarListItem>> {
+  const pagination = getPaginationState(filters);
+  const where = getCarWhere(filters);
+  const [total, cars] = await Promise.all([
+    prisma.car.count({ where }),
+    prisma.car.findMany({
+      include: carListInclude,
+      orderBy: getCarOrderBy(filters.sort),
+      skip: pagination.skip,
+      take: pagination.take,
+      where,
+    }),
+  ]);
+
+  return createPaginatedResult(cars.map(mapAdminCarListItem), total, pagination);
+}
+
+export async function getAllAdminCars(filters: AdminCarListFilters = {}) {
   const cars = await prisma.car.findMany({
-    include: carInclude,
+    include: carDetailInclude,
     orderBy: getCarOrderBy(filters.sort),
     where: getCarWhere(filters),
   });
@@ -131,7 +205,7 @@ export async function getAdminCars(filters: AdminCarListFilters = {}) {
 
 export async function getAdminCarById(id: string) {
   const car = await prisma.car.findUnique({
-    include: carInclude,
+    include: carDetailInclude,
     where: { id },
   });
 

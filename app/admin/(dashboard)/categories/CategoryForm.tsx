@@ -5,7 +5,7 @@ import type { VehicleCategoryType } from "../../../../lib/generated/prisma/enums
 import AdminImageUpload from "../_components/AdminImageUpload";
 import { createCategoryAction, updateCategoryAction } from "./actions";
 import styles from "../brands/page.module.css";
-import { categoryTypeOptions, initialCategoryActionState, slugifyCategory } from "./validation";
+import { categoryTypeOptions, initialCategoryActionState, slugifyCategory } from "./formOptions";
 
 type EditableCategory = {
   description: string | null;

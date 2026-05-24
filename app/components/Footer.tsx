@@ -2,8 +2,9 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { subscribeNewsletterAction } from "../newsletter/actions";
-import { initialNewsletterActionState } from "../newsletter/validation";
+import { initialNewsletterActionState } from "../newsletter/formState";
 import { fallbackSiteSettings, type PublicSiteSettings } from "../../lib/siteSettingsConfig";
+import PublicLogoImage from "./PublicLogoImage";
 
 type FooterProps = {
   className?: string;
@@ -69,14 +70,14 @@ export default function Footer({ className = "", settings = fallbackSiteSettings
         </div>
         <div className="footer-newsletter">
           {settings.footerLogo ? (
-            <img
+            <PublicLogoImage
               className="footer-logo"
               src={settings.footerLogo}
               alt={`${settings.siteName} footer logo`}
               width={260}
               height={80}
               loading="lazy"
-              suppressHydrationWarning
+              sizes="180px"
             />
           ) : null}
           <h3>Stay updated with Recon Imports</h3>

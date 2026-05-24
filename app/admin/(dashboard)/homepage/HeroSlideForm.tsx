@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import AdminImageUpload from "../_components/AdminImageUpload";
 import styles from "../brands/page.module.css";
 import { createHeroSlideAction, updateHeroSlideAction } from "./actions";
-import { initialHeroSlideActionState } from "./validation";
+import { initialHeroSlideActionState } from "./formState";
 
 type EditableHeroSlide = {
   ctaLink: string | null;

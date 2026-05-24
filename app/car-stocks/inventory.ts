@@ -1,4 +1,5 @@
 import { getCarPublicPath } from "../../lib/carPublicRoutes";
+import { formatPrice } from "../../lib/formatPrice";
 
 type BaseCar = {
   id: string;
@@ -442,9 +443,7 @@ export const suggestedCarIds = [
   "lexus-rx500h",
 ];
 
-export function formatPrice(price: number) {
-  return `BDT ${new Intl.NumberFormat("en-IN").format(price)}`;
-}
+export { formatPrice };
 
 export function getCarBySlug(slug: string) {
   return inventory.find((car) => car.id === slug);

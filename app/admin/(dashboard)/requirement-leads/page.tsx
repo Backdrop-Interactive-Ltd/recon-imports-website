@@ -1,8 +1,12 @@
+import Link from "next/link";
+import AdminPagination from "../_components/AdminPagination";
+import { createPaginatedResult, getPaginationState, getStringParam } from "../_components/listParams";
 import { LeadStatus } from "../../../../lib/generated/prisma/enums";
 import { prisma } from "../../../../lib/prisma";
+import type { Prisma } from "../../../../lib/generated/prisma/client";
 import styles from "../brands/page.module.css";
 import RequirementLeadRowActions from "./RequirementLeadRowActions";
-import { formatLeadStatus } from "./validation";
+import { formatLeadStatus, requirementLeadStatusOptions } from "./formOptions";
 
 export const metadata = {
   title: "Requirement Leads | Recon Imports Admin",
@@ -18,38 +22,104 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-async function getRequirementLeads() {
-  const leads = await prisma.requirementLead.findMany({
-    orderBy: { createdAt: "desc" },
-    select: {
-      carName: true,
-      createdAt: true,
-      details: true,
-      id: true,
-      imageUrls: true,
-      mileage: true,
-      model: true,
-      modelYear: true,
-      name: true,
-      phone: true,
-      status: true,
-      updatedAt: true,
-    },
-  });
+type RequirementLeadFilters = {
+  page?: string;
+  pageSize?: string;
+  q?: string;
+  sort?: string;
+  status?: string;
+};
 
-  return leads.map((lead) => ({
-    ...lead,
-    createdAtLabel: dateFormatter.format(lead.createdAt),
-    statusLabel: formatLeadStatus(lead.status),
-    updatedAtLabel: dateFormatter.format(lead.updatedAt),
-  }));
+function getRequirementLeadWhere(filters: RequirementLeadFilters) {
+  const where: Prisma.RequirementLeadWhereInput = {};
+  const query = filters.q?.trim();
+
+  if (filters.status && Object.values(LeadStatus).includes(filters.status as LeadStatus)) {
+    where.status = filters.status as LeadStatus;
+  }
+
+  if (query) {
+    where.OR = [
+      { name: { contains: query } },
+      { phone: { contains: query } },
+      { carName: { contains: query } },
+      { details: { contains: query } },
+    ];
+  }
+
+  return where;
 }
 
-export default async function AdminRequirementLeadsPage() {
-  const leads = await getRequirementLeads();
-  const newLeads = leads.filter((lead) => lead.status === LeadStatus.NEW).length;
-  const reviewedLeads = leads.filter((lead) => lead.status === LeadStatus.REVIEWED).length;
-  const closedLeads = leads.filter((lead) => lead.status === LeadStatus.CLOSED).length;
+async function getRequirementLeads(filters: RequirementLeadFilters) {
+  const pagination = getPaginationState(filters);
+  const where = getRequirementLeadWhere(filters);
+  const [total, leads] = await Promise.all([
+    prisma.requirementLead.count({ where }),
+    prisma.requirementLead.findMany({
+      orderBy: { createdAt: filters.sort === "oldest" ? "asc" : "desc" },
+      skip: pagination.skip,
+      take: pagination.take,
+      where,
+      select: {
+        carName: true,
+        createdAt: true,
+        details: true,
+        id: true,
+        imageUrls: true,
+        mileage: true,
+        model: true,
+        modelYear: true,
+        name: true,
+        phone: true,
+        status: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  return createPaginatedResult(
+    leads.map((lead) => ({
+      ...lead,
+      createdAtLabel: dateFormatter.format(lead.createdAt),
+      statusLabel: formatLeadStatus(lead.status),
+      updatedAtLabel: dateFormatter.format(lead.updatedAt),
+    })),
+    total,
+    pagination,
+  );
+}
+
+async function getRequirementLeadStats() {
+  const [total, newLeads, reviewedLeads, closedLeads] = await Promise.all([
+    prisma.requirementLead.count(),
+    prisma.requirementLead.count({ where: { status: LeadStatus.NEW } }),
+    prisma.requirementLead.count({ where: { status: LeadStatus.REVIEWED } }),
+    prisma.requirementLead.count({ where: { status: LeadStatus.CLOSED } }),
+  ]);
+
+  return { closedLeads, newLeads, reviewedLeads, total };
+}
+
+export default async function AdminRequirementLeadsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = (await searchParams) ?? {};
+  const filters: RequirementLeadFilters = {
+    page: getStringParam(params.page),
+    pageSize: getStringParam(params.pageSize),
+    q: getStringParam(params.q),
+    sort: getStringParam(params.sort),
+    status: getStringParam(params.status),
+  };
+  const [leadsPage, stats] = await Promise.all([getRequirementLeads(filters), getRequirementLeadStats()]);
+  const leads = leadsPage.items;
+  const pageParams = {
+    q: filters.q,
+    sort: filters.sort,
+    status: filters.status,
+  };
 
   return (
     <section className={styles.brandsPage}>
@@ -64,29 +134,68 @@ export default async function AdminRequirementLeadsPage() {
       <div className={styles.summaryGrid}>
         <div>
           <span>Total Leads</span>
-          <strong>{leads.length}</strong>
+          <strong>{stats.total}</strong>
         </div>
         <div>
           <span>New</span>
-          <strong>{newLeads}</strong>
+          <strong>{stats.newLeads}</strong>
         </div>
         <div>
           <span>Reviewed</span>
-          <strong>{reviewedLeads}</strong>
+          <strong>{stats.reviewedLeads}</strong>
         </div>
         <div>
           <span>Closed</span>
-          <strong>{closedLeads}</strong>
+          <strong>{stats.closedLeads}</strong>
         </div>
       </div>
 
       <section className={styles.listPanel}>
+        <form className={styles.filterBar} method="get">
+          <label>
+            <span>Search</span>
+            <input name="q" defaultValue={filters.q ?? ""} placeholder="Name, phone, car, details" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select name="status" defaultValue={filters.status ?? ""}>
+              <option value="">All</option>
+              {requirementLeadStatusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {formatLeadStatus(option)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Sort</span>
+            <select name="sort" defaultValue={filters.sort ?? ""}>
+              <option value="">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+          </label>
+          <label>
+            <span>Page size</span>
+            <select name="pageSize" defaultValue={filters.pageSize || "20"}>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+          <button className={styles.secondaryButton} type="submit">
+            Apply
+          </button>
+          <Link className={styles.secondaryLinkButton} href="/admin/requirement-leads">
+            Reset
+          </Link>
+        </form>
+
         <div className={styles.listHeader}>
           <div>
             <p>Lead Inbox</p>
             <h2>Database requirement leads</h2>
           </div>
-          <span>{leads.length} total</span>
+          <span>{leads.length} shown of {leadsPage.total}</span>
         </div>
 
         {leads.length > 0 ? (
@@ -179,10 +288,18 @@ export default async function AdminRequirementLeadsPage() {
           </div>
         ) : (
           <div className={styles.emptyState}>
-            <strong>No requirement leads yet</strong>
-            <p>Submitted Send Requirements forms will appear here.</p>
+            <strong>No requirement leads found</strong>
+            <p>Adjust the filters or wait for new Send Requirements submissions.</p>
           </div>
         )}
+        <AdminPagination
+          basePath="/admin/requirement-leads"
+          page={leadsPage.page}
+          pageSize={leadsPage.pageSize}
+          params={pageParams}
+          total={leadsPage.total}
+          totalPages={leadsPage.totalPages}
+        />
       </section>
     </section>
   );

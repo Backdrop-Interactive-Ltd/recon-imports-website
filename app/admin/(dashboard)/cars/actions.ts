@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
-import { carFormSchema, carIdSchema, saleStatusOptions, type CarActionState } from "./validation";
+import { saleStatusOptions, type CarActionState } from "./formOptions";
+import { carFormSchema, carIdSchema } from "./validation";
 
 function fieldErrorState(error: ReturnType<typeof carFormSchema.safeParse>): CarActionState {
   if (error.success) {

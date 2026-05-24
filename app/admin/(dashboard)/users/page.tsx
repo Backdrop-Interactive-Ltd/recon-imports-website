@@ -5,7 +5,7 @@ import { prisma } from "../../../../lib/prisma";
 import styles from "../brands/page.module.css";
 import AdminUserForm from "./AdminUserForm";
 import AdminUserRowActions from "./AdminUserRowActions";
-import { formatAdminRole } from "./validation";
+import { formatAdminRole } from "./formOptions";
 
 export const metadata = {
   title: "Admin Users | Recon Imports Admin",

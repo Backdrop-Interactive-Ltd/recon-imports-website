@@ -4,7 +4,7 @@ import { Check, Info, Search } from "lucide-react";
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { submitAuctionSheetRequestAction } from "./actions";
 import { auctionSheetReportFee } from "./constants";
-import { initialAuctionSheetRequestActionState, paymentMethodOptions } from "./validation";
+import { initialAuctionSheetRequestActionState, paymentMethodOptions } from "./formOptions";
 import type { PublicSiteSettings } from "../../lib/siteSettingsConfig";
 
 function formatCurrency(amount: number) {

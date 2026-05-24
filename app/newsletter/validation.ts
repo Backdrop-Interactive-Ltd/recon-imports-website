@@ -1,15 +1,5 @@
 import { z } from "zod";
-
-export type NewsletterActionState = {
-  errors?: Partial<Record<"email" | "form", string>>;
-  message: string;
-  status: "idle" | "error" | "success";
-};
-
-export const initialNewsletterActionState: NewsletterActionState = {
-  message: "",
-  status: "idle",
-};
+export type { NewsletterActionState } from "./formState";
 
 export const newsletterSubscribeSchema = z.object({
   email: z

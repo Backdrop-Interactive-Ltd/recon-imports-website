@@ -14,7 +14,7 @@ import {
   formatEnumLabel,
   paymentStatusOptions,
   type AuctionSheetAdminActionState,
-} from "./validation";
+} from "./formOptions";
 
 type AuctionSheetRequestRowActionsProps = {
   paymentStatus: PaymentStatus;
