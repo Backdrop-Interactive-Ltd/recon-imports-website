@@ -6,6 +6,7 @@ type BaseCar = {
   name: string;
   year: string;
   fuel: string;
+  grade?: string | null;
   type: "Brand New" | "Pre Owned" | "Pre Order" | "Reconditioned";
   mileage: string;
   price: number;

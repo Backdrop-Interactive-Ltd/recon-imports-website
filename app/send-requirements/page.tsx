@@ -1,20 +1,32 @@
 import Footer from "../components/Footer";
+import JsonLd from "../components/JsonLd";
 import PublicLogoImage from "../components/PublicLogoImage";
 import { getSiteSettings } from "../../lib/siteSettings";
+import { createBreadcrumbJsonLd, createPublicMetadata } from "../../lib/seo";
 import SendRequirementsForm from "./SendRequirementsForm";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = createPublicMetadata({
+  description:
+    "Tell Recon Imports your preferred car model, budget, features, and requirements. We help you find the right Japanese car in Bangladesh.",
+  path: "/send-requirements",
+  title: "Send Your Car Requirements | Recon Imports Bangladesh",
+});
 
 export default async function SendRequirementsPage() {
   const siteSettings = await getSiteSettings();
 
   return (
     <main className="send-requirements-page">
+      <JsonLd
+        data={createBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Send Requirements", path: "/send-requirements" }])}
+      />
       <header className="cars-header send-requirements-header">
         <a className="cars-logo" href="/">
           <PublicLogoImage
             src={siteSettings.websiteLogo || "/recon-logo.webp"}
-            alt={siteSettings.siteName}
+            alt={`${siteSettings.siteName || "Recon Imports"} logo`}
             width={178}
             height={55}
             sizes="178px"

@@ -73,7 +73,7 @@ export default function Footer({ className = "", settings = fallbackSiteSettings
             <PublicLogoImage
               className="footer-logo"
               src={settings.footerLogo}
-              alt={`${settings.siteName} footer logo`}
+              alt={`${settings.siteName || "Recon Imports"} footer logo`}
               width={260}
               height={80}
               loading="lazy"

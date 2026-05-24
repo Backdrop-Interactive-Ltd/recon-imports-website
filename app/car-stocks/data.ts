@@ -19,6 +19,7 @@ import { brandOptions as fallbackBrandOptions, getBrandBySlug } from "./brands";
 import { getCarBySlug, getSuggestedCars, inventory, type CarInventoryItem } from "./inventory";
 
 export type PublicBrandOption = {
+  logoUrl?: string | null;
   name: string;
   slug: string;
 };
@@ -186,6 +187,7 @@ function mapDatabaseCar(car: PublicCarRecord): CarInventoryItem {
     features,
     fuel,
     gallery: gallery.length > 0 ? gallery : [primaryGalleryImage],
+    grade: car.grade || null,
     hero: primaryGalleryImage,
     id: car.slug,
     image: cardImage,
@@ -395,15 +397,21 @@ export async function getPublicCarDetail(slug: string): Promise<PublicCarDetail 
 
 export async function getPublicBrandBySlug(slug: string): Promise<PublicBrandOption | null> {
   try {
-    const databaseBrand = await prisma.brand.findUnique({
+    const databaseBrand = await prisma.brand.findFirst({
       select: {
+        logoUrl: true,
         name: true,
         slug: true,
       },
-      where: { slug },
+      where: { isActive: true, slug },
     });
 
-    if (databaseBrand) return databaseBrand;
+    if (databaseBrand) {
+      return {
+        ...databaseBrand,
+        logoUrl: getOptimizedCloudinaryImageUrl(databaseBrand.logoUrl),
+      };
+    }
   } catch (error) {
     console.error("Failed to load public brand from database.", error);
   }

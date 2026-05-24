@@ -88,7 +88,7 @@ export default function HomeHeader({ phoneHref, searchItems, siteSettings }: Hom
         <button className="brand" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
           <PublicLogoImage
             src={siteSettings.websiteLogo || "/recon-logo.webp"}
-            alt={siteSettings.siteName}
+            alt={`${siteSettings.siteName || "Recon Imports"} logo`}
             width={178}
             height={55}
             loading="eager"

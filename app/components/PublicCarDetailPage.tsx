@@ -2,11 +2,13 @@ import { Download, MessageCircle, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getCarPublicPath } from "../../lib/carPublicRoutes";
 import { getPhoneHref, getSiteSettings, getWhatsAppHref } from "../../lib/siteSettings";
+import { createBreadcrumbJsonLd, createVehicleProductJsonLd } from "../../lib/seo";
 import { getPublicCarDetail } from "../car-stocks/data";
 import { formatPrice } from "../../lib/formatPrice";
 import ShareButton from "../car-stocks/[slug]/ShareButton";
 import SuggestedCarousel from "../car-stocks/[slug]/SuggestedCarousel";
 import Footer from "./Footer";
+import JsonLd from "./JsonLd";
 import ProductGallery from "./ProductGallery";
 import ProductVideo from "./ProductVideo";
 import PublicLogoImage from "./PublicLogoImage";
@@ -55,11 +57,38 @@ export default async function PublicCarDetailPage({ params, section }: PublicCar
 
   return (
     <main className="product-page">
+      <JsonLd
+        data={[
+          createBreadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: section.label, path: section.href },
+            { name: product.name, path: productPath },
+          ]),
+          createVehicleProductJsonLd({
+            brand: product.brand,
+            bodyType: product.detailBody,
+            condition: product.type,
+            description: product.description,
+            fuelType: product.detailFuel,
+            gallery: [product.hero, ...product.gallery],
+            grade: product.grade,
+            mileage: product.mileage,
+            model: product.model,
+            name: product.name,
+            path: productPath,
+            price: product.price,
+            saleStatus: product.saleStatus,
+            stockType: product.type,
+            transmission: product.transmission,
+            year: product.year,
+          }),
+        ]}
+      />
       <header className="cars-header product-header">
         <a className="cars-logo" href="/">
           <PublicLogoImage
             src={siteSettings.websiteLogo || "/recon-logo.webp"}
-            alt={siteSettings.siteName}
+            alt={`${siteSettings.siteName || "Recon Imports"} logo`}
             width={178}
             height={55}
             loading="eager"

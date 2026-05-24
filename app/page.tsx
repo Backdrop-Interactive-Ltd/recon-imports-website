@@ -3,8 +3,10 @@ import { getBrandLogoImageUrl, getCarCardImageUrl, getHeroImageUrl } from "../li
 import { getCarPublicPath } from "../lib/carPublicRoutes";
 import { prisma } from "../lib/prisma";
 import { getSiteSettings } from "../lib/siteSettings";
+import { createHomepageJsonLd, createHomepageMetadata } from "../lib/seo";
 import { getHomepageDealCars } from "./car-stocks/data";
 import { inventory } from "./car-stocks/inventory";
+import JsonLd from "./components/JsonLd";
 import HomeClient, {
   type HomepageBrand,
   type HomepageCategory,
@@ -13,6 +15,12 @@ import HomeClient, {
 } from "./HomeClient";
 
 export const revalidate = 60;
+
+export async function generateMetadata() {
+  const settings = await getSiteSettings();
+
+  return createHomepageMetadata(settings);
+}
 
 const categoryRouteBySlug: Record<string, string> = {
   crossover: "/crossover",
@@ -328,13 +336,16 @@ export default async function Home() {
   ]);
 
   return (
-    <HomeClient
-      brands={brands}
-      categories={categories}
-      deals={deals}
-      heroSlides={heroSlides}
-      searchItems={searchItems ?? getFallbackSearchItems()}
-      siteSettings={siteSettings}
-    />
+    <>
+      <JsonLd data={createHomepageJsonLd(siteSettings)} />
+      <HomeClient
+        brands={brands}
+        categories={categories}
+        deals={deals}
+        heroSlides={heroSlides}
+        searchItems={searchItems ?? getFallbackSearchItems()}
+        siteSettings={siteSettings}
+      />
+    </>
   );
 }

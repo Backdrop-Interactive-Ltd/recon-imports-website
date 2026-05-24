@@ -1,5 +1,7 @@
 import { Download } from "lucide-react";
+import { createBreadcrumbJsonLd } from "../../lib/seo";
 import Footer from "../components/Footer";
+import JsonLd from "../components/JsonLd";
 import PublicLogoImage from "../components/PublicLogoImage";
 import { fallbackSiteSettings, type PublicSiteSettings } from "../../lib/siteSettingsConfig";
 import type { PublicBrandOption } from "./data";
@@ -11,6 +13,7 @@ export type StockListingPageProps = {
   availableBrands?: PublicBrandOption[];
   bodyFilter?: "Sedan" | "Hatchback" | "SUV" | "Crossover" | "MPV" | "Passenger Van";
   brandFilter?: string;
+  canonicalPath?: string;
   inventoryItems?: CarInventoryItem[];
   introCopy?: string;
   siteSettings?: PublicSiteSettings;
@@ -21,18 +24,32 @@ export type StockListingPageProps = {
 export default function StockListingPage({
   activePage,
   availableBrands = [],
+  canonicalPath,
   inventoryItems = [],
   introCopy = "Glance through selected vehicles and choose according to your budget and quality preferences.",
   siteSettings = fallbackSiteSettings,
   title = "Choose per your preference",
 }: StockListingPageProps) {
+  const pagePath =
+    canonicalPath ??
+    (activePage === "brand-new"
+      ? "/brand-new"
+      : activePage === "reconditioned"
+        ? "/reconditioned"
+        : activePage === "pre-owned"
+          ? "/pre-owned"
+          : activePage === "pre-order"
+            ? "/pre-order"
+            : "/send-requirements");
+
   return (
     <main className="cars-page">
+      <JsonLd data={createBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: title, path: pagePath }])} />
       <header className="cars-header">
         <a className="cars-logo" href="/">
           <PublicLogoImage
             src={siteSettings.websiteLogo || "/recon-logo.webp"}
-            alt={siteSettings.siteName}
+            alt={`${siteSettings.siteName || "Recon Imports"} logo`}
             width={178}
             height={55}
             loading="eager"

@@ -52,7 +52,7 @@ export const fallbackSiteSettings: PublicSiteSettings = {
   bankTransferAccount: "",
   bkashPaymentNumber: "",
   defaultMetaDescription:
-    "Recon Imports offers Japanese reconditioned cars, car stocks, auction sheet verification, and vehicle import support in Bangladesh.",
+    "Recon Imports offers premium Japanese reconditioned cars, verified auction sheet support, car stock listings, and reliable vehicle import services in Bangladesh.",
   defaultMetaTitle: "Recon Imports | Premium Japanese Reconditioned Cars in Bangladesh",
   email: "",
   facebookUrl: "https://www.facebook.com/",
