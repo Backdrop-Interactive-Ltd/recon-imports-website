@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import Link from "next/link";
 import AdminPagination from "../_components/AdminPagination";
 import { createPaginatedResult, getPaginationState, getStringParam } from "../_components/listParams";
@@ -136,6 +137,7 @@ export default async function AdminMediaPage({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requireAdminPagePermission("media.manage");
   const params = (await searchParams) ?? {};
   const filters: MediaFilters = {
     fileType: getStringParam(params.fileType),

@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import Link from "next/link";
 import AdminPagination from "../_components/AdminPagination";
 import { createPaginatedResult, getPaginationState, getStringParam } from "../_components/listParams";
@@ -100,6 +101,7 @@ export default async function AdminNewsletterPage({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requireAdminPagePermission("newsletter.manage");
   const params = (await searchParams) ?? {};
   const filters: NewsletterFilters = {
     isActive: getStringParam(params.isActive),

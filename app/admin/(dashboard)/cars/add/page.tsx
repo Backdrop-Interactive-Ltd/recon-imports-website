@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../../lib/adminAuthorization";
 import CarForm from "../CarForm";
 import CarsSubnav from "../CarsSubnav";
 import { getCarBrands } from "../queries";
@@ -10,6 +11,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AddCarPage() {
+  await requireAdminPagePermission("inventory.manage");
   const brands = await getCarBrands();
 
   return (

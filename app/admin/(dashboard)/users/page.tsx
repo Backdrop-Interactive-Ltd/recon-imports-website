@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { auth } from "../../../../lib/auth";
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import { AdminRole } from "../../../../lib/generated/prisma/enums";
 import { prisma } from "../../../../lib/prisma";
 import styles from "../brands/page.module.css";
@@ -31,19 +30,7 @@ function getInitials(name: string) {
 }
 
 async function getCurrentAdminId() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/admin/login");
-  }
-
-  const currentAdminId = (session.user as { id?: string }).id;
-
-  if (!currentAdminId) {
-    redirect("/admin/login");
-  }
-
-  return currentAdminId;
+  return (await requireAdminPagePermission("adminUsers.manage")).id;
 }
 
 async function getAdminUsers() {
@@ -69,6 +56,7 @@ async function getAdminUsers() {
 }
 
 export default async function AdminUsersPage() {
+  await requireAdminPagePermission("adminUsers.manage");
   const [currentAdminId, users] = await Promise.all([getCurrentAdminId(), getAdminUsers()]);
   const activeUsers = users.filter((user) => user.isActive).length;
   const inactiveUsers = users.length - activeUsers;

@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import type { VehicleCategoryType } from "../../../../lib/generated/prisma/enums";
 import { prisma } from "../../../../lib/prisma";
 import CategoryForm from "./CategoryForm";
@@ -61,6 +62,7 @@ async function getCategories() {
 }
 
 export default async function AdminCategoriesPage() {
+  await requireAdminPagePermission("categories.manage");
   const categories = await getCategories();
   const activeCategories = categories.filter((category) => category.isActive).length;
   const inactiveCategories = categories.length - activeCategories;

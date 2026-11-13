@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import { prisma } from "../../../../lib/prisma";
 import BrandForm from "./BrandForm";
 import BrandRowActions from "./BrandRowActions";
@@ -50,6 +51,7 @@ async function getBrands() {
 }
 
 export default async function AdminBrandsPage() {
+  await requireAdminPagePermission("brands.manage");
   const brands = await getBrands();
   const activeBrands = brands.filter((brand) => brand.isActive).length;
   const inactiveBrands = brands.length - activeBrands;

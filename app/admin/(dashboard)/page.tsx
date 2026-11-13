@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../lib/adminAuthorization";
 import {
   Activity,
   Car,
@@ -229,6 +230,7 @@ const quickActions = [
 ];
 
 export default async function AdminDashboardPage() {
+  await requireAdminPagePermission("dashboard.access");
   const [stats, activitySections] = await Promise.all([getDashboardStats(), getRecentActivity()]);
 
   return (

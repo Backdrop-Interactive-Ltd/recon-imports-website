@@ -102,3 +102,33 @@ export type AuctionSheetRequest = Prisma.AuctionSheetRequestModel
  * 
  */
 export type NewsletterSubscriber = Prisma.NewsletterSubscriberModel
+/**
+ * Model Department
+ * 
+ */
+export type Department = Prisma.DepartmentModel
+/**
+ * Model Employee
+ * 
+ */
+export type Employee = Prisma.EmployeeModel
+/**
+ * Model EmployeePublicProfile
+ * 
+ */
+export type EmployeePublicProfile = Prisma.EmployeePublicProfileModel
+/**
+ * Model EmployeeVerificationIdentity
+ * 
+ */
+export type EmployeeVerificationIdentity = Prisma.EmployeeVerificationIdentityModel
+/**
+ * Model EmployeePublicationApproval
+ * 
+ */
+export type EmployeePublicationApproval = Prisma.EmployeePublicationApprovalModel
+/**
+ * Model EmployeeAuditEvent
+ * 
+ */
+export type EmployeeAuditEvent = Prisma.EmployeeAuditEventModel

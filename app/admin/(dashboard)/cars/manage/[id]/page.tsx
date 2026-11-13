@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../../../lib/adminAuthorization";
 import CarForm from "../../CarForm";
 import CarsSubnav from "../../CarsSubnav";
 import { getAdminCarById, getCarBrands } from "../../queries";
@@ -10,6 +11,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function EditCarPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdminPagePermission("inventory.manage");
   const { id } = await params;
   const [brands, car] = await Promise.all([getCarBrands(), getAdminCarById(id)]);
 

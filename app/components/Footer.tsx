@@ -52,7 +52,7 @@ export default function Footer({ className = "", settings = fallbackSiteSettings
         </div>
         <div className="footer-column">
           <h3>Support</h3>
-          <button type="button">About Us</button>
+          <a href="/about-us">About Us</a>
           <button type="button">Privacy Policy</button>
           <button type="button">FAQ's & support</button>
           <button type="button">Import Regulations</button>

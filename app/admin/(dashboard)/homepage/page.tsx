@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import { prisma } from "../../../../lib/prisma";
 import styles from "../brands/page.module.css";
 import HeroSlideForm from "./HeroSlideForm";
@@ -42,6 +43,7 @@ async function getHeroSlides() {
 }
 
 export default async function AdminHomepagePage() {
+  await requireAdminPagePermission("homepage.manage");
   const slides = await getHeroSlides();
   const activeSlides = slides.filter((slide) => slide.isActive).length;
   const inactiveSlides = slides.length - activeSlides;

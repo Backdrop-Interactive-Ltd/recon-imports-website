@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
 import Link from "next/link";
 import { Car, ClipboardList, ListChecks } from "lucide-react";
 import CarsSubnav from "./CarsSubnav";
@@ -32,6 +33,7 @@ const actionCards = [
 ];
 
 export default async function AdminCarsOverviewPage() {
+  await requireAdminPagePermission("inventory.manage");
   const stats = await getAdminCarStats();
 
   return (

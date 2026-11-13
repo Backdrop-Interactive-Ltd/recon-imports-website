@@ -1,6 +1,6 @@
-import { AdminRole } from "../../../../lib/generated/prisma/enums";
+import { adminRoles, type AdminRole } from "../../../../lib/adminPermissions";
 
-export const adminUserRoleOptions = [AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.EDITOR] as const;
+export const adminUserRoleOptions = adminRoles;
 
 export type AdminUserActionState = {
   errors?: Partial<Record<"email" | "form" | "id" | "isActive" | "name" | "password" | "role", string>>;

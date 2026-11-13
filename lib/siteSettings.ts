@@ -38,8 +38,7 @@ function normalizeSiteSettingValue(key: SiteSettingKey, value: string) {
   return value.replace(legacyBrandReplacePattern, "Recon Imports");
 }
 
-export async function getSiteSettings(): Promise<PublicSiteSettings> {
-  try {
+async function readSiteSettings(): Promise<PublicSiteSettings> {
     const rows = await prisma.siteSetting.findMany({
       select: {
         key: true,
@@ -62,6 +61,17 @@ export async function getSiteSettings(): Promise<PublicSiteSettings> {
     }
 
     return settings;
+}
+
+// Admin callers must never receive editable defaults during an outage.
+export async function getAdminSiteSettings(): Promise<PublicSiteSettings> {
+  try { return await readSiteSettings(); }
+  catch { throw new Error("Saved settings could not be loaded. Check the database connection and reload. No settings were changed."); }
+}
+
+export async function getSiteSettings(): Promise<PublicSiteSettings> {
+  try {
+    return await readSiteSettings();
   } catch (error) {
     console.error("Failed to load site settings from database.", error);
     return fallbackSiteSettings;

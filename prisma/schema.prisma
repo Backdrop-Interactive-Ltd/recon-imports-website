@@ -118,6 +118,10 @@ model AdminUser {
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  employeeProfiles EmployeePublicProfile[] @relation("EmployeeProfileCreator")
+  employeeSubmissions EmployeePublicProfile[] @relation("EmployeeProfileSubmitter")
+  employeeReviews EmployeePublicationApproval[] @relation("EmployeeApprovalReviewer")
+  employeeAuditEvents EmployeeAuditEvent[] @relation("EmployeeAuditActor")
 }
 
 model Account {
@@ -385,4 +389,174 @@ model NewsletterSubscriber {
   updatedAt DateTime @updatedAt
 
   @@index([isActive])
+}
+
+enum EmployeeEmploymentStatus {
+  ACTIVE
+  INACTIVE
+  FORMER
+}
+enum EmployeeProfileState {
+  DRAFT
+  SUBMITTED
+  ERASED
+}
+enum EmployeePublicationScope {
+  DIRECTORY
+  VERIFICATION
+}
+enum EmployeeApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+enum EmployeeAuditEventType {
+  CREATED
+  DRAFT_SAVED
+  REVISION_SUBMITTED
+  APPROVAL_REQUESTED
+  REVISION_APPROVED
+  REVISION_REJECTED
+  PROFILE_PUBLISHED
+  PROFILE_UNPUBLISHED
+  APPROVAL_WITHDRAWN
+  CONSENT_WITHDRAWN
+  STATUS_CHANGED
+  DEPARTMENT_CHANGED
+  IDENTITY_ISSUED
+  IDENTITY_RETIRED
+  ARCHIVED
+  RESTORED
+  PERSONAL_DATA_ERASED
+}
+model Department {
+  id String @id @default(cuid())
+  name String @db.VarChar(120)
+  slug String @unique @db.VarChar(120)
+  displayOrder Int @default(0)
+  isActive Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  employees Employee[]
+  profileRevisions EmployeePublicProfile[]
+  @@index([isActive, displayOrder, id])
+}
+model Employee {
+  id String @id @default(cuid())
+  employeeCode String @unique @db.VarChar(32)
+  internalName String? @db.VarChar(160)
+  departmentId String?
+  employmentStatus EmployeeEmploymentStatus @default(INACTIVE)
+  statusChangedAt DateTime @default(now()) @db.Timestamptz(3)
+  archivedAt DateTime? @db.Timestamptz(3)
+  personalDataErasedAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  revisionCounter Int @default(0)
+  publicationEpoch Int @default(1)
+  reactivationApprovalIds String[] @default([])
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  profiles EmployeePublicProfile[]
+  identities EmployeeVerificationIdentity[]
+  auditEvents EmployeeAuditEvent[]
+  @@index([departmentId, employmentStatus, archivedAt, id])
+  @@index([employmentStatus, archivedAt, id])
+}
+model EmployeePublicProfile {
+  id String @id @default(cuid())
+  employeeId String
+  revision Int
+  state EmployeeProfileState @default(DRAFT)
+  version Int @default(1)
+  publicName String? @db.VarChar(160)
+  designation String? @db.VarChar(160)
+  biography String? @db.VarChar(2000)
+  experienceSummary String? @db.VarChar(500)
+  departmentId String?
+  departmentName String? @db.VarChar(120)
+  portraitStorageKey String? @db.VarChar(300)
+  portraitStorageVersion String? @db.VarChar(100)
+  officialPhone String? @db.VarChar(40)
+  officialEmail String? @db.VarChar(254)
+  displayOrder Int @default(0)
+  isFeatured Boolean @default(false)
+  createdById String?
+  submittedById String?
+  submittedBySnapshot String? @db.VarChar(180)
+  submittedAt DateTime? @db.Timestamptz(3)
+  erasedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdBy AdminUser? @relation("EmployeeProfileCreator", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  submittedBy AdminUser? @relation("EmployeeProfileSubmitter", fields: [submittedById], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  approvals EmployeePublicationApproval[]
+  @@unique([employeeId, revision])
+  @@index([employeeId, state])
+  @@index([departmentId, displayOrder, id])
+  @@index([createdById])
+  @@index([submittedById])
+}
+model EmployeeVerificationIdentity {
+  id String @id @default(cuid())
+  employeeId String
+  publicKey String @unique @db.VarChar(32)
+  issuedAt DateTime @default(now()) @db.Timestamptz(3)
+  retiredAt DateTime? @db.Timestamptz(3)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@index([employeeId, issuedAt])
+}
+model EmployeePublicationApproval {
+  id String @id @default(cuid())
+  employeeId String
+  profileRevision Int
+  employmentEpoch Int
+  scope EmployeePublicationScope
+  status EmployeeApprovalStatus @default(PENDING)
+  isPublished Boolean @default(false)
+  publishedAt DateTime? @db.Timestamptz(3)
+  withdrawnAt DateTime? @db.Timestamptz(3)
+  publishPortrait Boolean @default(false)
+  publishPhone Boolean @default(false)
+  publishEmail Boolean @default(false)
+  consentReference String? @db.VarChar(200)
+  consentPolicyVersion String? @db.VarChar(40)
+  consentRecordedAt DateTime? @db.Timestamptz(3)
+  consentExpiresAt DateTime? @db.Timestamptz(3)
+  evidenceErasedAt DateTime? @db.Timestamptz(3)
+  decidedById String?
+  decidedBySnapshot String? @db.VarChar(180)
+  decidedAt DateTime? @db.Timestamptz(3)
+  selfApproved Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  profile EmployeePublicProfile @relation(fields: [employeeId, profileRevision], references: [employeeId, revision], onDelete: Restrict, onUpdate: Restrict)
+  decidedBy AdminUser? @relation("EmployeeApprovalReviewer", fields: [decidedById], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  @@index([employeeId, scope, createdAt])
+  @@index([scope, status, isPublished, employeeId])
+  @@index([consentReference])
+  @@index([decidedById])
+}
+model EmployeeAuditEvent {
+  id String @id @default(cuid())
+  employeeId String
+  actorAdminId String?
+  actorSnapshot String @db.VarChar(180)
+  actorRole AdminRole
+  eventType EmployeeAuditEventType
+  profileRevision Int?
+  recordVersion Int
+  changedFields String[] @default([])
+  summary String @db.VarChar(240)
+  correlationId String @db.VarChar(100)
+  isSelfApproval Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  actorAdmin AdminUser? @relation("EmployeeAuditActor", fields: [actorAdminId], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  @@index([employeeId, createdAt, id])
+  @@index([actorAdminId, createdAt])
 }

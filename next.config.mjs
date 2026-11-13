@@ -1,4 +1,5 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { isolatedDistDir } from "./scripts/build-isolation.mjs";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -6,6 +7,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(process.env.RECON_ISOLATED_BUILD ? { distDir: isolatedDistDir(process.env.RECON_ISOLATED_BUILD) } : {}),
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {
     remotePatterns: [

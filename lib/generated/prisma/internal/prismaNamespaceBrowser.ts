@@ -67,7 +67,13 @@ export const ModelName = {
   SellCarLead: 'SellCarLead',
   RequirementLead: 'RequirementLead',
   AuctionSheetRequest: 'AuctionSheetRequest',
-  NewsletterSubscriber: 'NewsletterSubscriber'
+  NewsletterSubscriber: 'NewsletterSubscriber',
+  Department: 'Department',
+  Employee: 'Employee',
+  EmployeePublicProfile: 'EmployeePublicProfile',
+  EmployeeVerificationIdentity: 'EmployeeVerificationIdentity',
+  EmployeePublicationApproval: 'EmployeePublicationApproval',
+  EmployeeAuditEvent: 'EmployeeAuditEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -350,6 +356,129 @@ export const NewsletterSubscriberScalarFieldEnum = {
 } as const
 
 export type NewsletterSubscriberScalarFieldEnum = (typeof NewsletterSubscriberScalarFieldEnum)[keyof typeof NewsletterSubscriberScalarFieldEnum]
+
+
+export const DepartmentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
+
+
+export const EmployeeScalarFieldEnum = {
+  id: 'id',
+  employeeCode: 'employeeCode',
+  internalName: 'internalName',
+  departmentId: 'departmentId',
+  employmentStatus: 'employmentStatus',
+  statusChangedAt: 'statusChangedAt',
+  archivedAt: 'archivedAt',
+  personalDataErasedAt: 'personalDataErasedAt',
+  version: 'version',
+  revisionCounter: 'revisionCounter',
+  publicationEpoch: 'publicationEpoch',
+  reactivationApprovalIds: 'reactivationApprovalIds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
+
+
+export const EmployeePublicProfileScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  revision: 'revision',
+  state: 'state',
+  version: 'version',
+  publicName: 'publicName',
+  designation: 'designation',
+  biography: 'biography',
+  experienceSummary: 'experienceSummary',
+  departmentId: 'departmentId',
+  departmentName: 'departmentName',
+  portraitStorageKey: 'portraitStorageKey',
+  portraitStorageVersion: 'portraitStorageVersion',
+  officialPhone: 'officialPhone',
+  officialEmail: 'officialEmail',
+  displayOrder: 'displayOrder',
+  isFeatured: 'isFeatured',
+  createdById: 'createdById',
+  submittedById: 'submittedById',
+  submittedBySnapshot: 'submittedBySnapshot',
+  submittedAt: 'submittedAt',
+  erasedAt: 'erasedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmployeePublicProfileScalarFieldEnum = (typeof EmployeePublicProfileScalarFieldEnum)[keyof typeof EmployeePublicProfileScalarFieldEnum]
+
+
+export const EmployeeVerificationIdentityScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  publicKey: 'publicKey',
+  issuedAt: 'issuedAt',
+  retiredAt: 'retiredAt'
+} as const
+
+export type EmployeeVerificationIdentityScalarFieldEnum = (typeof EmployeeVerificationIdentityScalarFieldEnum)[keyof typeof EmployeeVerificationIdentityScalarFieldEnum]
+
+
+export const EmployeePublicationApprovalScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  profileRevision: 'profileRevision',
+  employmentEpoch: 'employmentEpoch',
+  scope: 'scope',
+  status: 'status',
+  isPublished: 'isPublished',
+  publishedAt: 'publishedAt',
+  withdrawnAt: 'withdrawnAt',
+  publishPortrait: 'publishPortrait',
+  publishPhone: 'publishPhone',
+  publishEmail: 'publishEmail',
+  consentReference: 'consentReference',
+  consentPolicyVersion: 'consentPolicyVersion',
+  consentRecordedAt: 'consentRecordedAt',
+  consentExpiresAt: 'consentExpiresAt',
+  evidenceErasedAt: 'evidenceErasedAt',
+  decidedById: 'decidedById',
+  decidedBySnapshot: 'decidedBySnapshot',
+  decidedAt: 'decidedAt',
+  selfApproved: 'selfApproved',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmployeePublicationApprovalScalarFieldEnum = (typeof EmployeePublicationApprovalScalarFieldEnum)[keyof typeof EmployeePublicationApprovalScalarFieldEnum]
+
+
+export const EmployeeAuditEventScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  actorAdminId: 'actorAdminId',
+  actorSnapshot: 'actorSnapshot',
+  actorRole: 'actorRole',
+  eventType: 'eventType',
+  profileRevision: 'profileRevision',
+  recordVersion: 'recordVersion',
+  changedFields: 'changedFields',
+  summary: 'summary',
+  correlationId: 'correlationId',
+  isSelfApproval: 'isSelfApproval',
+  createdAt: 'createdAt'
+} as const
+
+export type EmployeeAuditEventScalarFieldEnum = (typeof EmployeeAuditEventScalarFieldEnum)[keyof typeof EmployeeAuditEventScalarFieldEnum]
 
 
 export const SortOrder = {

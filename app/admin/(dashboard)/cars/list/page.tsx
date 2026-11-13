@@ -1,3 +1,4 @@
+import { requireAdminPagePermission } from "../../../../../lib/adminAuthorization";
 import Link from "next/link";
 import AdminPagination from "../../_components/AdminPagination";
 import { getStringParam } from "../../_components/listParams";
@@ -17,6 +18,7 @@ export default async function CarsListPage({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requireAdminPagePermission("inventory.manage");
   const params = (await searchParams) ?? {};
   const filters: AdminCarListFilters = {
     brandId: getStringParam(params.brandId),

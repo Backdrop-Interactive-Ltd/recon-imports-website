@@ -1,8 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { auth } from "../../../../lib/auth";
+import { requireAdminPermission } from "../../../../lib/adminAuthorization";
 import { prisma } from "../../../../lib/prisma";
 import { brandFormSchema, brandIdSchema, type BrandActionState } from "./validation";
 
@@ -38,11 +37,7 @@ function readBrandForm(formData: FormData) {
 }
 
 async function requireAdminSession() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/admin/login");
-  }
+  return requireAdminPermission("brands.manage");
 }
 
 async function isDuplicateSlug(slug: string, currentBrandId?: string) {

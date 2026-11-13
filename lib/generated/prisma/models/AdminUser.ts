@@ -206,6 +206,10 @@ export type AdminUserWhereInput = {
   isActive?: Prisma.BoolFilter<"AdminUser"> | boolean
   createdAt?: Prisma.DateTimeFilter<"AdminUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AdminUser"> | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileListRelationFilter
+  employeeSubmissions?: Prisma.EmployeePublicProfileListRelationFilter
+  employeeReviews?: Prisma.EmployeePublicationApprovalListRelationFilter
+  employeeAuditEvents?: Prisma.EmployeeAuditEventListRelationFilter
 }
 
 export type AdminUserOrderByWithRelationInput = {
@@ -217,6 +221,10 @@ export type AdminUserOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  employeeProfiles?: Prisma.EmployeePublicProfileOrderByRelationAggregateInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileOrderByRelationAggregateInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalOrderByRelationAggregateInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventOrderByRelationAggregateInput
 }
 
 export type AdminUserWhereUniqueInput = Prisma.AtLeast<{
@@ -231,6 +239,10 @@ export type AdminUserWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"AdminUser"> | boolean
   createdAt?: Prisma.DateTimeFilter<"AdminUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AdminUser"> | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileListRelationFilter
+  employeeSubmissions?: Prisma.EmployeePublicProfileListRelationFilter
+  employeeReviews?: Prisma.EmployeePublicationApprovalListRelationFilter
+  employeeAuditEvents?: Prisma.EmployeeAuditEventListRelationFilter
 }, "id" | "email">
 
 export type AdminUserOrderByWithAggregationInput = {
@@ -270,6 +282,10 @@ export type AdminUserCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileCreateNestedManyWithoutCreatedByInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileCreateNestedManyWithoutSubmittedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalCreateNestedManyWithoutDecidedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventCreateNestedManyWithoutActorAdminInput
 }
 
 export type AdminUserUncheckedCreateInput = {
@@ -281,6 +297,10 @@ export type AdminUserUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutCreatedByInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutSubmittedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedCreateNestedManyWithoutDecidedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedCreateNestedManyWithoutActorAdminInput
 }
 
 export type AdminUserUpdateInput = {
@@ -292,6 +312,10 @@ export type AdminUserUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUpdateManyWithoutCreatedByNestedInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUpdateManyWithoutSubmittedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUpdateManyWithoutDecidedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUpdateManyWithoutActorAdminNestedInput
 }
 
 export type AdminUserUncheckedUpdateInput = {
@@ -303,6 +327,10 @@ export type AdminUserUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutCreatedByNestedInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutSubmittedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedUpdateManyWithoutDecidedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedUpdateManyWithoutActorAdminNestedInput
 }
 
 export type AdminUserCreateManyInput = {
@@ -371,6 +399,11 @@ export type AdminUserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type AdminUserNullableScalarRelationFilter = {
+  is?: Prisma.AdminUserWhereInput | null
+  isNot?: Prisma.AdminUserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -387,6 +420,414 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type AdminUserCreateNestedOneWithoutEmployeeProfilesInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeProfilesInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeProfilesInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeProfilesInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserCreateNestedOneWithoutEmployeeSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeSubmissionsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeSubmissionsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeSubmissionsInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserUpdateOneWithoutEmployeeProfilesNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeProfilesInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeProfilesInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeProfilesInput
+  upsert?: Prisma.AdminUserUpsertWithoutEmployeeProfilesInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutEmployeeProfilesInput, Prisma.AdminUserUpdateWithoutEmployeeProfilesInput>, Prisma.AdminUserUncheckedUpdateWithoutEmployeeProfilesInput>
+}
+
+export type AdminUserUpdateOneWithoutEmployeeSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeSubmissionsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeSubmissionsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeSubmissionsInput
+  upsert?: Prisma.AdminUserUpsertWithoutEmployeeSubmissionsInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutEmployeeSubmissionsInput, Prisma.AdminUserUpdateWithoutEmployeeSubmissionsInput>, Prisma.AdminUserUncheckedUpdateWithoutEmployeeSubmissionsInput>
+}
+
+export type AdminUserCreateNestedOneWithoutEmployeeReviewsInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeReviewsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeReviewsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeReviewsInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserUpdateOneWithoutEmployeeReviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeReviewsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeReviewsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeReviewsInput
+  upsert?: Prisma.AdminUserUpsertWithoutEmployeeReviewsInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutEmployeeReviewsInput, Prisma.AdminUserUpdateWithoutEmployeeReviewsInput>, Prisma.AdminUserUncheckedUpdateWithoutEmployeeReviewsInput>
+}
+
+export type AdminUserCreateNestedOneWithoutEmployeeAuditEventsInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeAuditEventsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeAuditEventsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeAuditEventsInput
+  connect?: Prisma.AdminUserWhereUniqueInput
+}
+
+export type AdminUserUpdateOneWithoutEmployeeAuditEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeAuditEventsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeAuditEventsInput>
+  connectOrCreate?: Prisma.AdminUserCreateOrConnectWithoutEmployeeAuditEventsInput
+  upsert?: Prisma.AdminUserUpsertWithoutEmployeeAuditEventsInput
+  disconnect?: Prisma.AdminUserWhereInput | boolean
+  delete?: Prisma.AdminUserWhereInput | boolean
+  connect?: Prisma.AdminUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUserUpdateToOneWithWhereWithoutEmployeeAuditEventsInput, Prisma.AdminUserUpdateWithoutEmployeeAuditEventsInput>, Prisma.AdminUserUncheckedUpdateWithoutEmployeeAuditEventsInput>
+}
+
+export type AdminUserCreateWithoutEmployeeProfilesInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeSubmissions?: Prisma.EmployeePublicProfileCreateNestedManyWithoutSubmittedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalCreateNestedManyWithoutDecidedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventCreateNestedManyWithoutActorAdminInput
+}
+
+export type AdminUserUncheckedCreateWithoutEmployeeProfilesInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutSubmittedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedCreateNestedManyWithoutDecidedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedCreateNestedManyWithoutActorAdminInput
+}
+
+export type AdminUserCreateOrConnectWithoutEmployeeProfilesInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeProfilesInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeProfilesInput>
+}
+
+export type AdminUserCreateWithoutEmployeeSubmissionsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileCreateNestedManyWithoutCreatedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalCreateNestedManyWithoutDecidedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventCreateNestedManyWithoutActorAdminInput
+}
+
+export type AdminUserUncheckedCreateWithoutEmployeeSubmissionsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutCreatedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedCreateNestedManyWithoutDecidedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedCreateNestedManyWithoutActorAdminInput
+}
+
+export type AdminUserCreateOrConnectWithoutEmployeeSubmissionsInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeSubmissionsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeSubmissionsInput>
+}
+
+export type AdminUserUpsertWithoutEmployeeProfilesInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeProfilesInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeProfilesInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeProfilesInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeProfilesInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutEmployeeProfilesInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeProfilesInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeProfilesInput>
+}
+
+export type AdminUserUpdateWithoutEmployeeProfilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeSubmissions?: Prisma.EmployeePublicProfileUpdateManyWithoutSubmittedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUpdateManyWithoutDecidedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUpdateManyWithoutActorAdminNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutEmployeeProfilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutSubmittedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedUpdateManyWithoutDecidedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedUpdateManyWithoutActorAdminNestedInput
+}
+
+export type AdminUserUpsertWithoutEmployeeSubmissionsInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeSubmissionsInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeSubmissionsInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeSubmissionsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeSubmissionsInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutEmployeeSubmissionsInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeSubmissionsInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeSubmissionsInput>
+}
+
+export type AdminUserUpdateWithoutEmployeeSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUpdateManyWithoutCreatedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUpdateManyWithoutDecidedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUpdateManyWithoutActorAdminNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutEmployeeSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutCreatedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedUpdateManyWithoutDecidedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedUpdateManyWithoutActorAdminNestedInput
+}
+
+export type AdminUserCreateWithoutEmployeeReviewsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileCreateNestedManyWithoutCreatedByInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileCreateNestedManyWithoutSubmittedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventCreateNestedManyWithoutActorAdminInput
+}
+
+export type AdminUserUncheckedCreateWithoutEmployeeReviewsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutCreatedByInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutSubmittedByInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedCreateNestedManyWithoutActorAdminInput
+}
+
+export type AdminUserCreateOrConnectWithoutEmployeeReviewsInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeReviewsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeReviewsInput>
+}
+
+export type AdminUserUpsertWithoutEmployeeReviewsInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeReviewsInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeReviewsInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeReviewsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeReviewsInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutEmployeeReviewsInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeReviewsInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeReviewsInput>
+}
+
+export type AdminUserUpdateWithoutEmployeeReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUpdateManyWithoutCreatedByNestedInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUpdateManyWithoutSubmittedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUpdateManyWithoutActorAdminNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutEmployeeReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutCreatedByNestedInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutSubmittedByNestedInput
+  employeeAuditEvents?: Prisma.EmployeeAuditEventUncheckedUpdateManyWithoutActorAdminNestedInput
+}
+
+export type AdminUserCreateWithoutEmployeeAuditEventsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileCreateNestedManyWithoutCreatedByInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileCreateNestedManyWithoutSubmittedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalCreateNestedManyWithoutDecidedByInput
+}
+
+export type AdminUserUncheckedCreateWithoutEmployeeAuditEventsInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  role?: $Enums.AdminRole
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutCreatedByInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedCreateNestedManyWithoutSubmittedByInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedCreateNestedManyWithoutDecidedByInput
+}
+
+export type AdminUserCreateOrConnectWithoutEmployeeAuditEventsInput = {
+  where: Prisma.AdminUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeAuditEventsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeAuditEventsInput>
+}
+
+export type AdminUserUpsertWithoutEmployeeAuditEventsInput = {
+  update: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeAuditEventsInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeAuditEventsInput>
+  create: Prisma.XOR<Prisma.AdminUserCreateWithoutEmployeeAuditEventsInput, Prisma.AdminUserUncheckedCreateWithoutEmployeeAuditEventsInput>
+  where?: Prisma.AdminUserWhereInput
+}
+
+export type AdminUserUpdateToOneWithWhereWithoutEmployeeAuditEventsInput = {
+  where?: Prisma.AdminUserWhereInput
+  data: Prisma.XOR<Prisma.AdminUserUpdateWithoutEmployeeAuditEventsInput, Prisma.AdminUserUncheckedUpdateWithoutEmployeeAuditEventsInput>
+}
+
+export type AdminUserUpdateWithoutEmployeeAuditEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUpdateManyWithoutCreatedByNestedInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUpdateManyWithoutSubmittedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUpdateManyWithoutDecidedByNestedInput
+}
+
+export type AdminUserUncheckedUpdateWithoutEmployeeAuditEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAdminRoleFieldUpdateOperationsInput | $Enums.AdminRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employeeProfiles?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutCreatedByNestedInput
+  employeeSubmissions?: Prisma.EmployeePublicProfileUncheckedUpdateManyWithoutSubmittedByNestedInput
+  employeeReviews?: Prisma.EmployeePublicationApprovalUncheckedUpdateManyWithoutDecidedByNestedInput
+}
+
+
+/**
+ * Count Type AdminUserCountOutputType
+ */
+
+export type AdminUserCountOutputType = {
+  employeeProfiles: number
+  employeeSubmissions: number
+  employeeReviews: number
+  employeeAuditEvents: number
+}
+
+export type AdminUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  employeeProfiles?: boolean | AdminUserCountOutputTypeCountEmployeeProfilesArgs
+  employeeSubmissions?: boolean | AdminUserCountOutputTypeCountEmployeeSubmissionsArgs
+  employeeReviews?: boolean | AdminUserCountOutputTypeCountEmployeeReviewsArgs
+  employeeAuditEvents?: boolean | AdminUserCountOutputTypeCountEmployeeAuditEventsArgs
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminUserCountOutputType
+   */
+  select?: Prisma.AdminUserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountEmployeeProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmployeePublicProfileWhereInput
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountEmployeeSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmployeePublicProfileWhereInput
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountEmployeeReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmployeePublicationApprovalWhereInput
+}
+
+/**
+ * AdminUserCountOutputType without action
+ */
+export type AdminUserCountOutputTypeCountEmployeeAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmployeeAuditEventWhereInput
+}
 
 
 export type AdminUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -398,6 +839,11 @@ export type AdminUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  employeeProfiles?: boolean | Prisma.AdminUser$employeeProfilesArgs<ExtArgs>
+  employeeSubmissions?: boolean | Prisma.AdminUser$employeeSubmissionsArgs<ExtArgs>
+  employeeReviews?: boolean | Prisma.AdminUser$employeeReviewsArgs<ExtArgs>
+  employeeAuditEvents?: boolean | Prisma.AdminUser$employeeAuditEventsArgs<ExtArgs>
+  _count?: boolean | Prisma.AdminUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["adminUser"]>
 
 export type AdminUserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -434,10 +880,24 @@ export type AdminUserSelectScalar = {
 }
 
 export type AdminUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "role" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["adminUser"]>
+export type AdminUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  employeeProfiles?: boolean | Prisma.AdminUser$employeeProfilesArgs<ExtArgs>
+  employeeSubmissions?: boolean | Prisma.AdminUser$employeeSubmissionsArgs<ExtArgs>
+  employeeReviews?: boolean | Prisma.AdminUser$employeeReviewsArgs<ExtArgs>
+  employeeAuditEvents?: boolean | Prisma.AdminUser$employeeAuditEventsArgs<ExtArgs>
+  _count?: boolean | Prisma.AdminUserCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type AdminUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AdminUserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $AdminUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AdminUser"
-  objects: {}
+  objects: {
+    employeeProfiles: Prisma.$EmployeePublicProfilePayload<ExtArgs>[]
+    employeeSubmissions: Prisma.$EmployeePublicProfilePayload<ExtArgs>[]
+    employeeReviews: Prisma.$EmployeePublicationApprovalPayload<ExtArgs>[]
+    employeeAuditEvents: Prisma.$EmployeeAuditEventPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
@@ -841,6 +1301,10 @@ readonly fields: AdminUserFieldRefs;
  */
 export interface Prisma__AdminUserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  employeeProfiles<T extends Prisma.AdminUser$employeeProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$employeeProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePublicProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  employeeSubmissions<T extends Prisma.AdminUser$employeeSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$employeeSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePublicProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  employeeReviews<T extends Prisma.AdminUser$employeeReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$employeeReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePublicationApprovalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  employeeAuditEvents<T extends Prisma.AdminUser$employeeAuditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdminUser$employeeAuditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeeAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -895,6 +1359,10 @@ export type AdminUserFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  /**
    * Filter, which AdminUser to fetch.
    */
   where: Prisma.AdminUserWhereUniqueInput
@@ -913,6 +1381,10 @@ export type AdminUserFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  /**
    * Filter, which AdminUser to fetch.
    */
   where: Prisma.AdminUserWhereUniqueInput
@@ -930,6 +1402,10 @@ export type AdminUserFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the AdminUser
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
   /**
    * Filter, which AdminUser to fetch.
    */
@@ -979,6 +1455,10 @@ export type AdminUserFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  /**
    * Filter, which AdminUser to fetch.
    */
   where?: Prisma.AdminUserWhereInput
@@ -1026,6 +1506,10 @@ export type AdminUserFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the AdminUser
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
   /**
    * Filter, which AdminUsers to fetch.
    */
@@ -1075,6 +1559,10 @@ export type AdminUserCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  /**
    * The data needed to create a AdminUser.
    */
   data: Prisma.XOR<Prisma.AdminUserCreateInput, Prisma.AdminUserUncheckedCreateInput>
@@ -1122,6 +1610,10 @@ export type AdminUserUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the AdminUser
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
   /**
    * The data needed to update a AdminUser.
    */
@@ -1189,6 +1681,10 @@ export type AdminUserUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  /**
    * The filter to search for the AdminUser to update in case it exists.
    */
   where: Prisma.AdminUserWhereUniqueInput
@@ -1215,6 +1711,10 @@ export type AdminUserDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
+  /**
    * Filter which AdminUser to delete.
    */
   where: Prisma.AdminUserWhereUniqueInput
@@ -1235,6 +1735,102 @@ export type AdminUserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
+ * AdminUser.employeeProfiles
+ */
+export type AdminUser$employeeProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmployeePublicProfile
+   */
+  select?: Prisma.EmployeePublicProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmployeePublicProfile
+   */
+  omit?: Prisma.EmployeePublicProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeePublicProfileInclude<ExtArgs> | null
+  where?: Prisma.EmployeePublicProfileWhereInput
+  orderBy?: Prisma.EmployeePublicProfileOrderByWithRelationInput | Prisma.EmployeePublicProfileOrderByWithRelationInput[]
+  cursor?: Prisma.EmployeePublicProfileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmployeePublicProfileScalarFieldEnum | Prisma.EmployeePublicProfileScalarFieldEnum[]
+}
+
+/**
+ * AdminUser.employeeSubmissions
+ */
+export type AdminUser$employeeSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmployeePublicProfile
+   */
+  select?: Prisma.EmployeePublicProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmployeePublicProfile
+   */
+  omit?: Prisma.EmployeePublicProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeePublicProfileInclude<ExtArgs> | null
+  where?: Prisma.EmployeePublicProfileWhereInput
+  orderBy?: Prisma.EmployeePublicProfileOrderByWithRelationInput | Prisma.EmployeePublicProfileOrderByWithRelationInput[]
+  cursor?: Prisma.EmployeePublicProfileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmployeePublicProfileScalarFieldEnum | Prisma.EmployeePublicProfileScalarFieldEnum[]
+}
+
+/**
+ * AdminUser.employeeReviews
+ */
+export type AdminUser$employeeReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmployeePublicationApproval
+   */
+  select?: Prisma.EmployeePublicationApprovalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmployeePublicationApproval
+   */
+  omit?: Prisma.EmployeePublicationApprovalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeePublicationApprovalInclude<ExtArgs> | null
+  where?: Prisma.EmployeePublicationApprovalWhereInput
+  orderBy?: Prisma.EmployeePublicationApprovalOrderByWithRelationInput | Prisma.EmployeePublicationApprovalOrderByWithRelationInput[]
+  cursor?: Prisma.EmployeePublicationApprovalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmployeePublicationApprovalScalarFieldEnum | Prisma.EmployeePublicationApprovalScalarFieldEnum[]
+}
+
+/**
+ * AdminUser.employeeAuditEvents
+ */
+export type AdminUser$employeeAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmployeeAuditEvent
+   */
+  select?: Prisma.EmployeeAuditEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmployeeAuditEvent
+   */
+  omit?: Prisma.EmployeeAuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeeAuditEventInclude<ExtArgs> | null
+  where?: Prisma.EmployeeAuditEventWhereInput
+  orderBy?: Prisma.EmployeeAuditEventOrderByWithRelationInput | Prisma.EmployeeAuditEventOrderByWithRelationInput[]
+  cursor?: Prisma.EmployeeAuditEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmployeeAuditEventScalarFieldEnum | Prisma.EmployeeAuditEventScalarFieldEnum[]
+}
+
+/**
  * AdminUser without action
  */
 export type AdminUserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1246,4 +1842,8 @@ export type AdminUserDefaultArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the AdminUser
    */
   omit?: Prisma.AdminUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminUserInclude<ExtArgs> | null
 }

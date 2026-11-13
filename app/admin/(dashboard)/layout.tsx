@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
-import { auth, signOut } from "../../../lib/auth";
+import { signOut } from "../../../lib/auth";
+import { requireAdminPagePermission } from "../../../lib/adminAuthorization";
 import AdminNav from "./AdminNav";
 import styles from "./layout.module.css";
 
@@ -8,11 +8,7 @@ export default async function AdminDashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/admin/login");
-  }
+  const admin = await requireAdminPagePermission("dashboard.access");
 
   return (
     <div className={styles.shell}>
@@ -24,15 +20,15 @@ export default async function AdminDashboardLayout({
             <strong>Admin Panel</strong>
           </div>
         </div>
-        <AdminNav />
+        <AdminNav role={admin.role} />
       </aside>
 
       <div className={styles.workspace}>
         <header className={styles.topbar}>
           <div>
             <p className={styles.topbarEyebrow}>Signed in as</p>
-            <h2>{session.user.name ?? "Admin"}</h2>
-            <span>{session.user.email}</span>
+            <h2>{admin.name}</h2>
+            <span>{admin.email}</span>
           </div>
           <form
             action={async () => {

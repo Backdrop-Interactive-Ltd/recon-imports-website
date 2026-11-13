@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { hasAdminPermission, type AdminRole } from "../../../lib/adminPermissions";
 import styles from "./layout.module.css";
 
 const adminNavItems = [
@@ -33,12 +34,13 @@ const adminNavItems = [
   { href: "/admin/media", label: "Media", icon: Image },
 ];
 
-export default function AdminNav() {
+export default function AdminNav({ role }: { role: AdminRole }) {
   const pathname = usePathname();
 
   return (
     <nav className={styles.nav} aria-label="Admin navigation">
       {adminNavItems.map((item) => {
+        if (item.href === "/admin/users" && !hasAdminPermission(role, "adminUsers.manage")) return null;
         const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(`${item.href}/`));
         const Icon = item.icon;
 

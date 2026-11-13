@@ -10,6 +10,7 @@ export const revalidate = 3600;
 
 const staticRoutes = [
   { path: "/", priority: 1 },
+  { path: "/about-us", priority: 0.7 },
   { path: "/brand-new", priority: 0.9 },
   { path: "/sell-your-car", priority: 0.75 },
   { path: "/send-requirements", priority: 0.75 },

@@ -15,6 +15,8 @@ type AdminImageUploadProps = {
   label: string;
   name: string;
   onChange: (url: string) => void;
+  onUploadStateChange?: (uploading: boolean) => void;
+  disabled?: boolean;
   value: string;
 };
 
@@ -23,7 +25,7 @@ type UploadResponse = {
   url?: string;
 };
 
-export default function AdminImageUpload({ error, folder, label, name, onChange, value }: AdminImageUploadProps) {
+export default function AdminImageUpload({ error, folder, label, name, onChange, onUploadStateChange, disabled = false, value }: AdminImageUploadProps) {
   const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadError, setUploadError] = useState("");
@@ -59,6 +61,7 @@ export default function AdminImageUpload({ error, folder, label, name, onChange,
     uploadData.append("file", file);
     uploadData.append("folder", folder);
     setIsUploading(true);
+    onUploadStateChange?.(true);
 
     try {
       const response = await fetch("/api/admin/uploads", {
@@ -73,11 +76,12 @@ export default function AdminImageUpload({ error, folder, label, name, onChange,
       }
 
       onChange(result.url);
-      setUploadMessage("Image uploaded successfully.");
+      setUploadMessage("Image uploaded. Save the form to apply this image.");
     } catch {
       setUploadError("Image upload failed. Please check your connection.");
     } finally {
       setIsUploading(false);
+      onUploadStateChange?.(false);
     }
   }
 
@@ -107,7 +111,7 @@ export default function AdminImageUpload({ error, folder, label, name, onChange,
           <input
             accept={ADMIN_IMAGE_UPLOAD_ACCEPT}
             className={styles.fileInput}
-            disabled={isUploading}
+            disabled={isUploading || disabled}
             id={inputId}
             onChange={(event) => handleFileChange(event.target.files?.[0])}
             ref={fileInputRef}
@@ -117,7 +121,7 @@ export default function AdminImageUpload({ error, folder, label, name, onChange,
             Allowed: jpg, jpeg, png, webp, svg. Max size: {formatUploadSize(ADMIN_IMAGE_UPLOAD_MAX_BYTES)}.
           </p>
           {value ? (
-            <button className={styles.clearButton} disabled={isUploading} onClick={handleClearImage} type="button">
+            <button className={styles.clearButton} disabled={isUploading || disabled} onClick={handleClearImage} type="button">
               Remove image
             </button>
           ) : null}

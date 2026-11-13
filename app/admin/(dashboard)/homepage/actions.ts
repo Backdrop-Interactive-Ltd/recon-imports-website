@@ -1,8 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { auth } from "../../../../lib/auth";
+import { requireAdminPermission } from "../../../../lib/adminAuthorization";
 import { prisma } from "../../../../lib/prisma";
 import { heroSlideFormSchema, heroSlideIdSchema, type HeroSlideActionState } from "./validation";
 
@@ -44,11 +43,7 @@ function readHeroSlideForm(formData: FormData) {
 }
 
 async function requireAdminSession() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/admin/login");
-  }
+  return requireAdminPermission("homepage.manage");
 }
 
 function revalidateHeroViews() {

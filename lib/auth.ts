@@ -4,6 +4,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import { adminLoginSchema } from "./validations/auth";
+import { isAdminRole } from "./adminPermissions";
 
 const isProduction = process.env.NODE_ENV === "production";
 const authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
@@ -36,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: parsed.data.email },
         });
 
-        if (!admin?.isActive) {
+        if (!admin?.isActive || !isAdminRole(admin.role)) {
           return null;
         }
 

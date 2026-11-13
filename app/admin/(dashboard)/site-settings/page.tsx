@@ -1,4 +1,5 @@
-import { getSiteSettings } from "../../../../lib/siteSettings";
+import { requireAdminPagePermission } from "../../../../lib/adminAuthorization";
+import { getAdminSiteSettings } from "../../../../lib/siteSettings";
 import SiteSettingsForm from "./SiteSettingsForm";
 import styles from "./page.module.css";
 
@@ -9,7 +10,12 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminSiteSettingsPage() {
-  const settings = await getSiteSettings();
+  await requireAdminPagePermission("settings.manage");
+  let settings;
+  try { settings = await getAdminSiteSettings(); }
+  catch {
+    return <section className={styles.settingsPage} role="alert"><h1>Site Settings unavailable</h1><p>Saved settings could not be loaded. Check the database connection and reload this page. Editing is disabled; your saved settings have not been changed.</p><a href="/admin/site-settings">Reload settings</a></section>;
+  }
 
   return (
     <section className={styles.settingsPage}>

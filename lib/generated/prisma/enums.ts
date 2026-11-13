@@ -148,3 +148,62 @@ export const AuctionSheetStatus = {
 } as const
 
 export type AuctionSheetStatus = (typeof AuctionSheetStatus)[keyof typeof AuctionSheetStatus]
+
+
+export const EmployeeEmploymentStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  FORMER: 'FORMER'
+} as const
+
+export type EmployeeEmploymentStatus = (typeof EmployeeEmploymentStatus)[keyof typeof EmployeeEmploymentStatus]
+
+
+export const EmployeeProfileState = {
+  DRAFT: 'DRAFT',
+  SUBMITTED: 'SUBMITTED',
+  ERASED: 'ERASED'
+} as const
+
+export type EmployeeProfileState = (typeof EmployeeProfileState)[keyof typeof EmployeeProfileState]
+
+
+export const EmployeePublicationScope = {
+  DIRECTORY: 'DIRECTORY',
+  VERIFICATION: 'VERIFICATION'
+} as const
+
+export type EmployeePublicationScope = (typeof EmployeePublicationScope)[keyof typeof EmployeePublicationScope]
+
+
+export const EmployeeApprovalStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type EmployeeApprovalStatus = (typeof EmployeeApprovalStatus)[keyof typeof EmployeeApprovalStatus]
+
+
+export const EmployeeAuditEventType = {
+  CREATED: 'CREATED',
+  DRAFT_SAVED: 'DRAFT_SAVED',
+  REVISION_SUBMITTED: 'REVISION_SUBMITTED',
+  APPROVAL_REQUESTED: 'APPROVAL_REQUESTED',
+  REVISION_APPROVED: 'REVISION_APPROVED',
+  REVISION_REJECTED: 'REVISION_REJECTED',
+  PROFILE_PUBLISHED: 'PROFILE_PUBLISHED',
+  PROFILE_UNPUBLISHED: 'PROFILE_UNPUBLISHED',
+  APPROVAL_WITHDRAWN: 'APPROVAL_WITHDRAWN',
+  CONSENT_WITHDRAWN: 'CONSENT_WITHDRAWN',
+  STATUS_CHANGED: 'STATUS_CHANGED',
+  DEPARTMENT_CHANGED: 'DEPARTMENT_CHANGED',
+  IDENTITY_ISSUED: 'IDENTITY_ISSUED',
+  IDENTITY_RETIRED: 'IDENTITY_RETIRED',
+  ARCHIVED: 'ARCHIVED',
+  RESTORED: 'RESTORED',
+  PERSONAL_DATA_ERASED: 'PERSONAL_DATA_ERASED'
+} as const
+
+export type EmployeeAuditEventType = (typeof EmployeeAuditEventType)[keyof typeof EmployeeAuditEventType]

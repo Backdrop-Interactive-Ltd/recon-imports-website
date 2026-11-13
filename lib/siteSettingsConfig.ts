@@ -56,7 +56,7 @@ export const fallbackSiteSettings: PublicSiteSettings = {
   defaultMetaTitle: "Recon Imports | Premium Japanese Reconditioned Cars in Bangladesh",
   email: "",
   facebookUrl: "https://www.facebook.com/",
-  favicon: "/favicon.ico",
+  favicon: "/favicon.svg",
   footerCopyrightText: "© 2026 Recon Imports. All Rights Reserved by @Backdrop Interactive",
   footerLogo: "",
   googleMapsUrl: "",

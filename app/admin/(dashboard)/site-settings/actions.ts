@@ -1,9 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { SiteSettingType } from "../../../../lib/generated/prisma/enums";
-import { auth } from "../../../../lib/auth";
+import { requireAdminPermission } from "../../../../lib/adminAuthorization";
 import { prisma } from "../../../../lib/prisma";
 import { siteSettingFields } from "../../../../lib/siteSettingsConfig";
 import {
@@ -32,11 +31,7 @@ function fieldErrorState(error: ReturnType<typeof siteSettingsSchema.safeParse>)
 }
 
 async function requireAdminSession() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/admin/login");
-  }
+  return requireAdminPermission("settings.manage");
 }
 
 function revalidateSiteSettingsViews() {
@@ -57,7 +52,8 @@ export async function updateSiteSettingsAction(
     return fieldErrorState(parsed);
   }
 
-  await prisma.$transaction(
+  try {
+    await prisma.$transaction(
     siteSettingFields.map((field) =>
       prisma.siteSetting.upsert({
         create: {
@@ -74,7 +70,10 @@ export async function updateSiteSettingsAction(
         },
       }),
     ),
-  );
+    );
+  } catch {
+    return { status: "error", message: "Could not confirm the settings save. Check the database connection, then reload saved settings before retrying." };
+  }
 
   revalidateSiteSettingsViews();
 

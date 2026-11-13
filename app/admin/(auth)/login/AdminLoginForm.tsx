@@ -21,6 +21,7 @@ export default function AdminLoginForm() {
 
   return (
     <form action={formAction} className={styles.form}>
+      {searchParams.get("error") === "DatabaseUnavailable" ? <p className={styles.error} role="alert">The database is unavailable. Start the local database and reload. Saved settings have not been changed.</p> : null}
       <input name="callbackUrl" type="hidden" value={callbackUrl} />
       <label className={styles.field}>
         <span>Email</span>
