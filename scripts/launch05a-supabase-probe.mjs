@@ -22,24 +22,7 @@ export function validateTarget(input) {
     options: '-c default_transaction_read_only=on -c statement_timeout=10000', application_name: 'recon-launch05a-readonly' };
 }
 
-async function main() {
-  if (process.argv[2] === '--prepare') { console.log(privateRun('supabase')); return; }
-  const directory = path.resolve(process.argv[2] ?? '');
-  if (!directory.startsWith(taskRoot + path.sep) || !fs.existsSync(directory)) throw Error('Invalid private report directory.');
-  let raw = ''; for await (const chunk of process.stdin) { raw += chunk; if (raw.length > 16384) throw Error('Credential input too large.'); }
-  let input,config;
-  try { input=JSON.parse(raw); raw=''; config=validateTarget(input); }
-  catch {
-    writeReport(directory,'supabase-result.json',{status:'INPUT_OR_CA_VALIDATION_FAILED',errorCode:'CHECK_FIELDS_AND_DASHBOARD_CA',databaseConnectionsAttempted:false});
-    console.log(JSON.stringify({status:'INPUT_OR_CA_VALIDATION_FAILED',report:path.join(directory,'supabase-result.json')}));
-    process.exitCode=1;return;
-  }
-  const db = new pg.Client(config);
-  let result;
-  const observed={};
-  try {
-    await db.connect();
-    await db.query('BEGIN READ ONLY ISOLATION LEVEL REPEATABLE READ');
+export async function inspectDatabase(db, observed = {}) {
     const identity = (await db.query("SELECT current_database() AS database,current_setting('server_version') AS version,current_setting('transaction_read_only') AS read_only,current_setting('search_path') AS search_path,current_schema() AS current_schema")).rows[0];
     if (identity.database !== 'postgres' || identity.read_only !== 'on') throw Error('Read-only target identity verification failed.');
     observed.identity=identity;
@@ -72,11 +55,32 @@ async function main() {
     const userRows = inventory.filter(t=>(!t.managed||t.businessManaged)&&t.rows!==null&&Number(t.rows)>0);
     const publicSchema = schemaRows.find(s=>s.schema==='public');
     const ready = identity.current_schema==='public' && publicSchema?.create && publicSchema?.usage && permissions.plpgsql && !collisions.length && !hasHistory && !userRows.length && !unknownRows;
-    result = { status:'CONNECTED_READ_ONLY',tlsCertificateVerified:true,identity,schemas:schemaRows,role,permissions,tableInventory:inventory,
+    return { status:'CONNECTED_READ_ONLY',tlsCertificateVerified:true,identity,schemas:schemaRows,role,permissions,tableInventory:inventory,
       existingApplicationTables:inventory.filter(t=>t.schema==='public'&&appNames.includes(t.table)).map(t=>t.table),collidingObjects:collisions,migrationHistoryPresent:hasHistory,migrations:history,
       existingUserDataTables:userRows.map(t=>({schema:t.schema,table:t.table,rows:t.rows})),unreadableUserTables:unknownRows,
       migrationReadiness:ready?'PRECHECKS_PASS_EXECUTION_NOT_AUTHORIZED':'BLOCKED_OR_REQUIRES_REVIEW',ddlExecutionTested:false,
       limits:'Read-only catalog/privilege checks cannot prove DDL execution, provider default-grant/API safety, or Hyperdrive origin/caching.' };
+}
+
+async function main() {
+  if (process.argv[2] === '--prepare') { console.log(privateRun('supabase')); return; }
+  const directory = path.resolve(process.argv[2] ?? '');
+  if (!directory.startsWith(taskRoot + path.sep) || !fs.existsSync(directory)) throw Error('Invalid private report directory.');
+  let raw = ''; for await (const chunk of process.stdin) { raw += chunk; if (raw.length > 16384) throw Error('Credential input too large.'); }
+  let input,config;
+  try { input=JSON.parse(raw); raw=''; config=validateTarget(input); }
+  catch {
+    writeReport(directory,'supabase-result.json',{status:'INPUT_OR_CA_VALIDATION_FAILED',errorCode:'CHECK_FIELDS_AND_DASHBOARD_CA',databaseConnectionsAttempted:false});
+    console.log(JSON.stringify({status:'INPUT_OR_CA_VALIDATION_FAILED',report:path.join(directory,'supabase-result.json')}));
+    process.exitCode=1;return;
+  }
+  const db = new pg.Client(config);
+  let result;
+  const observed={};
+  try {
+    await db.connect();
+    await db.query('BEGIN READ ONLY ISOLATION LEVEL REPEATABLE READ');
+    result = await inspectDatabase(db, observed);
     await db.query('ROLLBACK');
   } catch (error) {
     result = {status:'CONNECTION_OR_READ_ONLY_CHECK_FAILED',...observed,errorCode:/^[A-Z0-9_]+$/.test(error.code??'')?error.code:'CHECK_FAILED',secretsLogged:false};

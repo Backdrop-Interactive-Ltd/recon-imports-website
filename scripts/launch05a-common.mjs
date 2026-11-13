@@ -4,12 +4,14 @@ import { randomBytes, createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 export const taskRoot = path.resolve('.local/launch05a');
-export function privateRun(label) {
+export function privateRun(label, scope = 'launch05a') {
   if (process.platform !== 'win32') throw Error('This backup/prompt workflow requires Windows.');
+  if (!['launch05a', 'launch05c'].includes(scope)) throw Error('Unexpected private workflow scope.');
+  const selectedRoot = path.resolve('.local', scope);
   const root = path.resolve('.');
   if (JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).name !== 'recon-imports-website') throw Error('Unexpected workspace.');
-  const dir = path.join(taskRoot, `${new Date().toISOString().replace(/[^0-9]/g, '')}-${label}-${randomBytes(4).toString('hex')}`);
-  fs.mkdirSync(taskRoot, { recursive: true });
+  const dir = path.join(selectedRoot, `${new Date().toISOString().replace(/[^0-9]/g, '')}-${label}-${randomBytes(4).toString('hex')}`);
+  fs.mkdirSync(selectedRoot, { recursive: true });
   fs.mkdirSync(dir);
   if (path.relative(fs.realpathSync(root), fs.realpathSync(dir)) !== path.relative(root, dir)) throw Error('Private directory escapes workspace.');
   const identity = execFileSync('whoami.exe', ['/user', '/fo', 'csv', '/nh'], { encoding: 'utf8', windowsHide: true });
