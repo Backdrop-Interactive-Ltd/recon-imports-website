@@ -19,8 +19,13 @@ test('clean official allocation starts at 101 and increments; repeat runs verify
 
 test('upgrade preserves issued legacy codes and old sequence while bootstrapping beyond higher allocations', async () => {
   const f = await fixture(); try {
-    const schema = `compat_${randomBytes(6).toString('hex')}`;
-    await f.owner.query(`CREATE SCHEMA "${schema}"`);
+    const supplied=process.env.RECON_TEST_PREPROVISIONED_GRANTS==='LAUNCH-05D'?process.env.EID02B_COMPAT_SCHEMA:undefined;
+    const schema = supplied ?? `compat_${randomBytes(6).toString('hex')}`;
+    assert.match(schema,/^compat_[a-f0-9]{12}$/);
+    if(supplied) {
+      const access=(await f.owner.query("SELECT has_schema_privilege(current_user,$1,'USAGE') AND has_schema_privilege(current_user,$1,'CREATE') AS allowed",[schema])).rows[0];
+      assert.equal(access.allowed,true);
+    } else await f.owner.query(`CREATE SCHEMA "${schema}"`);
     await f.owner.query(`SET search_path TO "${schema}"`);
     const migrations = (await readdir('prisma/migrations')).filter(x => /^\d/.test(x)).sort();
     for (const migration of migrations.slice(0, -1)) await f.owner.query(await readFile(`prisma/migrations/${migration}/migration.sql`, 'utf8'));

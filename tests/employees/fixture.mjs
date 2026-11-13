@@ -9,6 +9,8 @@ const { PrismaClient, Prisma }=require('../../lib/generated/prisma/client.ts');
 
 export async function fixture(overrides = {}) {
   const url = new URL(process.env.DATABASE_URL);
+  const runtimeRole=new URL(process.env.EID02B_RUNTIME_URL).username;
+  assert.ok(['eid02b_runtime','recon_runtime'].includes(runtimeRole));
   assert.equal(url.hostname,'127.0.0.1');
   assert.match(process.env.EID02B_DATABASE ?? '',/^eid(?:02b|03)_[a-f0-9]{12}$/);
   assert.equal(url.pathname,`/${process.env.EID02B_DATABASE}`);
@@ -16,11 +18,16 @@ export async function fixture(overrides = {}) {
   const owner = new pg.Client({connectionString:url.toString()}); await owner.connect();
   const marker=await owner.query("SELECT shobj_description(oid,'pg_database') AS marker FROM pg_database WHERE datname=current_database()");
   assert.equal(marker.rows[0].marker,process.env.EID02B_MARKER);
+  if(process.env.RECON_TEST_PREPROVISIONED_GRANTS==='LAUNCH-05D') {
+    assert.equal(url.username,'recon_migrator');
+    assert.equal(new URL(process.env.EID02B_RUNTIME_URL).username,'recon_runtime');
+  } else {
   await owner.query('GRANT USAGE ON SCHEMA public TO eid02b_runtime');
   await owner.query('GRANT SELECT (id,name,email,role,"isActive"), UPDATE ("updatedAt") ON "AdminUser" TO eid02b_runtime');
   await owner.query('GRANT SELECT,INSERT,UPDATE ON "Department","Employee","EmployeePublicProfile","EmployeeVerificationIdentity","EmployeePublicationApproval" TO eid02b_runtime');
   await owner.query('GRANT SELECT,INSERT ON "EmployeeAuditEvent" TO eid02b_runtime');
   await owner.query('GRANT USAGE,SELECT ON SEQUENCE recon_employee_code_seq, recon_employee_official_code_seq TO eid02b_runtime');
+  }
   for (const [id,role] of [['eid_super','SUPER_ADMIN'],['eid_admin','ADMIN'],['eid_editor','EDITOR']]) {
     await owner.query(`INSERT INTO "AdminUser" (id,name,email,"passwordHash",role,"isActive","updatedAt") VALUES ($1,$1,$2,'synthetic-unused-hash',$3,true,CURRENT_TIMESTAMP)
       ON CONFLICT (id) DO UPDATE SET role=EXCLUDED.role,"isActive"=true`,[id,`${id}@example.invalid`,role]);
@@ -57,7 +64,7 @@ export async function fixture(overrides = {}) {
     const requested=await call('requestPublicationApproval',employeeId,{revision,scope,consentReference:`synthetic-consent-${employeeId}`,consentPolicyVersion:'synthetic-v1',consentRecordedAt:new Date(Date.now()-10000),...extra});
     return call('decidePublicationApproval',employeeId,{approvalId:requested.id,decision:'APPROVED'});
   }
-  return {prisma,owner,load,services,queries,version,call,employee,submitted,approved,transactionErrors,
+  return {prisma,owner,load,services,queries,version,call,employee,submitted,approved,transactionErrors,runtimeRole,
     setSubject:id=>{subject=id;},
     async close(){await prisma.$disconnect();await owner.end();},
   };

@@ -76,7 +76,9 @@ test('audit is append-only but admin deletion permits only narrowly scoped FK cl
 });
 test('disposable roles cannot connect elsewhere or reset sequence; runtime cannot mutate audit history',async()=>{
  const f=await fixture();try{
-  const roles=await f.owner.query("SELECT rolname,rolsuper,rolcreatedb,rolcreaterole FROM pg_roles WHERE rolname IN ('eid02b_test','eid02b_runtime')");
+  const names=[new URL(process.env.DATABASE_URL).username,new URL(process.env.EID02B_RUNTIME_URL).username];
+  const roles=await f.owner.query('SELECT rolname,rolsuper,rolcreatedb,rolcreaterole FROM pg_roles WHERE rolname=ANY($1)',[names]);
+  assert.equal(roles.rows.length,2);
   assert.ok(roles.rows.every(r=>!r.rolsuper&&!r.rolcreatedb&&!r.rolcreaterole));
   const elsewhere=new URL(process.env.EID02B_RUNTIME_URL);elsewhere.pathname='/postgres';
   const connection=new pg.Client({connectionString:elsewhere.toString()});

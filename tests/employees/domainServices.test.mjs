@@ -92,16 +92,16 @@ test('controlled erasure redacts personal data and evidence while retaining immu
 test('audit failure rolls back employee creation; actor deletion invalidates the same session hint',async()=>{
  const f=await fixture();try{
   const before=await f.prisma.employee.count();
-  await f.owner.query('REVOKE INSERT ON "EmployeeAuditEvent" FROM eid02b_runtime');
+  await f.owner.query(`REVOKE INSERT ON "EmployeeAuditEvent" FROM "${f.runtimeRole}"`);
   await assert.rejects(f.services.createEmployee({internalName:'Synthetic Rollback Only'}));
   assert.equal(await f.prisma.employee.count(),before);
-  await f.owner.query('GRANT INSERT ON "EmployeeAuditEvent" TO eid02b_runtime');
+  await f.owner.query(`GRANT INSERT ON "EmployeeAuditEvent" TO "${f.runtimeRole}"`);
   const actor=`eid_removed_${randomUUID()}`;
   await f.owner.query(`INSERT INTO "AdminUser" (id,name,email,"passwordHash",role,"updatedAt") VALUES ($1,'Synthetic Removed Actor',$2,'unused','ADMIN',now())`,[actor,`${actor}@example.invalid`]);
   f.setSubject(actor);await f.services.createEmployee({});
   await f.owner.query('DELETE FROM "AdminUser" WHERE id=$1',[actor]);
   for(const name of mutationNames) await assert.rejects(f.services[name]({}),error=>error.code==='UNAUTHENTICATED');
- }finally{await f.owner.query('GRANT INSERT ON "EmployeeAuditEvent" TO eid02b_runtime');await f.close();}
+ }finally{try{await f.owner.query(`GRANT INSERT ON "EmployeeAuditEvent" TO "${f.runtimeRole}"`);}finally{await f.close();}}
 });
 test('referenced portrait erasure is explicitly blocked; unavailable database never gives a public-positive fallback',async()=>{
  const f=await fixture();try{
@@ -132,11 +132,11 @@ test('competing draft saves and publication replacement use versions and atomic 
   assert.equal(await f.prisma.employeePublicationApproval.count({where:{employeeId:e.id,isPublished:true,scope:'DIRECTORY'}}),1);
   const other=publishing[0].status==='fulfilled'?b:a;
   const prior=await f.prisma.employeePublicationApproval.findFirstOrThrow({where:{employeeId:e.id,isPublished:true}});
-  await f.owner.query('REVOKE INSERT ON "EmployeeAuditEvent" FROM eid02b_runtime');
+  await f.owner.query(`REVOKE INSERT ON "EmployeeAuditEvent" FROM "${f.runtimeRole}"`);
   try {
     await assert.rejects(f.call('publishEmployeeProfile',e.id,{approvalId:other.id}));
     assert.equal((await f.prisma.employeePublicationApproval.findFirstOrThrow({where:{employeeId:e.id,isPublished:true}})).id,prior.id);
-  } finally { await f.owner.query('GRANT INSERT ON "EmployeeAuditEvent" TO eid02b_runtime'); }
+  } finally { await f.owner.query(`GRANT INSERT ON "EmployeeAuditEvent" TO "${f.runtimeRole}"`); }
   await f.call('publishEmployeeProfile',e.id,{approvalId:other.id});
   assert.equal((await f.prisma.employeePublicationApproval.findFirstOrThrow({where:{employeeId:e.id,isPublished:true}})).id,other.id);
  }finally{await f.close();}

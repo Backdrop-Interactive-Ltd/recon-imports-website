@@ -144,13 +144,13 @@ test('concurrent status changes admit one winner; audit failure rolls back the c
     assert.equal(race.find(x => x.status === 'rejected').reason.code, 'CONFLICT');
     const before = await f.prisma.employee.findUnique({ where: { id: e.id } });
     const approvals = await f.prisma.employeePublicationApproval.count({ where: { employeeId: e.id } });
-    await f.owner.query('REVOKE INSERT ON "EmployeeAuditEvent" FROM eid02b_runtime');
+    await f.owner.query(`REVOKE INSERT ON "EmployeeAuditEvent" FROM "${f.runtimeRole}"`);
     await rejection(f.call('rejoinEmployee', e.id), 'UNAVAILABLE');
     assert.deepEqual(await f.prisma.employee.findUnique({ where: { id: e.id } }), before);
     assert.equal(await f.prisma.employeePublicationApproval.count({ where: { employeeId: e.id } }), approvals);
     assert.equal(await f.prisma.employeePublicationApproval.count({ where: { employeeId: e.id, isPublished: true } }), 0);
   } finally {
-    await f.owner.query('GRANT INSERT ON "EmployeeAuditEvent" TO eid02b_runtime');
-    await f.close();
+    try { await f.owner.query(`GRANT INSERT ON "EmployeeAuditEvent" TO "${f.runtimeRole}"`); }
+    finally { await f.close(); }
   }
 });
