@@ -8,6 +8,16 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   agentRules: false,
+  ...(process.env.RECON_WORKERS_BUILD === "1" ? {
+    // The generated workerd client imports its PostgreSQL compiler from lib/.
+    // Turbopack's broad WASM trace otherwise includes unused Prisma CLI/PGlite
+    // and every database provider; OpenNext turns those traces into imports.
+    outputFileTracingExcludes: { "*": [
+      "./node_modules/@prisma/**/*.wasm",
+      "./node_modules/prisma/**/*.wasm",
+      "./node_modules/@electric-sql/**/*.wasm",
+    ] },
+  } : {}),
   ...(process.env.RECON_ISOLATED_BUILD ? { distDir: isolatedDistDir(process.env.RECON_ISOLATED_BUILD) } : {}),
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {

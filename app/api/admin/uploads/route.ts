@@ -1,8 +1,4 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
-import { randomUUID } from "node:crypto";
-import sharp from "sharp";
 import { AdminAuthorizationError, requireAdminPermission } from "../../../../lib/adminAuthorization";
 import { prisma } from "../../../../lib/prisma";
 import {
@@ -75,17 +71,12 @@ export async function POST(request: Request) {
       const result = await uploadImageBuffer(buffer, folder);
       deliveryUrl = getUploadedImageDeliveryUrl(result);
       publicId = result.public_id;
-    } else {
+    } else if (process.env.NODE_ENV === "development") {
       // Keep local development usable without cloud credentials. Decode and
       // re-encode uploads so only raster image content is served publicly.
-      const image = await sharp(buffer, { limitInputPixels: 40_000_000 }).png().toBuffer();
-      const filename = `${randomUUID()}.png`;
-      const directory = join(process.cwd(), "public", "uploads", folder);
-      await mkdir(directory, { recursive: true });
-      await writeFile(join(directory, filename), image, { flag: "wx" });
-      deliveryUrl = `/uploads/${folder}/${filename}`;
-      publicId = `local/${folder}/${filename}`;
-    }
+      const { uploadLocalDevelopmentImage } = await import("../../../../lib/uploads/local");
+      ({ deliveryUrl, publicId } = await uploadLocalDevelopmentImage(buffer, folder));
+    } else throw new Error("Persistent cloud media storage is required.");
     let mediaId: string | undefined;
 
     try {

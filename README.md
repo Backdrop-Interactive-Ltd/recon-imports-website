@@ -1,5 +1,12 @@
 # Recon Imports Website
 
+## Optional Cloudflare Workers build
+
+See [DEPLOY-04B setup and verification](docs/deployment/deploy-04b-workers.md).
+`npm run build:workers` creates an isolated, sanitized OpenNext artifact;
+`npm run preview:workers` runs it locally. These commands do not deploy.
+The standard Next.js development, build and Node/VPS commands remain available.
+
 ## Local development
 
 For this existing local installation, run:

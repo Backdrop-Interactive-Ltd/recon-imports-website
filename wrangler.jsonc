@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "recon-imports-website",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "recon-imports-website" }],
+  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "recon-imports-next-cache" }],
+  "durable_objects": {
+    "bindings": [
+      { "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" },
+      { "name": "NEXT_TAG_CACHE_DO_SHARDED", "class_name": "DOShardedTagCache" }
+    ]
+  },
+  // Cloudflare Durable Object declarations, not PostgreSQL migrations.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"] }],
+  "images": { "binding": "IMAGES" },
+  // Add a provisioned HYPERDRIVE binding with query caching DISABLED before
+  // production, or supply a remote TLS DATABASE_URL secret. Never use localhost.
+  // AUTH_SECRET, AUTH_URL and Cloudinary credentials are secrets, not vars here.
+  "vars": { "NEXTJS_ENV": "production" }
+}

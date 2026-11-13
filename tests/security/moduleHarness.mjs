@@ -19,8 +19,7 @@ export function createHarness(overrides = {}, globals = {}) {
       if (!path.isAbsolute(identifier)) return synthetic(identifier, await import(identifier));
       const source = await fs.readFile(identifier, 'utf8');
       const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } });
-      const module = new vm.SourceTextModule(output.outputText, { context, identifier });
-      await module.link(async (specifier, parent) => {
+      async function resolveImport(specifier, parent) {
         let target = specifier;
         if (specifier.startsWith('.')) {
           target = path.resolve(path.dirname(parent.identifier), specifier);
@@ -30,7 +29,15 @@ export function createHarness(overrides = {}, globals = {}) {
           }
         }
         return load(target);
+      }
+      const module = new vm.SourceTextModule(output.outputText, { context, identifier,
+        importModuleDynamically: async (specifier, parent) => {
+          const imported = await resolveImport(specifier, parent);
+          if (imported.status !== 'evaluated') await imported.evaluate();
+          return imported;
+        },
       });
+      await module.link(resolveImport);
       return module;
     })();
     cache.set(identifier, promise);
