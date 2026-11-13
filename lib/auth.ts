@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import { adminLoginSchema } from "./validations/auth";
 import { isAdminRole } from "./adminPermissions";
+import { getSafeAdminRedirect } from "./adminRedirect";
 
 const isProduction = process.env.NODE_ENV === "production";
 const authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
@@ -57,21 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    redirect({ baseUrl, url }) {
-      if (url.startsWith("/admin") && !url.startsWith("/admin/login")) {
-        return `${baseUrl}${url}`;
-      }
-
-      if (url.startsWith(baseUrl)) {
-        const nextUrl = new URL(url);
-
-        if (nextUrl.pathname.startsWith("/admin") && nextUrl.pathname !== "/admin/login") {
-          return url;
-        }
-      }
-
-      return `${baseUrl}/admin`;
-    },
+    redirect: getSafeAdminRedirect,
     jwt({ token, user }) {
       if (user) {
         token.role = (user as { role?: string }).role;

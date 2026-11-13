@@ -25,6 +25,8 @@ build/
 .DS_Store
 ._*
 *.tsbuildinfo
+next-env.d.ts
+lib/generated/prisma/
 *.log
 preview-*.png
 .local/

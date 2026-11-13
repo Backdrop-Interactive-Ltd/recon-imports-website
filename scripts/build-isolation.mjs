@@ -27,7 +27,7 @@ export function preserveTypeMetadata(root = process.cwd()) {
         };
         expected = normalize(current) === normalize(original.content);
       } else {
-        const normalize = text => text.replace(/import "\.\/(?:\.next(?:\/dev)?|\.local\/builds\/(?:eid02b|eid03|data02)(?:\/dev)?)\/types\/routes\.d\.ts";\r?\n/g, '');
+        const normalize = text => text.replace(/import "\.\/(?:\.next(?:\/dev)?|\.local\/builds\/(?:eid02b|eid03|data02)(?:\/dev)?)\/types\/(?:routes|root-params)\.d\.ts";\r?\n/g, '');
         expected = normalize(current) === normalize(original.content);
       }
       if (expected) writeFileSync(original.filename, original.content);

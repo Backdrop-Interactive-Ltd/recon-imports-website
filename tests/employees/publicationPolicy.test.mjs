@@ -4,7 +4,8 @@ import {fixture,rejection} from './fixture.mjs';
 
 test('exact frozen revisions, independent scopes, contact minimization and consent withdrawal',async()=>{
  const f=await fixture();try{
-  const e=await f.employee();const p=await f.submitted(e.id);
+ const e=await f.employee();const name=`Synthetic publication ${e.id}`;
+ const p=await f.submitted(e.id,{publicName:name});
   const identity=await f.call('issueVerificationIdentity',e.id);
   const directory=await f.approved(e.id,p.revision);
   await f.call('publishEmployeeProfile',e.id,{approvalId:directory.id});
@@ -15,19 +16,20 @@ test('exact frozen revisions, independent scopes, contact minimization and conse
   assert.equal(publicProfile.active,true);assert.equal(publicProfile.officialPhone,'+8801000000000');assert.equal(publicProfile.officialEmail,null);
   await f.call('unpublishEmployeeProfile',e.id,{approvalId:directory.id});
   assert.ok(await f.queries.getEmployeeVerification(identity.publicKey));
-  assert.ok(!(await f.queries.getPublicEmployeeDirectory({pageSize:50})).some(row=>row.employeeCode===e.employeeCode));
+  assert.equal((await f.queries.getPublicEmployeeDirectory({search:name})).length,0);
   await f.call('publishEmployeeProfile',e.id,{approvalId:directory.id});
   const expected=['active','biography','checkedAt','departmentName','designation','employeeCode','experienceSummary','isFeatured','officialEmail','officialPhone','portrait','publicName'];
   assert.deepEqual(Object.keys(publicProfile).sort(),expected.sort());
-  const list=await f.queries.getPublicEmployeeDirectory({search:'Synthetic'});const row=list.find(r=>r.employeeCode===e.employeeCode);
+  const list=await f.queries.getPublicEmployeeDirectory({search:name});const row=list.find(r=>r.employeeCode===e.employeeCode);
+  assert.equal(list.length,1);assert.ok(row,'the unique published fixture must be returned');
   assert.equal(row.officialPhone,null);assert.equal(row.officialEmail,null);
   assert.ok(!JSON.stringify(row).includes('synthetic-consent'));assert.ok(!('publicKey' in row));
   const draft=await f.call('createDraftRevision',e.id,{fields:{publicName:'Unapproved Changed Name'}});
-  assert.equal((await f.queries.getEmployeeVerification(identity.publicKey)).publicName,'Synthetic Public Name');
+  assert.equal((await f.queries.getEmployeeVerification(identity.publicKey)).publicName,name);
   await rejection(f.call('saveEmployeeDraft',e.id,{revision:p.revision,expectedProfileVersion:p.version,fields:{publicName:'Forbidden'}}),'INELIGIBLE');
   await f.call('withdrawEmployeeConsent',e.id,{consentReference:`synthetic-consent-${e.id}`});
   assert.equal(await f.queries.getEmployeeVerification(identity.publicKey),null);
-  assert.ok(!(await f.queries.getPublicEmployeeDirectory({pageSize:50})).some(r=>r.employeeCode===e.employeeCode));
+  assert.equal((await f.queries.getPublicEmployeeDirectory({search:name})).length,0);
   assert.equal(await f.prisma.employeePublicationApproval.count({where:{employeeId:e.id,isPublished:true}}),0);
   await rejection(f.call('publishEmployeeProfile',e.id,{approvalId:directory.id}),'INELIGIBLE');
   assert.equal(draft.state,'DRAFT');

@@ -72,7 +72,7 @@ if(mode === 'init') {
   if(!args.length) throw Error('A command is required');
   const runtime=process.env.EID02B_RUNTIME === '1';
   const command=args.shift();
-  const nodeArgs=command === 'prisma' ? [resolve('node_modules/prisma/build/index.js'),...args] : command === 'node' ? args : command === 'build' ? [resolve('node_modules/next/dist/bin/next'),'build'] : null;
+  const nodeArgs=command === 'prisma' ? [resolve('node_modules/prisma/build/index.js'),...args] : command === 'node' ? args : command === 'build' ? [resolve('scripts/build-next.mjs')] : null;
   if(!nodeArgs) throw Error('Only prisma, node and build are supported');
   const restoreTypes = command === 'build' ? preserveTypeMetadata() : () => {};
   const child=spawn(process.execPath,nodeArgs,{stdio:'inherit',windowsHide:true,env:{...process.env,RECON_ISOLATED_BUILD:slug,DATABASE_URL:runtime?target.runtimeUrl:target.ownerUrl,EID02B_RUNTIME_URL:target.runtimeUrl,EID02B_DATABASE:target.database,EID02B_MARKER:target.marker,AUTH_SECRET:randomBytes(32).toString('hex')}});

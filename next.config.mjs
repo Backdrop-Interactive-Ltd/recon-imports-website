@@ -7,6 +7,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  agentRules: false,
   ...(process.env.RECON_ISOLATED_BUILD ? { distDir: isolatedDistDir(process.env.RECON_ISOLATED_BUILD) } : {}),
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {

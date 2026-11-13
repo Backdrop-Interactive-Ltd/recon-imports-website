@@ -81,7 +81,7 @@ test('isolated builds restore generated type metadata and preserve unrelated con
   await writeFile(path.join(root, 'next-env.d.ts'), declarations);
   const restore = preserveTypeMetadata(root);
   await writeFile(path.join(root, 'tsconfig.json'), JSON.stringify({ include: ['app/**/*.tsx', '.local/builds/data02/types/**/*.ts'], compilerOptions: { strict: true } }));
-  await writeFile(path.join(root, 'next-env.d.ts'), declarations.replace('.next/dev', '.local/builds/data02'));
+  await writeFile(path.join(root, 'next-env.d.ts'), declarations.replace('.next/dev', '.local/builds/data02') + 'import "./.local/builds/data02/types/root-params.d.ts";\n');
   restore();
   assert.equal(await readFile(path.join(root, 'tsconfig.json'), 'utf8'), config);
   assert.equal(await readFile(path.join(root, 'next-env.d.ts'), 'utf8'), declarations);

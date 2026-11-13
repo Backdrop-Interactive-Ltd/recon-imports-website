@@ -58,9 +58,10 @@ Do not use a hard reset or Git cleanup to resolve local differences.
 
 .gitignore excludes environment files except the template, .local/, uploaded media,
 compiler caches, copy sidecars, database archives and common secret/key files.
-The generated Prisma client remains tracked because this application imports it
-and installation does not yet guarantee automatic generation. Schema, migrations
-and required configuration remain tracked. Store database backups, uploads and
+The generated Prisma client is created automatically by npm install/npm ci and
+before every production build; keep build dependencies installed in the build job.
+Its generated output, Next type declarations and runtime caches are ignored.
+Schema, migrations and required configuration remain tracked. Store database backups, uploads and
 credentials separately; Git does not back up database records or ignored assets.
 
 Modern premium car showroom and inventory management platform built with **Next.js**, featuring a fully custom backend CMS, dynamic vehicle management, homepage content controls, lead management, and admin dashboard functionality.
