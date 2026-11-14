@@ -30,7 +30,7 @@ const adminNavItems = [
   { href: "/admin/auction-sheet-requests", label: "Auction Sheets", icon: FileCheck2 },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/users", label: "Admin Users", icon: UserCog },
-  { href: "/admin/employees", label: "Employees", icon: UsersRound },
+  { href: "/admin/employees", label: "Team Members", icon: UsersRound },
   { href: "/admin/site-settings", label: "Site Settings", icon: Settings },
   { href: "/admin/media", label: "Media", icon: Image },
 ];

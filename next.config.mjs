@@ -8,6 +8,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   agentRules: false,
+  // Employee draft forms accept a validated 3 MB photo plus multipart fields.
+  experimental: { serverActions: { bodySizeLimit: "4mb" } },
   ...(process.env.RECON_WORKERS_BUILD === "1" ? {
     // The generated workerd client imports its PostgreSQL compiler from lib/.
     // Turbopack's broad WASM trace otherwise includes unused Prisma CLI/PGlite

@@ -10,7 +10,7 @@ import { employeeCreateSchema, departmentSchema, draftSchema, employeeVersionSch
 
 type Tx = Prisma.TransactionClient;
 export class EmployeeDomainError extends Error {
-  constructor(public readonly code: "VALIDATION" | "CONFLICT" | "NOT_FOUND" | "INELIGIBLE" | "UNAVAILABLE" | "PORTRAIT_STORAGE_PENDING" | "APPROVAL_REQUIRED" | "CONSENT_REQUIRED" | "CONSENT_EXPIRED" | "CONSENT_WITHDRAWN") {
+  constructor(public readonly code: "CONSENT_REFERENCE_INVALID" | "CONSENT_POLICY_INVALID" | "CONSENT_RECORDED_INVALID" | "CONSENT_EXPIRY_INVALID" | "CONSENT_RECORDED_FUTURE" | "CONSENT_EXPIRY_PAST" | "CONSENT_REVISION_REQUIRED" | "CONSENT_PORTRAIT_MISSING" | "CONSENT_PHONE_MISSING" | "CONSENT_EMAIL_MISSING" | "VALIDATION" | "CONFLICT" | "NOT_FOUND" | "INELIGIBLE" | "UNAVAILABLE" | "PORTRAIT_STORAGE_PENDING" | "APPROVAL_REQUIRED" | "CONSENT_REQUIRED" | "CONSENT_EXPIRED" | "CONSENT_WITHDRAWN") {
     super(`Employee operation failed: ${code}.`); this.name = "EmployeeDomainError";
   }
 }
@@ -69,9 +69,10 @@ async function departmentSnapshot(tx: Tx, departmentId: string | null | undefine
   if (!department?.isActive) fail("INELIGIBLE");
   return { departmentId: department.id, departmentName: department.name };
 }
-async function draftValues(tx: Tx, input: z.infer<typeof draftSchema>) {
+async function draftValues(tx: Tx, input: z.infer<typeof draftSchema>, uploadedPortrait?: { url: string; version: string }) {
   if (input.portraitStorageKey || input.portraitStorageVersion) fail("PORTRAIT_STORAGE_PENDING");
-  const { departmentId, ...values } = input;
+  const { departmentId, ...fields } = input;
+  const values = { ...fields, ...(uploadedPortrait ? { portraitStorageKey: uploadedPortrait.url, portraitStorageVersion: uploadedPortrait.version } : {}) };
   return departmentId !== undefined ? { ...values, ...await departmentSnapshot(tx, departmentId) } : values;
 }
 async function profile(tx: Tx, employee: Employee, revision: number): Promise<EmployeePublicProfile> {
@@ -132,17 +133,26 @@ export async function createDraftRevision(input: unknown) {
     await audit(tx, actor, updated, "DRAFT_SAVED", ["draft"], created.revision); return created;
   });
 }
-export async function saveEmployeeDraft(input: unknown) {
+export async function checkEmployeePhotoDraft(input: unknown) {
+  return run("employees.draft.edit", async tx => {
+    const data = parse(revisionSchema.extend({ expectedProfileVersion: versionSchema }), input);
+    const employee = await lockEmployee(tx, data.employeeId, data.expectedVersion);
+    const draft = await profile(tx, employee, data.revision);
+    if (draft.state !== "DRAFT") fail("INELIGIBLE");
+    if (draft.version !== data.expectedProfileVersion) fail("CONFLICT");
+  });
+}
+export async function saveEmployeeDraft(input: unknown, uploadedPortrait?: { url: string; version: string }) {
   return run("employees.draft.edit", async (tx, actor) => {
     const data = parse(revisionSchema.extend({ expectedProfileVersion: versionSchema, fields: draftSchema }), input);
     const employee = await lockEmployee(tx, data.employeeId, data.expectedVersion);
     const draft = await profile(tx, employee, data.revision);
     if (draft.state !== "DRAFT") fail("INELIGIBLE");
     if (draft.version !== data.expectedProfileVersion) fail("CONFLICT");
-    const values = await draftValues(tx, data.fields);
+    const values = await draftValues(tx, data.fields, uploadedPortrait);
     const updatedDraft = await tx.employeePublicProfile.update({ where: { id: draft.id }, data: { ...values, version: { increment: 1 } } });
     const updated = await bump(tx, employee);
-    await audit(tx, actor, updated, "DRAFT_SAVED", Object.keys(data.fields), draft.revision); return updatedDraft;
+    await audit(tx, actor, updated, "DRAFT_SAVED", [...Object.keys(data.fields), ...(uploadedPortrait ? ["portraitStorageKey", "portraitStorageVersion"] : [])], draft.revision); return updatedDraft;
   });
 }
 export async function submitEmployeeRevision(input: unknown) {
@@ -158,13 +168,25 @@ export async function submitEmployeeRevision(input: unknown) {
 }
 export async function requestPublicationApproval(input: unknown) {
   return run("employees.revisions.submit", async (tx, actor) => {
-    const data = parse(approvalRequestSchema, input);
+    const parsed = approvalRequestSchema.safeParse(input);
+    if (!parsed.success) {
+      const fields = parsed.error.issues.map(issue => issue.path[0]);
+      if (fields.includes("consentReference")) fail("CONSENT_REFERENCE_INVALID");
+      if (fields.includes("consentPolicyVersion")) fail("CONSENT_POLICY_INVALID");
+      if (fields.includes("consentRecordedAt")) fail("CONSENT_RECORDED_INVALID");
+      if (fields.includes("consentExpiresAt")) fail("CONSENT_EXPIRY_INVALID");
+      fail("VALIDATION");
+    }
+    const data = parsed.data;
     const employee = await lockEmployee(tx, data.employeeId, data.expectedVersion);
     const submitted = await profile(tx, employee, data.revision);
-    if (submitted.state !== "SUBMITTED" || submitted.erasedAt) fail("INELIGIBLE");
-    if (data.consentRecordedAt > new Date() || (data.consentExpiresAt && data.consentExpiresAt <= new Date())) fail("INELIGIBLE");
-    if (data.publishPortrait) fail("PORTRAIT_STORAGE_PENDING");
-    if ((data.publishPhone && !submitted.officialPhone) || (data.publishEmail && !submitted.officialEmail)) fail("INELIGIBLE");
+    if (submitted.state !== "SUBMITTED" || submitted.erasedAt) fail("CONSENT_REVISION_REQUIRED");
+    const now = new Date();
+    if (data.consentRecordedAt > now) fail("CONSENT_RECORDED_FUTURE");
+    if (data.consentExpiresAt && data.consentExpiresAt <= now) fail("CONSENT_EXPIRY_PAST");
+    if (data.publishPortrait && (!submitted.portraitStorageKey || !submitted.portraitStorageVersion)) fail("CONSENT_PORTRAIT_MISSING");
+    if (data.publishPhone && !submitted.officialPhone) fail("CONSENT_PHONE_MISSING");
+    if (data.publishEmail && !submitted.officialEmail) fail("CONSENT_EMAIL_MISSING");
     const { employeeId, expectedVersion: _version, revision, ...values } = data;
     const requested = await tx.employeePublicationApproval.create({ data: { ...values, employeeId, profileRevision: revision, employmentEpoch: employee.publicationEpoch } });
     const updated = await bump(tx, employee);
@@ -270,7 +292,7 @@ export async function rejoinEmployee(input: unknown) {
       if (await tx.employeePublicationApproval.findFirst({ where: { employeeId: employee.id, consentReference: value.consentReference, status: "WITHDRAWN" }, select: { id: true } })) fail("CONSENT_WITHDRAWN");
       const submitted = await profile(tx, employee, value.profileRevision);
       if (submitted.state !== "SUBMITTED" || submitted.erasedAt) fail("APPROVAL_REQUIRED");
-      if (value.publishPortrait) fail("PORTRAIT_STORAGE_PENDING");
+      if (value.publishPortrait && (!submitted.portraitStorageKey || !submitted.portraitStorageVersion)) fail("INELIGIBLE");
       if (snapshots.some(other => other.scope === value.scope)) fail("VALIDATION");
       snapshots.push(value);
     }

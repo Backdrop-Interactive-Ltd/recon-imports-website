@@ -1,0 +1,21 @@
+.main { max-width: 1400px; margin: auto; padding: 36px 5% 90px; }
+.back { display: inline-flex; gap: 18px; align-items: center; padding: 12px 0; margin-bottom: 30px; font-size: 13px; font-weight: 600; }
+.layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 100px); margin-top: 26px; align-items: start; }
+.portrait { position: relative; aspect-ratio: 4 / 5; background: #f1c6d7; border-radius: 100px 4px 4px 4px; overflow: hidden; }
+.portrait img { object-fit: cover; object-position: center top; }
+.placeholder { height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 22px; color: #6e2945; }
+.placeholder span { font-size: 11px; letter-spacing: .14em; }
+.copy { padding-top: 16px; min-width: 0; }
+.identity { font-size: 11px; letter-spacing: .12em; color: #685950; }
+.copy h1 { font-size: clamp(36px, 5vw, 76px); font-weight: 850; line-height: 1.05; letter-spacing: -.055em; margin: 24px 0 16px; overflow-wrap: anywhere; }
+.designation { font-size: 21px; color: #ae3217; margin-bottom: 38px; }
+.copy section { border-top: 1px solid #d8d3cb; padding: 24px 0 8px; }
+.copy h2 { font-size: 14px; letter-spacing: .04em; margin: 0 0 14px; }
+.copy section p { line-height: 1.85; color: #514943; font-size: 16px; white-space: pre-line; overflow-wrap: anywhere; }
+.contacts { display: flex; align-items: start; flex-direction: column; gap: 16px; overflow-wrap: anywhere; }
+.contacts a { border-bottom: 1px solid #ba4d31; padding-bottom: 4px; max-width: 100%; }
+.unavailable { text-align: center; padding: 50px 20px 70px; }
+.unavailable h1 { font-size: clamp(32px, 5vw, 64px); letter-spacing: -.05em; margin: 24px 0; }
+.unavailable p { line-height: 1.8; color: #63544a; }
+.unavailable a { display: inline-flex; align-items: center; gap: 16px; margin-top: 20px; border-bottom: 1px solid #171717; padding-bottom: 12px; }
+@media(max-width:760px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 24px; } .portrait { max-width: 480px; width: 100%; } .copy { padding-top: 0; } .main { padding-bottom: 54px; } .back { margin-bottom: 22px; } }

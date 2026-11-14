@@ -5,7 +5,7 @@ import { isVerificationKey, isEmployeeCode } from "./identifiers";
 export type PublicEmployee = {
   employeeCode: string; publicName: string; designation: string; departmentName: string | null;
   biography: string | null; experienceSummary: string | null; officialPhone: string | null;
-  officialEmail: string | null; isFeatured: boolean; portrait: null; checkedAt: Date;
+  officialEmail: string | null; isFeatured: boolean; portrait: string | null; checkedAt: Date;
 };
 export class EmployeePublicQueryError extends Error {
   constructor() { super("Employee information is temporarily unavailable."); this.name = "EmployeePublicQueryError"; }
@@ -22,7 +22,7 @@ const publicColumns = Prisma.sql`
   e."employeeCode", p."publicName", p."designation", p."departmentName", p."biography", p."experienceSummary",
   CASE WHEN a."publishPhone" THEN p."officialPhone" ELSE NULL END AS "officialPhone",
   CASE WHEN a."publishEmail" THEN p."officialEmail" ELSE NULL END AS "officialEmail",
-  p."isFeatured", NULL::text AS "portrait", CURRENT_TIMESTAMP AS "checkedAt"`;
+  p."isFeatured", CASE WHEN a."publishPortrait" THEN p."portraitStorageKey" ELSE NULL END AS "portrait", CURRENT_TIMESTAMP AS "checkedAt"`;
 
 // One statement checks live employment, exact frozen revision, scope, consent and epoch.
 // Never wrap these queries in unstable_cache/use cache/ISR or a stale-positive fallback.

@@ -56,7 +56,7 @@ export async function getEmployeeByCode(employeeCode: string) {
 }
 
 const pageSchema = z.number().int().min(1).max(10000);
-// Explicit projections: never serialize identities, portrait keys or raw model records.
+// Explicit projections: never serialize identities, raw model records.
 export async function getEmployeeEditorData(employeeCode: string, page = 1) {
   return read(async tx => {
     if (!isEmployeeCode(employeeCode)) return null;
@@ -65,7 +65,7 @@ export async function getEmployeeEditorData(employeeCode: string, page = 1) {
     if (!employee) return null;
     const [profiles, profileCount, draftCount, departments] = await Promise.all([
       tx.employeePublicProfile.findMany({ where: { employeeId: employee.id }, orderBy: { revision: "desc" }, skip: (page - 1) * 5, take: 5,
-        select: { id: true, revision: true, state: true, version: true, publicName: true, designation: true, biography: true, experienceSummary: true, departmentId: true, departmentName: true, officialPhone: true, officialEmail: true, displayOrder: true, isFeatured: true } }),
+        select: { id: true, revision: true, state: true, version: true, publicName: true, designation: true, biography: true, experienceSummary: true, departmentId: true, departmentName: true, officialPhone: true, officialEmail: true, displayOrder: true, isFeatured: true, portraitStorageKey: true, portraitStorageVersion: true } }),
       tx.employeePublicProfile.count({ where: { employeeId: employee.id } }),
       tx.employeePublicProfile.count({ where: { employeeId: employee.id, state: "DRAFT" } }),
       tx.department.findMany({ where: { isActive: true }, select: { id: true, name: true }, orderBy: [{ displayOrder: "asc" }, { id: "asc" }], take: 100 }),
