@@ -1,4 +1,4 @@
-const siteUrl = "https://reconimports.com";
+const siteUrl = "https://www.reconimports.com";
 
 const stockTypeBasePaths: Record<string, string> = {
   BRAND_NEW: "/brand-new",

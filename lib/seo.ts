@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getOpenGraphImageUrl } from "./cloudinaryImages";
 import type { PublicSiteSettings } from "./siteSettingsConfig";
 
-export const siteUrl = "https://reconimports.com";
+export const siteUrl = "https://www.reconimports.com";
 export const defaultMetaTitle = "Recon Imports | Premium Japanese Reconditioned Cars in Bangladesh";
 export const defaultMetaDescription =
   "Recon Imports offers premium Japanese reconditioned cars, verified auction sheet support, car stock listings, and reliable vehicle import services in Bangladesh.";

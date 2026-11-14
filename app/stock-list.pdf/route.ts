@@ -7,7 +7,7 @@ import { getSiteSettings } from "../../lib/siteSettings";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const siteUrl = "https://reconimports.com";
+const siteUrl = "https://www.reconimports.com";
 const cacheTtlMs = 60_000;
 const imageFetchTimeoutMs = 3_500;
 const imageFetchConcurrency = 5;

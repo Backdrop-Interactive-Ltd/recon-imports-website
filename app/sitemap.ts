@@ -3,7 +3,7 @@ import { getCarPublicPath } from "../lib/carPublicRoutes";
 import { CarSaleStatus } from "../lib/generated/prisma/enums";
 import { prisma } from "../lib/prisma";
 
-const siteUrl = "https://reconimports.com";
+const siteUrl = "https://www.reconimports.com";
 const now = new Date();
 
 export const revalidate = 3600;
@@ -38,7 +38,7 @@ function cleanRoutePath(routePath: string | null, fallbackSlug: string) {
   if (/^https?:\/\//i.test(path)) {
     try {
       const url = new URL(path);
-      return url.hostname === "reconimports.com" ? url.pathname : "";
+      return ["reconimports.com", "www.reconimports.com"].includes(url.hostname) ? url.pathname : "";
     } catch {
       return "";
     }

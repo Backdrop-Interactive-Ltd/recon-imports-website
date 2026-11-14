@@ -19,6 +19,6 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "Facebot",
       },
     ],
-    sitemap: "https://reconimports.com/sitemap.xml",
+    sitemap: "https://www.reconimports.com/sitemap.xml",
   };
 }
