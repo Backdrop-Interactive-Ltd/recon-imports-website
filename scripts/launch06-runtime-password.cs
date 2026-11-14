@@ -105,6 +105,10 @@ public static class ReconRuntimePassword
     {
         return PromptFields("RECON IMPORTS - Existing runtime login", "Runtime is already configured. Its password will be preserved; enter the existing password for read-only verification.", new[] { "runtime" }, new[] { "EXISTING recon_runtime password" })["runtime"];
     }
+    public static SecureString PromptHyperdriveRuntime()
+    {
+        return PromptFields("RECON IMPORTS - Hyperdrive runtime credential", "Enter the EXISTING verified recon_runtime password. Only the existing Hyperdrive origin credentials will change; no database password is reset.", new[] { "runtime" }, new[] { "EXISTING recon_runtime password" })["runtime"];
+    }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] private static extern IntPtr LoadLibraryEx(string file, IntPtr reserved, uint flags);
     [DllImport("kernel32.dll", CharSet = CharSet.Ansi)] private static extern IntPtr GetProcAddress(IntPtr module, string name);
