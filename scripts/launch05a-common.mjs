@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 export const taskRoot = path.resolve('.local/launch05a');
 export function privateRun(label, scope = 'launch05a') {
   if (process.platform !== 'win32') throw Error('This backup/prompt workflow requires Windows.');
-  if (!['launch05a', 'launch05c', 'launch05d', 'launch05e', 'launch05f', 'launch05g'].includes(scope)) throw Error('Unexpected private workflow scope.');
+  if (!['launch05a', 'launch05c', 'launch05d', 'launch05e', 'launch05f', 'launch05g', 'launch06'].includes(scope)) throw Error('Unexpected private workflow scope.');
   const selectedRoot = path.resolve('.local', scope);
   const root = path.resolve('.');
   if (JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).name !== 'recon-imports-website') throw Error('Unexpected workspace.');
