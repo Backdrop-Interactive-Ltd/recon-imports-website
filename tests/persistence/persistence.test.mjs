@@ -69,7 +69,7 @@ test('real PostgreSQL settings and isolated uploads survive worker restart and d
 
 test('favicon fallback exists and test build directories cannot select the normal .next output', async () => {
   const fallback = await readFile('public/favicon.svg', 'utf8'); assert.match(fallback, /<svg/);
-  for (const task of ['eid02b', 'eid03', 'data02']) assert.equal(isolatedDistDir(task), `.local/builds/${task}`);
+  for (const task of ['eid02b', 'eid03', 'eid04', 'data02']) assert.equal(isolatedDistDir(task), `.local/builds/${task}`);
   assert.throws(() => isolatedDistDir('../.next'));
 });
 

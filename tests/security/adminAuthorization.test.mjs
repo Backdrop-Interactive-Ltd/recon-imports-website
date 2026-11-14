@@ -108,7 +108,7 @@ test('all privileged Server Action exports reject unauthorized direct invocation
       checked++;
     }
   }
-  assert.equal(checked, 34, 'Update inventory when privileged actions change');
+  assert.equal(checked, 36, 'Update inventory when privileged actions change');
 });
 
 test('all account actions deny ADMIN/EDITOR, including stale SUPER_ADMIN JWT and client-supplied role', async () => {
@@ -206,7 +206,7 @@ test('every dashboard page guards before executing its body; account navigation 
     const fn=parsed.statements.find(n => ts.isFunctionDeclaration(n) && n.modifiers?.some(m => m.kind === ts.SyntaxKind.DefaultKeyword));
     assert.match(fn.body.statements[0].getText(parsed),/await requireAdminPagePermission\(/,file);
   }
-  assert.equal(files.length,16);
+  assert.equal(files.length,19);
   const f=await fixture(); const auth=await f.load('lib/adminAuthorization.ts');
   f.setSession(null);
   await assert.rejects(auth.requireAdminPagePermission('dashboard.access'), e => e.location === '/admin/login');
@@ -214,4 +214,5 @@ test('every dashboard page guards before executing its body; account navigation 
   await assert.rejects(auth.requireAdminPagePermission('adminUsers.manage'), e => e.location === '/admin');
   const source=await fs.readFile(`${actionDirectory}/AdminNav.tsx`,'utf8');
   assert.match(source,/hasAdminPermission\(role, "adminUsers.manage"\)/);
+  assert.match(source,/hasAdminPermission\(role, "employees.records.read"\)/);
 });

@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 export function isolatedDistDir(task) {
-  if (!['eid02b', 'eid03', 'data02'].includes(task)) throw Error('Unrecognized isolated build task.');
+  if (!['eid02b', 'eid03', 'eid04', 'data02'].includes(task)) throw Error('Unrecognized isolated build task.');
   return `.local/builds/${task}`;
 }
 
@@ -27,7 +27,7 @@ export function preserveTypeMetadata(root = process.cwd()) {
         };
         expected = normalize(current) === normalize(original.content);
       } else {
-        const normalize = text => text.replace(/import "\.\/(?:\.next(?:\/dev)?|\.local\/builds\/(?:eid02b|eid03|data02)(?:\/dev)?)\/types\/(?:routes|root-params)\.d\.ts";\r?\n/g, '');
+        const normalize = text => text.replace(/import "\.\/(?:\.next(?:\/dev)?|\.local\/builds\/(?:eid02b|eid03|eid04|data02)(?:\/dev)?)\/types\/(?:routes|root-params)\.d\.ts";\r?\n/g, '');
         expected = normalize(current) === normalize(original.content);
       }
       if (expected) writeFileSync(original.filename, original.content);

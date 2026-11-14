@@ -30,6 +30,7 @@ const adminNavItems = [
   { href: "/admin/auction-sheet-requests", label: "Auction Sheets", icon: FileCheck2 },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/users", label: "Admin Users", icon: UserCog },
+  { href: "/admin/employees", label: "Employees", icon: UsersRound },
   { href: "/admin/site-settings", label: "Site Settings", icon: Settings },
   { href: "/admin/media", label: "Media", icon: Image },
 ];
@@ -41,6 +42,7 @@ export default function AdminNav({ role }: { role: AdminRole }) {
     <nav className={styles.nav} aria-label="Admin navigation">
       {adminNavItems.map((item) => {
         if (item.href === "/admin/users" && !hasAdminPermission(role, "adminUsers.manage")) return null;
+        if (item.href === "/admin/employees" && !hasAdminPermission(role, "employees.records.read")) return null;
         const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(`${item.href}/`));
         const Icon = item.icon;
 

@@ -12,9 +12,9 @@ export async function fixture(overrides = {}) {
   const runtimeRole=new URL(process.env.EID02B_RUNTIME_URL).username;
   assert.ok(['eid02b_runtime','recon_runtime'].includes(runtimeRole));
   assert.equal(url.hostname,'127.0.0.1');
-  assert.match(process.env.EID02B_DATABASE ?? '',/^eid(?:02b|03)_[a-f0-9]{12}$/);
+  assert.match(process.env.EID02B_DATABASE ?? '',/^eid(?:02b|03|04)_[a-f0-9]{12}$/);
   assert.equal(url.pathname,`/${process.env.EID02B_DATABASE}`);
-  assert.ok(/^EID-(02B|03) isolated disposable /.test(process.env.EID02B_MARKER ?? ''));
+  assert.ok(/^EID-(02B|03|04) isolated disposable /.test(process.env.EID02B_MARKER ?? ''));
   const owner = new pg.Client({connectionString:url.toString()}); await owner.connect();
   const marker=await owner.query("SELECT shobj_description(oid,'pg_database') AS marker FROM pg_database WHERE datname=current_database()");
   assert.equal(marker.rows[0].marker,process.env.EID02B_MARKER);

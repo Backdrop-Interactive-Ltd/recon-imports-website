@@ -7,8 +7,8 @@ import { createServer } from 'node:net';
 import { spawn } from 'node:child_process';
 import { preserveTypeMetadata } from './build-isolation.mjs';
 
-const task=['EID-03','DATA-02'].includes(process.env.RECON_DISPOSABLE_TASK) ? process.env.RECON_DISPOSABLE_TASK : 'EID-02B';
-const slug={'EID-03':'eid03','EID-02B':'eid02b','DATA-02':'data02'}[task];
+const task=['EID-03','EID-04','DATA-02'].includes(process.env.RECON_DISPOSABLE_TASK) ? process.env.RECON_DISPOSABLE_TASK : 'EID-02B';
+const slug={'EID-03':'eid03','EID-04':'eid04','EID-02B':'eid02b','DATA-02':'data02'}[task];
 const manifestPath=resolve(`.local/${slug}-target.json`);
 const mode=process.argv[2];
 function describe(target) {
