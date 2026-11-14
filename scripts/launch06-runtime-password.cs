@@ -109,6 +109,10 @@ public static class ReconRuntimePassword
     {
         return PromptFields("RECON IMPORTS - Hyperdrive runtime credential", "Enter the EXISTING verified recon_runtime password. Only the existing Hyperdrive origin credentials will change; no database password is reset.", new[] { "runtime" }, new[] { "EXISTING recon_runtime password" })["runtime"];
     }
+    public static Dictionary<string, SecureString> PromptWorkerSecrets()
+    {
+        return PromptFields("RECON IMPORTS - Prepare Worker secrets only", "Private preparation only; no deployment. Use the SAME Cloudinary product environment and enabled rotated key pair previously verified.", new[] { "cloud", "confirmCloud", "apiKey", "apiSecret" }, new[] { "Cloudinary cloud name", "Repeat the SAME cloud name", "Cloudinary API key", "Cloudinary rotated API secret" });
+    }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] private static extern IntPtr LoadLibraryEx(string file, IntPtr reserved, uint flags);
     [DllImport("kernel32.dll", CharSet = CharSet.Ansi)] private static extern IntPtr GetProcAddress(IntPtr module, string name);
