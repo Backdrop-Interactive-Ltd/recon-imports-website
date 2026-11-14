@@ -28,6 +28,16 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "reconimports.com" }],
+        destination: "https://www.reconimports.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     const privateHeaders = [
       {
