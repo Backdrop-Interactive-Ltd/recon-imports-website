@@ -136,7 +136,7 @@ export default function HomeClient({
 
   return (
     <main>
-      <HomeHeader phoneHref={phoneHref} searchItems={searchItems} siteSettings={siteSettings} />
+      <HomeHeader phoneHref={phoneHref} searchItems={searchItems} siteSettings={siteSettings} brands={brands} />
       <HeroSlider heroSlides={heroSlides} />
       <VerifySection />
       <PurposeCategoryCarousel categories={categories} title={purposeSectionTitle} />
