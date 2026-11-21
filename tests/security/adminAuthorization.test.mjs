@@ -206,7 +206,7 @@ test('every dashboard page guards before executing its body; account navigation 
     const fn=parsed.statements.find(n => ts.isFunctionDeclaration(n) && n.modifiers?.some(m => m.kind === ts.SyntaxKind.DefaultKeyword));
     assert.match(fn.body.statements[0].getText(parsed),/await requireAdminPagePermission\(/,file);
   }
-  assert.equal(files.length,19);
+  assert.equal(files.length,20);
   const f=await fixture(); const auth=await f.load('lib/adminAuthorization.ts');
   f.setSession(null);
   await assert.rejects(auth.requireAdminPagePermission('dashboard.access'), e => e.location === '/admin/login');

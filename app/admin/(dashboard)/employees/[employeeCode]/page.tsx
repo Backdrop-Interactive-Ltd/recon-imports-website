@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdminPagePermission } from "../../../../../lib/adminAuthorization";
 import { hasAdminPermission } from "../../../../../lib/adminPermissions";
-import { getEmployeeEditorData, getEmployeeReviewData } from "../../../../../lib/employees/adminQueries";
+import { getEmployeeEditorData, getEmployeePageData } from "../../../../../lib/employees/adminQueries";
 import { EmployeeActionForm, EmployeePhotoField } from "../EmployeeForms";
 import styles from "../page.module.css";
 import EmployeeIdentityControls from "../EmployeeIdentityControls";
@@ -34,18 +34,17 @@ export default async function EmployeePage({ params, searchParams }: {
   params: Promise<{ employeeCode: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const actor = await requireAdminPagePermission("employees.records.read");
+  await requireAdminPagePermission("employees.records.read");
   const { employeeCode } = await params, query = await searchParams;
-  const revisionPage = pageNumber(query.revisions), approvalPage = pageNumber(query.approvals), historyPage = pageNumber(query.history);
-  const data = await getEmployeeEditorData(employeeCode, revisionPage);
+  const revisionPage = pageNumber(query.revisions), approvalPage = pageNumber(query.approvals);
+  const data = await getEmployeePageData(employeeCode, revisionPage, approvalPage);
   if (!data) notFound();
-  const { employee, profiles, departments } = data;
-  const review = hasAdminPermission(actor.role, "employees.restricted.read") ? await getEmployeeReviewData(employeeCode, approvalPage, historyPage) : null;
+  const { employee, profiles, departments, review, actorRole } = data;
   const writable = !employee.archivedAt && !employee.personalDataErasedAt;
   const base = { employeeId: employee.id, expectedVersion: employee.version };
   const profile = profiles.find(item => item.state === "DRAFT") ?? profiles[0];
   const name = profile?.publicName || employee.internalName || "Team profile";
-  const href = (key: string, value: number) => `/admin/employees/${encodeURIComponent(employee.employeeCode)}?${new URLSearchParams({ revisions: String(revisionPage), approvals: String(approvalPage), history: String(historyPage), [key]: String(value) })}`;
+  const href = (key: string, value: number) => `/admin/employees/${encodeURIComponent(employee.employeeCode)}?${new URLSearchParams({ revisions: String(revisionPage), approvals: String(approvalPage), [key]: String(value) })}`;
   return <section className={styles.page}>
     <header className={styles.panel}>
       <Link href="/admin/employees">Team Members</Link><p className={styles.eyebrow}>Website CMS / Team profile</p>
@@ -144,12 +143,12 @@ export default async function EmployeePage({ params, searchParams }: {
 
     <section id="identity" className={styles.panel} aria-labelledby="identity-heading"><p className={styles.eyebrow}>One permanent identity</p><h2 id="identity-heading">Identity &amp; QR</h2>
       <dl className={styles.facts}><dt>Employee ID</dt><dd>{employee.employeeCode}</dd><dt>Permanent profile URL</dt><dd><code>{employee.profileUrl}</code></dd></dl>
-      <EmployeeIdentityControls employeeCode={employee.employeeCode} profileUrl={employee.profileUrl} canExport={hasAdminPermission(actor.role, "employees.qr.export") && !employee.personalDataErasedAt} />
+      <EmployeeIdentityControls employeeCode={employee.employeeCode} profileUrl={employee.profileUrl} canExport={hasAdminPermission(actorRole, "employees.qr.export") && !employee.personalDataErasedAt} />
     </section>
 
     <section id="status" className={styles.panel} aria-labelledby="status-heading"><p className={styles.eyebrow}>Current or resigned</p><h2 id="status-heading">Member status</h2>
       <p><strong>{memberLabels[employee.employmentStatus]}</strong>. Changing status preserves the permanent ID and saved profile.</p>
-      {hasAdminPermission(actor.role, "employees.verification.status.manage") && !employee.personalDataErasedAt ? <details className={styles.advanced}><summary>Change member status</summary>
+      {hasAdminPermission(actorRole, "employees.verification.status.manage") && !employee.personalDataErasedAt ? <details className={styles.advanced}><summary>Change member status</summary>
         {writable && employee.employmentStatus === "INACTIVE" && <EmployeeActionForm {...base} operation="activate" label="Activate member profile" confirmation="Activate this member. Publication still requires consent and approval." />}
         {writable && employee.employmentStatus !== "RESIGNED" && <EmployeeActionForm {...base} operation="resign" label="Mark as resigned" confirmation="Confirm resignation and suspend existing publication settings." />}
         {(employee.employmentStatus !== "ACTIVE" || employee.archivedAt) && <EmployeeActionForm {...base} operation="rejoin" label="Rejoin team" confirmation="Restore this same member using only approved information with valid consent.">
@@ -161,13 +160,9 @@ export default async function EmployeePage({ params, searchParams }: {
       </details> : <p className={styles.muted}>Only a SUPER_ADMIN can change member status.</p>}
     </section>
 
-    {review && <details id="technical-history" className={`${styles.panel} ${styles.advanced}`}><summary>Advanced history</summary>
-      <p>Technical records are retained for review and security. They are not part of the public profile.</p><p>Record version: {employee.version}</p>
-      <h3>Saved profile versions</h3><ul>{profiles.map(item => <li key={item.id}>Version {item.revision}: {item.state}</li>)}</ul>
-      <h3>Approval records</h3><ul>{review.approvals.map(item => <li key={item.id}>Profile version {item.profileRevision}; use: {item.scope}; period: {item.employmentEpoch}; decision: {item.status}{item.selfApproved ? "; self-approval recorded" : ""}</li>)}</ul>
-      <h3>Protected history</h3><ol className={styles.history}>{review.history.map(event => <li key={event.id}><strong>{event.eventType}</strong> — {date(event.createdAt)}<br />Actor role: {event.actorRole}; record version: {event.recordVersion}{event.profileRevision !== null ? `; revision: ${event.profileRevision}` : ""}{event.isSelfApproval ? "; self-approval recorded" : ""}<br />Fields: {event.changedFields.join(", ") || "None"}</li>)}</ol>
-      {!review.history.length && <p>No history events on this page.</p>}
-      <nav className={styles.pagination} aria-label="History pages">{historyPage > 1 && <Link href={href("history", historyPage - 1)}>Newer events</Link>}{historyPage * 20 < review.historyCount && historyPage < 10000 && <Link href={href("history", historyPage + 1)}>Older events</Link>}</nav>
-    </details>}
+    {review && <section id="technical-history" className={styles.panel} aria-labelledby="history-heading">
+      <h2 id="history-heading">Advanced history</h2><p>Audit records are retained securely and loaded only when requested.</p>
+      <Link className={styles.button} href={"/admin/employees/" + encodeURIComponent(employee.employeeCode) + "/history"}>View protected history</Link>
+    </section>}
   </section>;
 }

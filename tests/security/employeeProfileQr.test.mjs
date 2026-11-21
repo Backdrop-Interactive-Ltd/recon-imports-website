@@ -86,7 +86,7 @@ test('unpublished, resigned, unknown and outage pages expose no private profile 
 test('Admin identity controls copy the production link and expose authorized PNG preview/download only', async () => {
   let copied = null;
   const load = createHarness({
-    react: { useState: () => ['', () => {}] },
+    react: { useState: () => ['', () => {}], useRef: value => ({ current: value }), useEffect: () => {} },
     [path.resolve('app/admin/(dashboard)/employees/page.module.css')]: { default: {} },
   }, { navigator: { clipboard: { writeText: async value => { copied = value; } } } });
   const { default: Controls } = await load('app/admin/(dashboard)/employees/EmployeeIdentityControls.tsx');
@@ -96,9 +96,9 @@ test('Admin identity controls copy the production link and expose authorized PNG
   await children.find(child => child.type === 'button').props.onClick();
   assert.equal(copied, expectedUrl);
   const html = renderToStaticMarkup(tree);
-  assert.match(html, /\/api\/admin\/employees\/RI-EMP-101\/qr\?download=1/);
-  assert.match(html, /download="RI-EMP-101-qr.png"/);
-  assert.match(html, /Permanent profile QR code for RI-EMP-101/);
+  assert.match(html, /Show QR Preview/);
+  assert.match(html, /Download QR Code/);
+  assert.ok(!html.includes("<img"), "No automatic QR resource on initial render");
   const restricted = renderToStaticMarkup(Controls({ ...props, canExport: false }));
   assert.ok(!restricted.includes('<img')); assert.ok(!restricted.includes('download='));
 });

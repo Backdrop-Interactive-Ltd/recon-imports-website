@@ -200,6 +200,37 @@ if (!process.execArgv.includes('--conditions=react-server')) {
       units: 'Node process CPU milliseconds; mock session/database; not production or edge CPU' }));
   });
 
+
+  test('consolidated initial page shares render identity and retains one fresh actor check without audit reads', async () => {
+    const f = initial(), oldHistory = tx.employeeAuditEvent;
+    tx.employeeAuditEvent = { findMany: async () => { throw Error('Initial render must not load history'); }, count: async () => { throw Error('Initial render must not count history'); } };
+    try {
+      await render(f, async () => {
+        await auth.requireAdminPagePermission('dashboard.access'); await auth.requireAdminPagePermission('employees.records.read');
+        const page = await queries.getEmployeePageData('RI-EMP-101'); assert.ok(page.review); assert.equal(page.actorRole, 'SUPER_ADMIN');
+      });
+    } finally { tx.employeeAuditEvent = oldHistory; }
+    assert.equal(f.counts.session, 1); assert.equal(f.counts.account, 1); assert.equal(f.counts.transactions, 1); assert.equal(f.counts.lockedActor, 1);
+  });
+
+  test('synthetic editor loader benchmark compares previous two transactions with the consolidated initial read', async () => {
+    const operation = optimized => async () => {
+      await auth.requireAdminPagePermission('dashboard.access'); await auth.requireAdminPagePermission('employees.records.read');
+      if (optimized) await queries.getEmployeePageData('RI-EMP-101');
+      else { await queries.getEmployeeEditorData('RI-EMP-101'); await queries.getEmployeeReviewData('RI-EMP-101'); }
+    };
+    for (let i = 0; i < 15; i++) for (const optimized of [false, true]) await render(initial(), operation(optimized));
+    const samples = { before: [], after: [] }, requests = 200;
+    for (let round = 0; round < 3; round++) for (const optimized of round % 2 ? [true, false] : [false, true]) {
+      const f = initial(), start = process.cpuUsage();
+      for (let i = 0; i < requests; i++) await render(f, operation(optimized));
+      const cpu = process.cpuUsage(start);
+      assert.equal(f.counts.transactions, requests * (optimized ? 1 : 2)); assert.equal(f.counts.lockedActor, requests * (optimized ? 1 : 2));
+      samples[optimized ? 'after' : 'before'].push((cpu.user + cpu.system) / 1000);
+    }
+    console.log(JSON.stringify({ benchmark: 'editor/review loader CPU; real RSC; mocked database; Node CPU milliseconds, not Cloudflare', requestsPerSample: requests, samples }));
+  });
+
   test('outside a React render the read helpers do not retain values', async () => {
     const f = initial();
     await scope.run(f, async () => {

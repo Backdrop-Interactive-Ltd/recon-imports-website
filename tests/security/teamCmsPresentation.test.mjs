@@ -18,8 +18,7 @@ async function rendered({ role = 'SUPER_ADMIN', period = 3, includeSnapshot = tr
     'next/navigation': { notFound: () => { throw Error('Not found'); } },
     [path.resolve('lib/adminAuthorization.ts')]: { requireAdminPagePermission: async permission => { assert.equal(permission, 'employees.records.read'); if (role === 'EDITOR') throw Error('Forbidden'); return { role }; } },
     [path.resolve('lib/employees/adminQueries.ts')]: {
-      getEmployeeEditorData: async () => ({ employee, profiles: includeSnapshot ? [draft, submitted] : [draft], profileCount: 2, hasDraft: true, departments: [] }),
-      getEmployeeReviewData: async () => { reviewReads++; return { approvals: [{ ...approval, employmentEpoch: period }], approvalCount: 1, history: [], historyCount: 0, publicationEpoch: 3 }; },
+      getEmployeePageData: async () => { if (role === "SUPER_ADMIN") reviewReads++; return { employee, profiles: includeSnapshot ? [draft, submitted] : [draft], profileCount: 2, hasDraft: true, departments: [], actorRole: role, review: role === "SUPER_ADMIN" ? { approvals: [{ ...approval, employmentEpoch: period }], approvalCount: 1, publicationEpoch: 3 } : null }; },
     },
     [path.resolve(`${directory}/EmployeeForms.tsx`)]: { EmployeePhotoField: () => React.createElement("input", { type: "file", name: "employeePhoto" }), EmployeeActionForm: ({ operation, children }) => React.createElement('form', { 'data-op': operation }, children) },
     [path.resolve(`${directory}/EmployeeIdentityControls.tsx`)]: { default: () => React.createElement("div", { "data-identity-controls": true }) },
@@ -33,10 +32,9 @@ async function rendered({ role = 'SUPER_ADMIN', period = 3, includeSnapshot = tr
 test('Team CMS presents the requested workflow while keeping technical history collapsed and future features unavailable', async () => {
   const { html } = await rendered();
   for (const text of ['Team Members', 'Add/Edit Profile', 'Save Draft', 'Review/Publish', 'Identity/QR', 'Status', 'Synthetic team member', 'Designation', 'Experience']) assert.ok(html.includes(text), text);
-  assert.match(html, /<details id="technical-history"[^>]*>/);
-  assert.ok(!/<details id="technical-history"[^>]*\bopen/.test(html));
-  assert.ok(html.indexOf('Record version:') > html.indexOf('id="technical-history"'));
-  assert.ok(html.includes('Protected history'));
+  assert.ok(html.includes('/admin/employees/RI-EMP-101/history'));
+  assert.ok(html.includes('View protected history'));
+  assert.ok(!html.includes('Record version:'));
   assert.ok(html.includes("data-identity-controls"));
   assert.ok(html.includes('name="employeePhoto"'));
   assert.ok(!html.includes('href="https://www.reconimports.com/team/'));
