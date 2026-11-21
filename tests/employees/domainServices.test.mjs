@@ -4,7 +4,7 @@ import {randomUUID} from 'node:crypto';
 import path from 'node:path';
 import {fixture,rejection} from './fixture.mjs';
 
-const mutationNames=['createEmployee','createDepartment','updateDepartment','createDraftRevision','saveEmployeeDraft','submitEmployeeRevision','requestPublicationApproval','decidePublicationApproval','publishEmployeeProfile','unpublishEmployeeProfile','withdrawPublicationApproval','withdrawEmployeeConsent','changeEmployeeStatus','resignEmployee','rejoinEmployee','issueVerificationIdentity','retireVerificationIdentity','archiveEmployee','restoreEmployee','eraseEmployeePersonalData'];
+const mutationNames=['checkEmployeePhotoDraft','createEmployee','createDepartment','updateDepartment','createDraftRevision','saveEmployeeDraft','submitEmployeeRevision','requestPublicationApproval','decidePublicationApproval','publishEmployeeProfile','unpublishEmployeeProfile','withdrawPublicationApproval','withdrawEmployeeConsent','changeEmployeeStatus','resignEmployee','rejoinEmployee','issueVerificationIdentity','retireVerificationIdentity','archiveEmployee','restoreEmployee','eraseEmployeePersonalData'];
 test('every exported mutation denies anonymous, deleted, disabled and EDITOR actors before input processing',async()=>{
  const f=await fixture();try{
   assert.deepEqual(Object.keys(f.services).filter(k=>k!=='EmployeeDomainError').sort(),mutationNames.slice().sort());
@@ -60,7 +60,7 @@ test('department changes preserve frozen snapshots; draft, submit and rejection 
   await rejection(f.call('decidePublicationApproval',e.id,{approvalId:requested.id,decision:'APPROVED'}),'INELIGIBLE');
   const draft=await f.call('createDraftRevision',e.id,{fields:{}});
   await rejection(f.call('submitEmployeeRevision',e.id,{revision:draft.revision}),'INELIGIBLE');
-  await rejection(f.call('requestPublicationApproval',e.id,{revision:draft.revision,scope:'DIRECTORY',consentReference:'synthetic',consentPolicyVersion:'v1',consentRecordedAt:new Date()}),'INELIGIBLE');
+  await rejection(f.call('requestPublicationApproval',e.id,{revision:draft.revision,scope:'DIRECTORY',consentReference:'synthetic',consentPolicyVersion:'v1',consentRecordedAt:new Date()}),'CONSENT_REVISION_REQUIRED');
  }finally{await f.close();}
 });
 test('controlled erasure redacts personal data and evidence while retaining immutable codes, keys and safe audit events',async()=>{

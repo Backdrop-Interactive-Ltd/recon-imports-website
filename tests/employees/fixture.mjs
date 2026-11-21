@@ -7,7 +7,7 @@ import { createHarness } from '../security/moduleHarness.mjs';
 const require=createRequire(import.meta.url);
 const { PrismaClient, Prisma }=require('../../lib/generated/prisma/client.ts');
 
-export async function fixture(overrides = {}) {
+export async function fixture(overrides = {}, globals = {}) {
   const url = new URL(process.env.DATABASE_URL);
   const runtimeRole=new URL(process.env.EID02B_RUNTIME_URL).username;
   assert.ok(['eid02b_runtime','recon_runtime'].includes(runtimeRole));
@@ -44,7 +44,7 @@ export async function fixture(overrides = {}) {
     [path.resolve('lib/generated/prisma/client.ts')]:{Prisma},
     'next/navigation':{redirect:()=>{throw Error('Unexpected redirect');}},
     ...overrides,
-  });
+  }, globals);
   const services=await load('lib/employees/services.ts');
   const queries=await load('lib/employees/publicQueries.ts');
   const version=async employeeId=>(await prisma.employee.findUniqueOrThrow({where:{id:employeeId}})).version;

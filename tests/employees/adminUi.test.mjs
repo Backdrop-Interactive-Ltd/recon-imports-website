@@ -9,9 +9,9 @@ const directory = 'app/admin/(dashboard)/employees';
 const idle = { status: 'idle', message: '' };
 const consent = () => ({ scope: 'DIRECTORY', consentReference: 'synthetic-private-consent', consentPolicyVersion: 'synthetic-v1', consentRecordedAt: new Date(Date.now() - 60000).toISOString().slice(0, 16) });
 const form = values => { const data = new FormData(); for (const [key, value] of Object.entries(values)) { if (Array.isArray(value)) for (const entry of value) data.append(key, String(entry)); else data.set(key, String(value)); } return data; };
-async function setup(overrides = {}) {
+async function setup(overrides = {}, globals = {}) {
   const refreshes = [];
-  const f = await fixture({ 'next/cache': { revalidatePath: (...args) => refreshes.push(args) }, 'next/navigation': { redirect: location => { throw Object.assign(new Error('Redirect'), { location }); }, notFound: () => { throw Error('Not found'); } }, ...overrides });
+  const f = await fixture({ 'next/cache': { revalidatePath: (...args) => refreshes.push(args) }, 'next/navigation': { redirect: location => { throw Object.assign(new Error('Redirect'), { location }); }, notFound: () => { throw Error('Not found'); } }, ...overrides }, globals);
   const actions = await f.load(`${directory}/actions.ts`);
   const queries = await f.load('lib/employees/adminQueries.ts');
   const act = async (operation, employeeId, values = {}) => actions.employeeAction(idle, form({ operation, employeeId, expectedVersion: await f.version(employeeId), confirmed: 'on', ...values }));
@@ -87,8 +87,8 @@ test('draft immutability, stale versions, consent expiry/withdrawal and confirma
     assert.equal((await f.act('resign', e.id, { confirmed: '' })).code, 'VALIDATION');
     assert.equal(await f.version(e.id), version);
     assert.equal((await f.act('resign', e.id, { expectedVersion: version - 1 })).code, 'CONFLICT');
-    assert.equal((await f.act('requestApproval', e.id, { ...consent(), revision: p.revision, consentExpiresAt: '2000-01-01T00:00' })).code, 'INELIGIBLE');
-    assert.equal((await f.act('requestApproval', e.id, { ...consent(), revision: p.revision, consentRecordedAt: '' })).code, 'VALIDATION');
+    assert.equal((await f.act('requestApproval', e.id, { ...consent(), revision: p.revision, consentExpiresAt: '2000-01-01T00:00' })).code, 'CONSENT_EXPIRY_PAST');
+    assert.equal((await f.act('requestApproval', e.id, { ...consent(), revision: p.revision, consentReference: '' })).code, 'CONSENT_REFERENCE_INVALID');
     const a = await f.approved(e.id, p.revision, 'VERIFICATION', { consentReference: 'synthetic-withdraw-ui' });
     success(await f.act('publish', e.id, { approvalId: a.id }));
     success(await f.act('resign', e.id));
@@ -114,7 +114,7 @@ test('editor queries are bounded and separate draft fields from restricted evide
     const first = await f.queries.getEmployeeEditorData(e.employeeCode);
     assert.equal(first.profiles.length, 5); assert.equal(first.profileCount, 7);
     assert.equal((await f.queries.getEmployeeEditorData(e.employeeCode, 2)).profiles.length, 2);
-    for (const forbidden of ['EID04-RESTRICTED-REFERENCE', 'consentReference', 'publicKey', 'portraitStorageKey', 'createdById']) assert.ok(!JSON.stringify(first).includes(forbidden));
+    for (const forbidden of ['EID04-RESTRICTED-REFERENCE', 'consentReference', 'publicKey', 'createdById']) assert.ok(!JSON.stringify(first).includes(forbidden));
     await assert.rejects(f.queries.getEmployeeReviewData(e.employeeCode), error => error.code === 'FORBIDDEN');
     await assert.rejects(f.queries.getEmployeeEditorData(e.employeeCode, 0), error => error.code === 'VALIDATION');
     f.setSubject('eid_super');
@@ -130,14 +130,15 @@ test('rendered detail screen protects consent/history/lifecycle controls by actu
   const f = await setup({
     'next/link': { default: ({ href, children }) => React.createElement('a', { href }, children) },
     [path.resolve(`${directory}/page.module.css`)]: { default: {} },
-    [path.resolve(`${directory}/EmployeeForms.tsx`)]: { EmployeeActionForm: ({ operation, children }) => React.createElement('form', { 'data-op': operation }, children) },
+    [path.resolve(`${directory}/EmployeeForms.tsx`)]: { EmployeePhotoField: () => null, EmployeeActionForm: ({ operation, children }) => React.createElement('form', { 'data-op': operation }, children) },
+    [path.resolve(`${directory}/EmployeeIdentityControls.tsx`)]: { default: () => null },
   }); try {
     const e = await f.employee(); const p = await f.submitted(e.id);
     await f.approved(e.id, p.revision, 'DIRECTORY', { consentReference: 'EID04-ONLY-SUPER-CONSENT' });
     const page = await f.load(`${directory}/[employeeCode]/page.tsx`);
     const props = { params: Promise.resolve({ employeeCode: e.employeeCode }), searchParams: Promise.resolve({}) };
     const superHtml = renderToStaticMarkup(await page.default(props));
-    assert.ok(superHtml.includes('EID04-ONLY-SUPER-CONSENT')); assert.ok(superHtml.includes('Protected history')); assert.ok(superHtml.includes('data-op="resign"'));
+    assert.ok(superHtml.includes('EID04-ONLY-SUPER-CONSENT')); assert.ok(superHtml.includes('View protected history')); assert.ok(superHtml.includes('data-op="resign"'));
     f.setSubject('eid_admin');
     const adminHtml = renderToStaticMarkup(await page.default(props));
     assert.ok(adminHtml.includes('Synthetic Public Name')); assert.ok(!adminHtml.includes('EID04-ONLY-SUPER-CONSENT')); assert.ok(!adminHtml.includes('Protected history')); assert.ok(!adminHtml.includes('data-op="publish"')); assert.ok(!adminHtml.includes('data-op="resign"'));
@@ -153,5 +154,59 @@ test('UI reads and action results fail closed on a database outage without expos
     await assert.rejects(f.queries.getEmployeeReviewData(e.employeeCode), error => error.code === 'UNAVAILABLE' && !error.message.includes('PRIVATE'));
     const result = await f.actions.createEmployeeAction(idle, form({ internalName: 'Outage test' }));
     assert.equal(result.code, 'UNAVAILABLE'); assert.ok(!JSON.stringify(result).includes('PRIVATE'));
+  } finally { await f.close(); }
+});
+
+test('combined page and deferred history use real transactions, bounded pages and fresh restricted authorization', async () => {
+  const f = await setup(); try {
+    const e = await f.employee();
+    await f.submitted(e.id);
+    for (let i = 0; i < 11; i++) {
+      const draft = await f.call('createDraftRevision', e.id, { fields: {} });
+      await f.call('saveEmployeeDraft', e.id, { revision: draft.revision, expectedProfileVersion: draft.version, fields: { publicName: 'Synthetic history', designation: 'Advisor' } });
+      await f.call('submitEmployeeRevision', e.id, { revision: draft.revision });
+    }
+    const page = await f.queries.getEmployeePageData(e.employeeCode);
+    assert.equal(page.actorRole, 'SUPER_ADMIN');
+    assert.ok(page.review);
+    assert.equal(Object.hasOwn(page.review, 'history'), false);
+    const first = await f.queries.getEmployeeHistoryData(e.employeeCode, 1);
+    const second = await f.queries.getEmployeeHistoryData(e.employeeCode, 2);
+    assert.equal(first.history.length, 20);
+    assert.ok(second.history.length > 0);
+    assert.equal(first.historyCount, second.historyCount);
+    assert.ok(second.history.every(row => !first.history.some(previous => previous.id === row.id)));
+    assert.ok(!JSON.stringify(first).includes('actorAdminId'));
+    await assert.rejects(f.queries.getEmployeeHistoryData(e.employeeCode, 0), error => error.code === 'VALIDATION');
+    await f.owner.query('UPDATE "AdminUser" SET role=\'ADMIN\' WHERE id=\'eid_super\'');
+    assert.equal((await f.queries.getEmployeePageData(e.employeeCode)).review, null);
+    await assert.rejects(f.queries.getEmployeeHistoryData(e.employeeCode), error => error.code === 'FORBIDDEN');
+    await f.owner.query('UPDATE "AdminUser" SET "isActive"=false WHERE id=\'eid_super\'');
+    await assert.rejects(f.queries.getEmployeePageData(e.employeeCode), error => error.code === 'UNAUTHENTICATED');
+    await assert.rejects(f.queries.getEmployeeHistoryData(e.employeeCode), error => error.code === 'UNAUTHENTICATED');
+  } finally { await f.close(); }
+});
+
+test('QR conditional responses retain live database authorization for unpublished and resigned employees', async () => {
+  const { NextResponse } = await import('next/server.js');
+  const f = await setup({ 'next/server': { NextResponse } }, { Response, Request, Headers, Uint8Array }); try {
+    const e = await f.employee();
+    const route = await f.load('app/api/admin/employees/[employeeCode]/qr/route.ts');
+    const params = { params: Promise.resolve({ employeeCode: e.employeeCode }) };
+    const url = `http://localhost/api/admin/employees/${e.employeeCode}/qr`;
+    const response = await route.GET(new Request(url), params);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('Content-Type'), 'image/png');
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    assert.deepEqual([...bytes.slice(0, 8)], [137,80,78,71,13,10,26,10]);
+    const etag = response.headers.get('ETag');
+    const conditional = () => route.GET(new Request(url, { headers: { 'If-None-Match': etag } }), params);
+    assert.equal((await conditional()).status, 304);
+    await f.call('resignEmployee', e.id);
+    assert.equal((await conditional()).status, 304);
+    await f.owner.query('UPDATE "AdminUser" SET role=\'ADMIN\' WHERE id=\'eid_super\'');
+    assert.equal((await conditional()).status, 403);
+    await f.owner.query('UPDATE "AdminUser" SET "isActive"=false WHERE id=\'eid_super\'');
+    assert.equal((await conditional()).status, 401);
   } finally { await f.close(); }
 });

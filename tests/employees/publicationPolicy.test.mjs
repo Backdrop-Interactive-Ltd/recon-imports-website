@@ -55,6 +55,6 @@ test('self approval is explicit, invalid transitions and unverified portraits ar
   assert.equal(a.selfApproved,true);
   assert.equal(await f.prisma.employeeAuditEvent.count({where:{employeeId:e.id,eventType:'REVISION_APPROVED',isSelfApproval:true}}),1);
   await rejection(f.call('decidePublicationApproval',e.id,{approvalId:a.id,decision:'REJECTED'}),'INELIGIBLE');
-  await rejection(f.call('requestPublicationApproval',e.id,{revision:p.revision,scope:'DIRECTORY',consentReference:'synthetic',consentPolicyVersion:'v1',consentRecordedAt:new Date(),publishPortrait:true}),'PORTRAIT_STORAGE_PENDING');
+  await rejection(f.call('requestPublicationApproval',e.id,{revision:p.revision,scope:'DIRECTORY',consentReference:'synthetic',consentPolicyVersion:'v1',consentRecordedAt:new Date(),publishPortrait:true}),'CONSENT_PORTRAIT_MISSING');
  }finally{await f.close();}
 });
