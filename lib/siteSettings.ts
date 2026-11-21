@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "./prisma";
 import { getLogoImageUrl, getOpenGraphImageUrl, getOptimizedCloudinaryImageUrl } from "./cloudinaryImages";
 import {
@@ -69,13 +70,19 @@ export async function getAdminSiteSettings(): Promise<PublicSiteSettings> {
   catch { throw new Error("Saved settings could not be loaded. Check the database connection and reload. No settings were changed."); }
 }
 
-export async function getSiteSettings(): Promise<PublicSiteSettings> {
+// Public layout/metadata/page reads share one snapshot within a React render only.
+// getAdminSiteSettings remains uncached, including after settings mutations.
+const getRenderSiteSettings = cache(async (): Promise<PublicSiteSettings> => {
   try {
     return await readSiteSettings();
   } catch (error) {
     console.error("Failed to load site settings from database.", error);
     return fallbackSiteSettings;
   }
+});
+
+export async function getSiteSettings(): Promise<PublicSiteSettings> {
+  return getRenderSiteSettings();
 }
 
 export function getPhoneHref(phoneNumber: string) {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { prisma } from "../prisma";
-import { requireAdminPermission, AdminAuthorizationError } from "../adminAuthorization";
+import { requireAdminPermission, requireAdminRenderPermission, AdminAuthorizationError } from "../adminAuthorization";
 import { hasAdminPermission, type AdminPermission } from "../adminPermissions";
 import { EmployeeDomainError } from "./services";
 import { isEmployeeCode } from "./identifiers";
@@ -12,8 +12,8 @@ const select = { id: true, employeeCode: true, internalName: true, employmentSta
 function present(employee: Prisma.EmployeeGetPayload<{ select: typeof select }>) {
   return { ...employee, employmentStatus: getEmployeeBusinessStatus(employee.employmentStatus), profilePath: getEmployeeProfilePath(employee.employeeCode), profileUrl: getEmployeeProfileUrl(employee.employeeCode) };
 }
-async function read<T>(query: (tx: Prisma.TransactionClient) => Promise<T>, permission: AdminPermission = "employees.records.read") {
-  const actor = await requireAdminPermission(permission);
+async function read<T>(query: (tx: Prisma.TransactionClient) => Promise<T>, permission: AdminPermission = "employees.records.read", authorize = requireAdminPermission) {
+  const actor = await authorize(permission);
   try {
     return await prisma.$transaction(async tx => {
       await tx.$executeRaw`SET LOCAL TIME ZONE 'UTC'`;
@@ -71,7 +71,7 @@ export async function getEmployeeEditorData(employeeCode: string, page = 1) {
       tx.department.findMany({ where: { isActive: true }, select: { id: true, name: true }, orderBy: [{ displayOrder: "asc" }, { id: "asc" }], take: 100 }),
     ]);
     return { employee: present(employee), profiles, profileCount, hasDraft: draftCount > 0, departments };
-  });
+  }, "employees.records.read", requireAdminRenderPermission);
 }
 
 export async function getEmployeeDepartmentOptions() {
@@ -95,5 +95,5 @@ export async function getEmployeeReviewData(employeeCode: string, approvalPage =
       tx.employeeAuditEvent.count({ where: { employeeId: employee.id } }),
     ]);
     return { approvals, approvalCount, history, historyCount, publicationEpoch: employee.publicationEpoch };
-  }, "employees.restricted.read");
+  }, "employees.restricted.read", requireAdminRenderPermission);
 }

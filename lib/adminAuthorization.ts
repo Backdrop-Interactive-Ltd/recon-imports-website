@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "./auth";
 import { prisma } from "./prisma";
@@ -31,16 +32,28 @@ export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   }
 }
 
-export async function requireAdminPermission(permission: AdminPermission): Promise<CurrentAdmin> {
-  const admin = await getCurrentAdmin();
+function checkPermission(admin: CurrentAdmin | null, permission: AdminPermission): CurrentAdmin {
   if (!admin) throw new AdminAuthorizationError("UNAUTHENTICATED");
   if (!hasAdminPermission(admin.role, permission)) throw new AdminAuthorizationError("FORBIDDEN");
   return admin;
 }
 
+// React owns this cache for one Server Component render, never across requests.
+// Keep getCurrentAdmin/requireAdminPermission uncached for actions and API handlers.
+const getRenderAdmin = cache(getCurrentAdmin);
+
+export async function requireAdminPermission(permission: AdminPermission): Promise<CurrentAdmin> {
+  return checkPermission(await getCurrentAdmin(), permission);
+}
+
+// Read-only render callers only. Transactional readers still recheck the live actor.
+export async function requireAdminRenderPermission(permission: AdminPermission): Promise<CurrentAdmin> {
+  return checkPermission(await getRenderAdmin(), permission);
+}
+
 export async function requireAdminPagePermission(permission: AdminPermission): Promise<CurrentAdmin> {
   try {
-    return await requireAdminPermission(permission);
+    return await requireAdminRenderPermission(permission);
   } catch (error) {
     if (!(error instanceof AdminAuthorizationError)) throw error;
     if (error.code === "FORBIDDEN") redirect("/admin");
